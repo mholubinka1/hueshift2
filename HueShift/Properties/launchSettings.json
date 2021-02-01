@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "HueShift": {
-      "commandName": "Project",
-      "commandLineArgs": "--configuration-file ..\\..\\..\\hueShift-conf-lastrun.json"
-    }
-  }
-}

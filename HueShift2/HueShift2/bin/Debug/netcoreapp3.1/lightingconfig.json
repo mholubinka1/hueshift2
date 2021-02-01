@@ -1,0 +1,31 @@
+{
+  "HueShiftOptions": {
+    "Mode": "Auto",
+    "PollingFrequency": 10,
+    "StandardTransitionTime": 5,
+    "TransitionTimeAtSunriseAndSunset": 120,
+    "AutoTransitionTimeLimits": {
+      "SunriseLower": "06:00:00",
+      "SunriseUpper": "08:30:00",
+      "SunsetLower": "18:00:00",
+      "SunsetUpper": "20:30:00"
+    },
+    "LightsToExclude": [],
+    "BridgeProperties": {
+      "IpAddress": "192.168.1.116",
+      "ApiKey": "JczcKHSLyUquDt3Bck9zQjAdmkQTUjvr6l5BSaCE"
+    },
+    "Geolocation": {
+      "Latitude": 51.5122184753418,
+      "Longitude": 0.0,
+      "TimeZone": "Europe/London"
+    },
+    "ColourTemperature": {
+      "Day": 250,
+      "Night": 454
+    }
+  },
+  "CustomScheduleOptions": {
+    "Programme": []
+  }
+}
