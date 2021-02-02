@@ -22,6 +22,6 @@ ENV UDPPORT 6454
 EXPOSE ${UDPPORT}
 EXPOSE ${UDPPORT}/udp
 
-COPY --from=build-env /app/HueShift2/out ./
+COPY --from=build-env /app/out ./
 
 ENTRYPOINT ["dotnet", "HueShift2.dll", "--configuration-file", "/config/hueshift2-config.json"]
