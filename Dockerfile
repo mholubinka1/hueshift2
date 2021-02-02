@@ -3,6 +3,7 @@ WORKDIR /app
 
 COPY HueShift2/HueShift2/*.csproj ./HueShift2
 
+WORKDIR /app/HueShift
 RUN dotnet restore
 
 COPY HueShift2/HueShift2/. ./HueShift2
