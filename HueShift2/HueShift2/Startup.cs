@@ -25,7 +25,7 @@ namespace HueShift2
 
         private static async Task GenerateStartupConfigurationFile(IConfiguration config, SerilogTypedLogger<LightingConfigFileGenerator> logger)
         {
-            var lightingConfigFilePath = config["LightingConfigFilePath"];
+            var lightingConfigFilePath = config["config-file"];
             Log.Warning($"{lightingConfigFilePath} does not exist.");
             await new LightingConfigFileGenerator(logger, config).Generate(lightingConfigFilePath);
             Log.Information($"{lightingConfigFilePath} successfully generated.");
@@ -39,7 +39,7 @@ namespace HueShift2
                 .ReadFrom.Configuration(startupConfig)
                 .CreateLogger();
 
-            var lightingConfigFilePath = startupConfig["LightingConfigFilePath"];
+            var lightingConfigFilePath = startupConfig["config-file"];
             if (!File.Exists(lightingConfigFilePath))
             {
                 await GenerateStartupConfigurationFile(startupConfig, new SerilogTypedLogger<LightingConfigFileGenerator>(Log.Logger));

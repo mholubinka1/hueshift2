@@ -3708,11 +3708,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mehol\\git\\hueshift-2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
+      "projectUniqueName": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
       "projectName": "HueShift2Tests",
-      "projectPath": "C:\\Users\\mehol\\git\\hueshift-2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
+      "projectPath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
       "packagesPath": "C:\\Users\\mehol\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mehol\\git\\hueshift-2\\HueShift2\\HueShift2Tests\\obj\\",
+      "outputPath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\mehol\\AppData\\Roaming\\NuGet\\NuGet.Config",

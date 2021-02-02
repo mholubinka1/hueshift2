@@ -23,7 +23,7 @@ namespace HueShift2
         private ILocalHueClient client;
 
         private List<Light> lightsOnNetwork;
-        public IDictionary<string, HueShiftLight> hueShiftLights;
+        private IDictionary<string, HueShiftLight> hueShiftLights;
 
         public LightManager(ILogger<LightManager> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, IHueClientManager clientManager, ILocalHueClient client)
         {
@@ -46,16 +46,17 @@ namespace HueShift2
             }
             else
             {
-                logger.LogInformation($"{lightsOnNetwork.Count - discoveredLights.Count} lights have disappeared from the network.");
+                logger.LogInformation($"{lightsOnNetwork.Count - discoveredLights.Count} lights are no longer connected to the network.");
+                //log names and ids of removed lights
             }
             return discoveredLights;
         }
 
         private async Task RefreshLights(DateTime currentTime)
         {
+            logger.LogInformation("Refreshing lights...");
             await clientManager.AssertConnected();
-            var discoveredLights = await DiscoverLights();
-            lightsOnNetwork = discoveredLights;
+            this.lightsOnNetwork = await DiscoverLights();
             this.hueShiftLights = hueShiftLights.Trim(lightsOnNetwork);
             var excludedLights = appOptionsDelegate.CurrentValue.LightsToExclude;
             var duration = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
@@ -65,12 +66,16 @@ namespace HueShift2
                 if (!this.hueShiftLights.ContainsKey(light.Id))
                 {
                     var hueShiftLight = new HueShiftLight(light);
-                    if (isExcluded) hueShiftLight.Exclude();
+                    if (isExcluded)
+                    {
+                        hueShiftLight.Exclude();
+                    }
                     this.hueShiftLights.Add(hueShiftLight.Id, hueShiftLight);
                 }
                 else
                 {
                     var expectedLight = this.hueShiftLights[light.Id];
+                    //log end of transition and change of controlstate
                     expectedLight.Refresh(light, currentTime);
                     if (isExcluded)
                     {
@@ -79,6 +84,7 @@ namespace HueShift2
                     await Sync(light, expectedLight, currentTime, duration);
                 }
             }
+            logger.LogInformation("Lights refreshed.");
             return;
         }
 

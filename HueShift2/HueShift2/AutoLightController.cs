@@ -40,10 +40,10 @@ namespace HueShift2
 
         private async Task PerformTransition(DateTime currentTime, DateTime? lastRunTime)
         {
-            logger.LogInformation("");
             var transitionDuration = transitionProvider.GetTransitionDuration(currentTime, lastRunTime);
             var resumeControl = transitionProvider.IsReset(currentTime, lastRunTime);
             var targetColourTemperature = transitionProvider.TargetLightState(currentTime).Colour.ColourTemperature;
+            logger.LogInformation("Performing transition...");
             var command = new LightCommand
             {
                 ColorTemperature = targetColourTemperature,
@@ -58,7 +58,7 @@ namespace HueShift2
             var currentTime = DateTime.Now;
             if (!transitionProvider.ShouldPerformTransition(currentTime, lastRunTime))
             {
-                logger.LogInformation("Refreshing...");
+                logger.LogDebug("No transition to perform.");
                 await lightManager.ExecuteRefresh(currentTime);
                 return currentTime;
             }

@@ -1,12 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "9cgBKSDAReAJXnxD7CrqLFpZTkwSs5BtuXU98gZALuOHuGyVuA3HDWXqFJqY7q5Fx4BL3VsetJ84faePowHzww==",
+  "dgSpecHash": "Hd+NUwhs++dHTXj3wJ35I5OI6n0oloOX7FkjDGONLmwMrAH662E0ylZDeAYTw8I0TK81M/O0ep3W0fZLA5Z9VA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\mehol\\git\\hueshift-2\\HueShift2\\HueShift2\\HueShift2.csproj",
+  "projectFilePath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2\\HueShift2.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mehol\\.nuget\\packages\\angle\\3.0.4\\angle.3.0.4.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\geotimezone\\4.1.0\\geotimezone.4.1.0.nupkg.sha512",
-    "C:\\Users\\mehol\\.nuget\\packages\\mcmaster.extensions.commandlineutils\\3.1.0\\mcmaster.extensions.commandlineutils.3.1.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\microsoft.extensions.configuration\\5.0.0\\microsoft.extensions.configuration.5.0.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\5.0.0\\microsoft.extensions.configuration.abstractions.5.0.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\microsoft.extensions.configuration.binder\\5.0.0\\microsoft.extensions.configuration.binder.5.0.0.nupkg.sha512",
@@ -44,7 +43,6 @@
     "C:\\Users\\mehol\\.nuget\\packages\\serilog.sinks.console\\4.0.0-dev-00839\\serilog.sinks.console.4.0.0-dev-00839.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\serilog.sinks.file\\5.0.0-dev-00909\\serilog.sinks.file.5.0.0-dev-00909.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\solarcalculator\\3.0.6\\solarcalculator.3.0.6.nupkg.sha512",
-    "C:\\Users\\mehol\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\system.diagnostics.diagnosticsource\\5.0.0\\system.diagnostics.diagnosticsource.5.0.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\system.diagnostics.eventlog\\5.0.0\\system.diagnostics.eventlog.5.0.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\system.security.accesscontrol\\5.0.0\\system.security.accesscontrol.5.0.0.nupkg.sha512",

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "dLx/HnQ20pPrfpaO4hnbkAP0i/JL9iyya0l0HuKwhUYbK7Td8t7nyjX2SMZWPxJnVxyDBhxsmfjteEBSAplXaQ==",
+  "dgSpecHash": "SDcbltXGzMdim/KZhZd2mso72+yLo2nR0wSo+JM/NQ09ji3hrdpwmr1PNMIr9keVDsFBm+kIZxdZJCiefB3RDA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\mehol\\git\\hueshift-2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
+  "projectFilePath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mehol\\.nuget\\packages\\microsoft.codecoverage\\16.9.0-preview-20210106-01\\microsoft.codecoverage.16.9.0-preview-20210106-01.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\microsoft.csharp\\4.0.1\\microsoft.csharp.4.0.1.nupkg.sha512",

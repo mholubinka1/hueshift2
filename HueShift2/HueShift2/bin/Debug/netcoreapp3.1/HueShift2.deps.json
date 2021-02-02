@@ -9,7 +9,6 @@
       "HueShift2/1.0.0": {
         "dependencies": {
           "GeoTimeZone": "4.1.0",
-          "McMaster.Extensions.CommandLineUtils": "3.1.0",
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.Configuration.Binder": "5.0.0",
           "Microsoft.Extensions.Configuration.Json": "5.0.0",
@@ -44,17 +43,6 @@
           "lib/netstandard2.1/GeoTimeZone.dll": {
             "assemblyVersion": "4.1.0.0",
             "fileVersion": "4.1.0.0"
-          }
-        }
-      },
-      "McMaster.Extensions.CommandLineUtils/3.1.0": {
-        "dependencies": {
-          "System.ComponentModel.Annotations": "5.0.0"
-        },
-        "runtime": {
-          "lib/netstandard2.0/McMaster.Extensions.CommandLineUtils.dll": {
-            "assemblyVersion": "3.1.0.0",
-            "fileVersion": "3.1.0.0"
           }
         }
       },
@@ -517,14 +505,6 @@
           }
         }
       },
-      "System.ComponentModel.Annotations/5.0.0": {
-        "runtime": {
-          "lib/netstandard2.1/System.ComponentModel.Annotations.dll": {
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.0.20.51904"
-          }
-        }
-      },
       "System.Diagnostics.DiagnosticSource/5.0.0": {
         "runtime": {
           "lib/netstandard1.3/System.Diagnostics.DiagnosticSource.dll": {
@@ -633,13 +613,6 @@
       "sha512": "sha512-mLx7Cvqq2A1xodBmBSrRRP+zkcWT0pcMV3zYhmj7KbBroIj2SnVAmbaFA8v0I6CoMz1qw4+UZ7MCaGiZ085teA==",
       "path": "geotimezone/4.1.0",
       "hashPath": "geotimezone.4.1.0.nupkg.sha512"
-    },
-    "McMaster.Extensions.CommandLineUtils/3.1.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-DNtyIXVFKpdoHIkd9+vqaIsari6ThQHGAvy4lwOIzAgSGHSJBWaG1K62MHGoyG4uyntpONlrBP9joKGRiJprkQ==",
-      "path": "mcmaster.extensions.commandlineutils/3.1.0",
-      "hashPath": "mcmaster.extensions.commandlineutils.3.1.0.nupkg.sha512"
     },
     "Microsoft.Extensions.Configuration/5.0.0": {
       "type": "package",
@@ -899,13 +872,6 @@
       "sha512": "sha512-ZL2yiawGB0sSJY1jgcs6gimz9M8/M+J2nlqYZl4SY5RqIGHpFrO2YzSA4nZN645jrqKsNG/OpYawwQCj2v/9Gg==",
       "path": "solarcalculator/3.0.6",
       "hashPath": "solarcalculator.3.0.6.nupkg.sha512"
-    },
-    "System.ComponentModel.Annotations/5.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-dMkqfy2el8A8/I76n2Hi1oBFEbG1SfxD2l5nhwXV3XjlnOmwxJlQbYpJH4W51odnU9sARCSAgv7S3CyAFMkpYg==",
-      "path": "system.componentmodel.annotations/5.0.0",
-      "hashPath": "system.componentmodel.annotations.5.0.0.nupkg.sha512"
     },
     "System.Diagnostics.DiagnosticSource/5.0.0": {
       "type": "package",

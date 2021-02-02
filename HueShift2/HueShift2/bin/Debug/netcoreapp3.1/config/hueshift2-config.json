@@ -13,7 +13,7 @@
     "LightsToExclude": [],
     "BridgeProperties": {
       "IpAddress": "192.168.1.116",
-      "ApiKey": "JczcKHSLyUquDt3Bck9zQjAdmkQTUjvr6l5BSaCE"
+      "ApiKey": null
     },
     "Geolocation": {
       "Latitude": 51.5122184753418,
