@@ -19,7 +19,6 @@ RUN mkdir -p log
 VOLUME /log
 
 ENV UDPPORT 6454
-
 EXPOSE ${UDPPORT}
 EXPOSE ${UDPPORT}/udp
 
