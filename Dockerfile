@@ -1,12 +1,12 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 WORKDIR /app
 
-COPY HueShift2/HueShift2/*.csproj ./HueShift2
+COPY HueShift2/HueShift2/*.csproj ./HueShift2/
 
 WORKDIR /app/HueShift2
 RUN dotnet restore
 
-COPY HueShift2/HueShift2/. ./HueShift2
+COPY HueShift2/HueShift2/. ./HueShift2/
 RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS runtime
