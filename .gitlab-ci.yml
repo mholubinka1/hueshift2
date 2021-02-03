@@ -1,6 +1,6 @@
 buildx-master:
   image: docker:latest
-  stage: buildx
+  stage: build
   variables:
     GIT_STRATEGY: none
   artifacts:
@@ -21,7 +21,7 @@ deploy-master:
   stage: deploy
   services:
     - name: docker:dind
-    - command: ["--experimental"]
+      command: ["--experimental"]
   before_script:
     - mkdir -p ~/.docker/cli-plugins
     - mv buildx ~/.docker/cli-plugins/docker-buildx
@@ -32,3 +32,5 @@ deploy-master:
     - docker buildx build
       --platform linux/amd64,linux/arm64,linux/arm/v7
       --push -t $CI_REGISTRY_IMAGE .
+  only:
+    - master
