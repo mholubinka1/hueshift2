@@ -1,12 +1,11 @@
-docker-build-master:
-  image: docker:latest
-  stages: 
-    - build
-    - push
-  services:
-    - docker:dind
-  before_script:
-    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+image: docker:latest
+stages: 
+  - build
+  - push
+services:
+  - docker:dind
+before_script:
+  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
 docker-build:
   stage: build
