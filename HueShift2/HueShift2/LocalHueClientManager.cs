@@ -40,7 +40,7 @@ namespace HueShift2
                 {
                     apiKey = await client.RegisterAsync("hueshift-2", "Bridge0");
                     logger.LogInformation("Application registered with bridge.");
-                    configHelper.AddOrUpdateSetting(configuration["LightingConfigFilePath"], "HueShiftOptions:BridgeProperties:ApiKey", apiKey);
+                    configHelper.AddOrUpdateSetting(configuration["config-file"], "HueShiftOptions:BridgeProperties:ApiKey", apiKey);
                     registered = true;
                 }
                 catch

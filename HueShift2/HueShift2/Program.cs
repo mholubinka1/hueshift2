@@ -35,6 +35,8 @@ namespace HueShift2
                         config.SetBasePath(Directory.GetCurrentDirectory());
                         config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                         config.AddJsonFile(lightingConfigFilePath, optional: false, reloadOnChange: true);
+                        config.AddEnvironmentVariables();
+                        config.AddCommandLine(args);
                     })
                     .ConfigureServices((hostContext, services) =>
                     {                   

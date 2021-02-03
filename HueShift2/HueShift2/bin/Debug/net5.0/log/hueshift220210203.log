@@ -1,0 +1,194 @@
+===> 15:24:48.431 +00:00 [wrn] hueshift-2: config/hueshift2-config.json does not exist.
+===> 15:24:49.670 +00:00 [inf] hueshift-2: Generating config/hueshift2-config.json with required settings.
+===> 15:24:49.686 +00:00 [inf] hueshift-2: Searching for Hue bridges on network.
+===> 15:25:03.462 +00:00 [inf] hueshift-2: Hue BridgeID: 001788fffe7b300a IP: 192.168.1.116 found.
+===> 15:25:03.472 +00:00 [inf] hueshift-2: Finding geolocation...
+===> 15:25:07.818 +00:00 [inf] hueshift-2: Located. TZ: Europe/London Lat: 51.5122184753418 Long: 0
+===> 15:35:38.974 +00:00 [wrn] hueshift-2: config/hueshift2-config.json does not exist.
+===> 15:35:39.839 +00:00 [inf] hueshift-2: Generating config/hueshift2-config.json with required settings.
+===> 15:35:39.847 +00:00 [inf] hueshift-2: Searching for Hue bridges on network.
+===> 15:35:44.347 +00:00 [inf] hueshift-2: Hue BridgeID: 001788fffe7b300a IP: 192.168.1.116 found.
+===> 15:35:44.350 +00:00 [inf] hueshift-2: Finding geolocation...
+===> 15:35:45.948 +00:00 [inf] hueshift-2: Located. TZ: Europe/London Lat: 51.5122184753418 Long: 0
+===> 15:37:41.053 +00:00 [wrn] hueshift-2: config/hueshift2-config.json does not exist.
+===> 15:37:41.164 +00:00 [inf] hueshift-2: Generating config/hueshift2-config.json with required settings.
+===> 15:37:41.170 +00:00 [inf] hueshift-2: Searching for Hue bridges on network.
+===> 15:37:42.827 +00:00 [inf] hueshift-2: Hue BridgeID: 001788fffe7b300a IP: 192.168.1.116 found.
+===> 15:37:42.831 +00:00 [inf] hueshift-2: Finding geolocation...
+===> 15:37:43.492 +00:00 [inf] hueshift-2: Located. TZ: Europe/London Lat: 51.5122184753418 Long: 0
+===> 15:38:35.439 +00:00 [wrn] hueshift-2: config/hueshift2-config.json does not exist.
+===> 15:38:35.671 +00:00 [inf] hueshift-2: Generating config/hueshift2-config.json with required settings.
+===> 15:38:35.694 +00:00 [inf] hueshift-2: Searching for Hue bridges on network.
+===> 15:38:38.776 +00:00 [inf] hueshift-2: Hue BridgeID: 001788fffe7b300a IP: 192.168.1.116 found.
+===> 15:38:38.782 +00:00 [inf] hueshift-2: Finding geolocation...
+===> 15:38:39.439 +00:00 [inf] hueshift-2: Located. TZ: Europe/London Lat: 51.5122184753418 Long: 0
+===> 15:38:40.431 +00:00 [inf] hueshift-2: config/hueshift2-config.json successfully generated.
+===> 15:38:40.585 +00:00 [inf] hueshift-2: Starting...
+===> 15:38:42.116 +00:00 [inf] hueshift-2: Host created successfully.
+===> 15:38:43.646 +00:00 [dbg] hueshift-2: Hosting starting
+===> 15:38:43.740 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:38:43.772 +00:00 [inf] hueshift-2: Application started. Press Ctrl+C to shut down.
+===> 15:38:43.778 +00:00 [inf] hueshift-2: Hosting environment: Production
+===> 15:38:43.782 +00:00 [inf] hueshift-2: Content root path: C:\Users\mehol\git\github\hueshift-2\HueShift2\HueShift2\bin\Debug\net5.0\
+===> 15:38:43.784 +00:00 [dbg] hueshift-2: Hosting started
+===> 15:38:43.874 +00:00 [inf] hueshift-2: Registering application with Hue bridge...
+===> 15:38:44.298 +00:00 [wrn] hueshift-2: Failed to authorise application. Ensure the button on the top of the bridge has been pressed.
+===> 15:38:44.301 +00:00 [inf] hueshift-2: Retrying in 10s.
+===> 15:38:54.315 +00:00 [inf] hueshift-2: Retrying...
+===> 15:38:54.415 +00:00 [wrn] hueshift-2: Failed to authorise application. Ensure the button on the top of the bridge has been pressed.
+===> 15:38:54.417 +00:00 [inf] hueshift-2: Retrying in 10s.
+===> 15:39:04.426 +00:00 [inf] hueshift-2: Retrying...
+===> 15:39:04.502 +00:00 [inf] hueshift-2: Application registered with bridge.
+===> 15:39:04.630 +00:00 [err] hueshift-2: Failed to write configuration setting: HueShiftOptions:BridgeProperties:ApiKey
+System.ArgumentNullException: Value cannot be null. (Parameter 'path')
+   at System.IO.File.ReadAllText(String path)
+   at HueShift2.Configuration.ConfigFileHelper.AddOrUpdateSetting[T](String configFilePath, String key, T value) in C:\Users\mehol\git\github\hueshift-2\HueShift2\HueShift2\Configuration\ConfigFileHelper.cs:line 41
+===> 15:39:05.995 +00:00 [inf] hueshift-2: Hue client initialised.
+===> 15:39:06.277 +00:00 [inf] hueshift-2: Discovered 9 new lights on the network.
+===> 15:39:06.307 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:39:06.311 +00:00 [inf] hueshift-2: Lights on network: 
+ID: 1    Name: Cocktail             ModelID: LCT010     ProductID: Philips-LCT010-1-A19ECLv4 
+ID: 2    Name: Records              ModelID: LCT010     ProductID: Philips-LCT010-1-A19ECLv4 
+ID: 3    Name: Centre               ModelID: LCA001     ProductID: Philips-LCA001-5-A19ECLv6 
+ID: 4    Name: Ceiling              ModelID: LCA001     ProductID: Philips-LCA001-5-A19ECLv6 
+ID: 5    Name: Dining Table         ModelID: LCA001     ProductID: Philips-LCA001-5-A19ECLv6 
+ID: 6    Name: Sarah's Bedside      ModelID: LTW012     ProductID: Philips-LTW012-1-E14CTv1 
+ID: 7    Name: Binky's Bedside      ModelID: LTW012     ProductID: Philips-LTW012-1-E14CTv1 
+ID: 8    Name: Landing              ModelID: LCA001     ProductID: Philips-LCA001-5-A19ECLv6 
+ID: 9    Name: Bedroom TV           ModelID: LCT010     ProductID: Philips-LCT010-1-A19ECLv4 
+
+===> 15:39:06.355 +00:00 [inf] hueshift-2: Excluded lights: none
+===> 15:39:06.358 +00:00 [inf] hueshift-2: Manually controlled lights: none
+===> 15:39:06.366 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:39:07.160 +00:00 [inf] hueshift-2: Performing transition...
+===> 15:39:07.163 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:39:07.378 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:39:07.383 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:39:17.893 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:39:17.896 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:39:17.899 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:39:17.992 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:40:29.628 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:40:39.642 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:40:39.644 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:40:39.646 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:40:39.788 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:40:39.790 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:40:49.814 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:40:49.816 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:40:49.818 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:40:49.916 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:40:49.917 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:40:59.935 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:40:59.938 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:40:59.939 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:41:00.032 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:41:00.044 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:41:10.053 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:41:10.057 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:41:10.060 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:41:10.179 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:41:10.181 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:41:20.192 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:41:20.195 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:41:20.197 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:41:20.319 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:46:16.825 +00:00 [inf] hueshift-2: Starting...
+===> 15:46:17.119 +00:00 [inf] hueshift-2: Host created successfully.
+===> 15:46:18.093 +00:00 [dbg] hueshift-2: Hosting starting
+===> 15:46:19.198 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:46:21.852 +00:00 [inf] hueshift-2: Registering application with Hue bridge...
+===> 15:46:23.896 +00:00 [inf] hueshift-2: Application started. Press Ctrl+C to shut down.
+===> 15:46:23.902 +00:00 [inf] hueshift-2: Hosting environment: Production
+===> 15:46:23.907 +00:00 [inf] hueshift-2: Content root path: C:\Users\mehol\git\github\hueshift-2\HueShift2\HueShift2\bin\Debug\net5.0\
+===> 15:46:23.909 +00:00 [dbg] hueshift-2: Hosting started
+===> 15:46:24.372 +00:00 [wrn] hueshift-2: Failed to authorise application. Ensure the button on the top of the bridge has been pressed.
+===> 15:46:24.375 +00:00 [inf] hueshift-2: Retrying in 10s.
+===> 15:46:34.398 +00:00 [inf] hueshift-2: Retrying...
+===> 15:46:34.614 +00:00 [wrn] hueshift-2: Failed to authorise application. Ensure the button on the top of the bridge has been pressed.
+===> 15:46:34.625 +00:00 [inf] hueshift-2: Retrying in 10s.
+===> 15:46:44.634 +00:00 [inf] hueshift-2: Retrying...
+===> 15:46:44.754 +00:00 [wrn] hueshift-2: Failed to authorise application. Ensure the button on the top of the bridge has been pressed.
+===> 15:46:44.756 +00:00 [inf] hueshift-2: Retrying in 10s.
+===> 15:46:54.767 +00:00 [inf] hueshift-2: Retrying...
+===> 15:46:54.792 +00:00 [inf] hueshift-2: Application registered with bridge.
+===> 15:46:55.869 +00:00 [inf] hueshift-2: HueShiftOptions:BridgeProperties:ApiKey successfully written to config/hueshift2-config.json
+===> 15:46:55.872 +00:00 [inf] hueshift-2: Hue client initialised.
+===> 15:46:56.727 +00:00 [inf] hueshift-2: Discovered 9 new lights on the network.
+===> 15:47:10.912 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:47:10.917 +00:00 [inf] hueshift-2: Lights on network: 
+ID: 1    Name: Cocktail             ModelID: LCT010     ProductID: Philips-LCT010-1-A19ECLv4 
+ID: 2    Name: Records              ModelID: LCT010     ProductID: Philips-LCT010-1-A19ECLv4 
+ID: 3    Name: Centre               ModelID: LCA001     ProductID: Philips-LCA001-5-A19ECLv6 
+ID: 4    Name: Ceiling              ModelID: LCA001     ProductID: Philips-LCA001-5-A19ECLv6 
+ID: 5    Name: Dining Table         ModelID: LCA001     ProductID: Philips-LCA001-5-A19ECLv6 
+ID: 6    Name: Sarah's Bedside      ModelID: LTW012     ProductID: Philips-LTW012-1-E14CTv1 
+ID: 7    Name: Binky's Bedside      ModelID: LTW012     ProductID: Philips-LTW012-1-E14CTv1 
+ID: 8    Name: Landing              ModelID: LCA001     ProductID: Philips-LCA001-5-A19ECLv6 
+ID: 9    Name: Bedroom TV           ModelID: LCT010     ProductID: Philips-LCT010-1-A19ECLv4 
+
+===> 15:47:10.934 +00:00 [inf] hueshift-2: Excluded lights: none
+===> 15:47:10.940 +00:00 [inf] hueshift-2: Manually controlled lights: none
+===> 15:47:10.946 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:47:12.031 +00:00 [inf] hueshift-2: Performing transition...
+===> 15:47:12.035 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:47:12.319 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:47:12.325 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:47:22.820 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:47:22.826 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:47:22.829 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:47:22.949 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:47:22.955 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:48:26.769 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:48:26.775 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:48:26.778 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:48:26.878 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:48:26.885 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:48:36.898 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:48:36.901 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:48:36.903 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:48:36.999 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:48:37.001 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:48:47.018 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:48:47.021 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:48:47.023 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:48:47.109 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:48:47.112 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:48:57.127 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:48:57.130 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:48:57.132 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:48:57.243 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:48:57.246 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:49:07.257 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:49:07.260 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:49:07.262 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:49:07.343 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:49:07.345 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:49:17.352 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:49:17.355 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:49:17.357 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:49:17.444 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:49:17.449 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:49:27.468 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:49:27.471 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:49:27.474 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:49:27.563 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:49:27.566 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:49:37.574 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:49:37.577 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:49:37.579 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:49:37.672 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:49:37.674 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:49:47.679 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:49:47.682 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:49:47.684 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:49:47.769 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:49:47.771 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:49:57.776 +00:00 [inf] hueshift-2: Executing automatic light control...
+===> 15:49:57.779 +00:00 [dbg] hueshift-2: No transition to perform.
+===> 15:49:57.780 +00:00 [inf] hueshift-2: Refreshing lights...
+===> 15:49:57.873 +00:00 [inf] hueshift-2: Discovered 0 new lights on the network.
+===> 15:49:57.875 +00:00 [inf] hueshift-2: Lights refreshed.
+===> 15:50:02.805 +00:00 [inf] hueshift-2: Application is shutting down...
+===> 15:50:02.811 +00:00 [dbg] hueshift-2: Hosting stopping
+===> 15:50:02.888 +00:00 [dbg] hueshift-2: Hosting stopped
