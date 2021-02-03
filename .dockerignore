@@ -1,3 +1,4 @@
-Dockerfile
-[b|B]in
-[o|O]bj
+.git
+.github
+**/[B|b]in
+**/[O|o]bj
