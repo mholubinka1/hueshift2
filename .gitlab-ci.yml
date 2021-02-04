@@ -8,9 +8,9 @@ docker-build-master:
 
   stage: build
   script:
-    - docker build --pull -t "index.docker.io/mholubinka1/hueshift2" .
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker push "index.docker.io/mholubinka1/hueshift2"
+    - docker push "$CI_REGISTRY_IMAGE"
   only:
     - master
   tags:
