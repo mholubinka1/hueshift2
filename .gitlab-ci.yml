@@ -12,3 +12,4 @@ docker-build-master:
     - master
   tags:
     - docker
+    
