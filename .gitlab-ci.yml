@@ -2,7 +2,7 @@ image: docker:latest
 services:
   - docker:dind
 before_script:
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  - docker login -u "mholubinka1" -p "d868cf0c-2ecd-4918-8557-cda22458de96" docker.io
   
 docker-build-master:
 
