@@ -2,14 +2,14 @@ image: docker:latest
 services:
   - docker:dind
 before_script:
-  - docker login -u "meholubinka" -p "c52f0ff0-846d-44b5-a55a-6af4df8a36b1" docker.io
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
 docker-build-master:
 
   stage: build
   script:
-    - docker build --pull -t "index.docker.io/meholubinka/hueshift2" .
-    - docker push "index.docker.io/meholubinka/hueshift2"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker push "$CI_REGISTRY_IMAGE"
   only:
     - master
   tags:
