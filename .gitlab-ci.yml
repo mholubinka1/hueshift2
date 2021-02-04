@@ -8,8 +8,8 @@ docker-build-master:
 
   stage: build
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
-    - docker push "$CI_REGISTRY_IMAGE"
+    - docker build --pull -t "index.docker.io/mholubinka1/hueshift2" .
+    - docker push "index.docker.io/mholubinka1/hueshift2"
   only:
     - master
   tags:
