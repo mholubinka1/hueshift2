@@ -1,13 +1,13 @@
 version: 2
 
 updates:
-  - package-ecosystem: "dotnet:nuget"
+  - package-ecosystem: "nuget"
     directory: "/"
-  - package-ecosystem: "dotnet:nuget"
+  - package-ecosystem: "nuget"
     directory: "/HueShift2/HueShift2"
     schedule:
       interval: "daily"
-  - package-ecosystem: "dotnet:nuget"
+  - package-ecosystem: "nuget"
     directory: "/HueShift2/HueShift2Tests"
     schedule:
       interval: "daily"
