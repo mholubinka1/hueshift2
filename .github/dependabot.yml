@@ -3,6 +3,8 @@ version: 2
 updates:
   - package-ecosystem: "nuget"
     directory: "/"
+    schedule:
+      interval: "daily"
   - package-ecosystem: "nuget"
     directory: "/HueShift2/HueShift2"
     schedule:
