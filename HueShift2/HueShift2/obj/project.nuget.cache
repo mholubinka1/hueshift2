@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "M1mf/GxOjkPpRU28wKxDBr5tRIq84NH887j3g4PHIYs6SSlR9b9zIoOXpuxrghoBzvkFMeg5t+mKTaxwFi0eXQ==",
+  "dgSpecHash": "JyyNC+rwWgH/yzEe4JwFE4T9O8+AeJJ9uOEDf6+Lk2jUxjijPPcvc2/6735ZLCYZIL+smGWxJiOhejJiaJWHOA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2\\HueShift2.csproj",
+  "projectFilePath": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2\\HueShift2.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mehol\\.nuget\\packages\\angle\\3.0.4\\angle.3.0.4.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\geotimezone\\4.1.0\\geotimezone.4.1.0.nupkg.sha512",

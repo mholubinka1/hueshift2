@@ -25,4 +25,4 @@ EXPOSE ${UDPPORT}/udp
 
 COPY --from=build-env /app/out ./
 
-ENTRYPOINT ["dotnet", "HueShift2.dll", "--configuration-file", "/config/hueshift2-config.json"]
+ENTRYPOINT ["dotnet", "HueShift2.dll", "--config-file", "/config/hueshift2-config.json"]

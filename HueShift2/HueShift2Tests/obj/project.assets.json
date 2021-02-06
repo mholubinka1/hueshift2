@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "Microsoft.CodeCoverage/16.9.0-preview-20210106-01": {
+      "Microsoft.CodeCoverage/16.9.0-preview-20210127-04": {
         "type": "package",
         "compile": {
           "lib/netcoreapp1.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll": {}
@@ -42,11 +42,17 @@
           "lib/netstandard1.3/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.NET.Test.Sdk/16.9.0-preview-20210106-01": {
+      "Microsoft.NET.Test.Sdk/16.9.0-preview-20210127-04": {
         "type": "package",
         "dependencies": {
-          "Microsoft.CodeCoverage": "16.9.0-preview-20210106-01",
-          "Microsoft.TestPlatform.TestHost": "16.9.0-preview-20210106-01"
+          "Microsoft.CodeCoverage": "16.9.0-preview-20210127-04",
+          "Microsoft.TestPlatform.TestHost": "16.9.0-preview-20210127-04"
+        },
+        "compile": {
+          "lib/netcoreapp2.1/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.1/_._": {}
         },
         "build": {
           "build/netcoreapp2.1/Microsoft.NET.Test.Sdk.props": {},
@@ -74,7 +80,7 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.TestPlatform.ObjectModel/16.9.0-preview-20210106-01": {
+      "Microsoft.TestPlatform.ObjectModel/16.9.0-preview-20210127-04": {
         "type": "package",
         "dependencies": {
           "NuGet.Frameworks": "5.0.0",
@@ -171,10 +177,10 @@
           }
         }
       },
-      "Microsoft.TestPlatform.TestHost/16.9.0-preview-20210106-01": {
+      "Microsoft.TestPlatform.TestHost/16.9.0-preview-20210127-04": {
         "type": "package",
         "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "16.9.0-preview-20210106-01",
+          "Microsoft.TestPlatform.ObjectModel": "16.9.0-preview-20210127-04",
           "Newtonsoft.Json": "9.0.1"
         },
         "compile": {
@@ -377,7 +383,7 @@
           "lib/netstandard2.0/NuGet.Frameworks.dll": {}
         }
       },
-      "NUnit/3.13.0": {
+      "NUnit/3.13.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "2.0.0"
@@ -874,13 +880,14 @@
     }
   },
   "libraries": {
-    "Microsoft.CodeCoverage/16.9.0-preview-20210106-01": {
-      "sha512": "A3vchhlORPD94uUjKsb2i1bUnX0UvdH2XEqvece7dFDXDgZDYvaUkRw5aWf7iLx1X+G8MulxuZ10SzWhC6bibw==",
+    "Microsoft.CodeCoverage/16.9.0-preview-20210127-04": {
+      "sha512": "DxYJ3PihEqT8HVuuk08aalriX7ko+FbrLq3qVfDIHNwwYdQKWeCgVx9op/gSdiWLI1eYBomsCCaLc1lHDLtoyA==",
       "type": "package",
-      "path": "microsoft.codecoverage/16.9.0-preview-20210106-01",
+      "path": "microsoft.codecoverage/16.9.0-preview-20210127-04",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "build/netstandard1.0/CodeCoverage/CodeCoverage.config",
         "build/netstandard1.0/CodeCoverage/CodeCoverage.exe",
         "build/netstandard1.0/CodeCoverage/VanguardInstrumentationProfiler_x86.config",
@@ -905,23 +912,38 @@
         "build/netstandard1.0/InstrumentationEngine/x86/MicrosoftInstrumentationEngine_x86.dll",
         "build/netstandard1.0/Microsoft.CodeCoverage.props",
         "build/netstandard1.0/Microsoft.CodeCoverage.targets",
+        "build/netstandard1.0/Microsoft.VisualStudio.Coverage.CoreLib.Net.dll",
+        "build/netstandard1.0/Microsoft.VisualStudio.Coverage.Interprocess.dll",
         "build/netstandard1.0/Microsoft.VisualStudio.TraceDataCollector.dll",
+        "build/netstandard1.0/cs/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/cs/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/de/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/de/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/es/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/es/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/fr/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/fr/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/it/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/it/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/ja/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/ja/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/ko/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/ko/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/pl/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/pl/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/pt-BR/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/pt-BR/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/ru/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/ru/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/tr/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/tr/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/zh-Hans/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/zh-Hans/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
+        "build/netstandard1.0/zh-Hant/Microsoft.VisualStudio.Coverage.CoreLib.Net.resources.dll",
         "build/netstandard1.0/zh-Hant/Microsoft.VisualStudio.TraceDataCollector.resources.dll",
         "lib/net45/Microsoft.VisualStudio.CodeCoverage.Shim.dll",
         "lib/netcoreapp1.0/Microsoft.VisualStudio.CodeCoverage.Shim.dll",
-        "microsoft.codecoverage.16.9.0-preview-20210106-01.nupkg.sha512",
+        "microsoft.codecoverage.16.9.0-preview-20210127-04.nupkg.sha512",
         "microsoft.codecoverage.nuspec"
       ]
     },
@@ -984,15 +1006,18 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "Microsoft.NET.Test.Sdk/16.9.0-preview-20210106-01": {
-      "sha512": "FzuT5gImvku1bTbKHlEv2JaSrj5pmknbgAUiqNAf3ndFPjVAxGsQurJUlmz9ndjtow9aeW6qzyRMWeK5I065VA==",
+    "Microsoft.NET.Test.Sdk/16.9.0-preview-20210127-04": {
+      "sha512": "shgi33TWabF0z1080xGn3Fpl1wKkpYWYpiLS3dU/lSGiz9IS+4K0Xdf+YuCC4mNvOSNaly7M8N9qq4T606W2wA==",
       "type": "package",
-      "path": "microsoft.net.test.sdk/16.9.0-preview-20210106-01",
+      "path": "microsoft.net.test.sdk/16.9.0-preview-20210127-04",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "build/net40/Microsoft.NET.Test.Sdk.props",
         "build/net40/Microsoft.NET.Test.Sdk.targets",
+        "build/net45/Microsoft.NET.Test.Sdk.props",
+        "build/net45/Microsoft.NET.Test.Sdk.targets",
         "build/netcoreapp1.0/Microsoft.NET.Test.Sdk.Program.cs",
         "build/netcoreapp1.0/Microsoft.NET.Test.Sdk.Program.fs",
         "build/netcoreapp1.0/Microsoft.NET.Test.Sdk.Program.vb",
@@ -1005,7 +1030,12 @@
         "build/netcoreapp2.1/Microsoft.NET.Test.Sdk.targets",
         "build/uap10.0/Microsoft.NET.Test.Sdk.props",
         "buildMultiTargeting/Microsoft.NET.Test.Sdk.props",
-        "microsoft.net.test.sdk.16.9.0-preview-20210106-01.nupkg.sha512",
+        "lib/net40/_._",
+        "lib/net45/_._",
+        "lib/netcoreapp1.0/_._",
+        "lib/netcoreapp2.1/_._",
+        "lib/uap10.0/_._",
+        "microsoft.net.test.sdk.16.9.0-preview-20210127-04.nupkg.sha512",
         "microsoft.net.test.sdk.nuspec"
       ]
     },
@@ -1039,13 +1069,14 @@
         "runtime.json"
       ]
     },
-    "Microsoft.TestPlatform.ObjectModel/16.9.0-preview-20210106-01": {
-      "sha512": "+VtYIjLC0f1+gVnTAgW+QxUgUrAnwodUzmvqiPGAam2zwmK4muzPqPXru6PjjfVVwVckI0FZEOKE7r0ukDZ/EA==",
+    "Microsoft.TestPlatform.ObjectModel/16.9.0-preview-20210127-04": {
+      "sha512": "96MevkhI3n0UeOonJzcItqPxy3ptJOx+cHCieFBUpwEoH5n7gFkGZRqTq3jw1IEpamgm9AaVA5sRuxodO2G6Ow==",
       "type": "package",
-      "path": "microsoft.testplatform.objectmodel/16.9.0-preview-20210106-01",
+      "path": "microsoft.testplatform.objectmodel/16.9.0-preview-20210127-04",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "lib/net45/Microsoft.TestPlatform.CoreUtilities.dll",
         "lib/net45/Microsoft.TestPlatform.PlatformAbstractions.dll",
         "lib/net45/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll",
@@ -1220,17 +1251,18 @@
         "lib/uap10.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
         "lib/uap10.0/zh-Hant/Microsoft.TestPlatform.CoreUtilities.resources.dll",
         "lib/uap10.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll",
-        "microsoft.testplatform.objectmodel.16.9.0-preview-20210106-01.nupkg.sha512",
+        "microsoft.testplatform.objectmodel.16.9.0-preview-20210127-04.nupkg.sha512",
         "microsoft.testplatform.objectmodel.nuspec"
       ]
     },
-    "Microsoft.TestPlatform.TestHost/16.9.0-preview-20210106-01": {
-      "sha512": "7LTT2aNfaGMESzAThjUlYTqiKoweWF/L6N1yq6Dj3P1t/TbJ6gixLT4FuQ4FEd4k0YGrTOJWx0KSlM9/XfH2VA==",
+    "Microsoft.TestPlatform.TestHost/16.9.0-preview-20210127-04": {
+      "sha512": "N0kwBg63x7si0CenRAvFwiuqrGYppsxtshddV3w7HumYJaOnwmTt7YQ/szUtf0Wj+jGmul2owOTjDNkWttvIeQ==",
       "type": "package",
-      "path": "microsoft.testplatform.testhost/16.9.0-preview-20210106-01",
+      "path": "microsoft.testplatform.testhost/16.9.0-preview-20210127-04",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "ThirdPartyNotices.txt",
         "build/netcoreapp1.0/Microsoft.TestPlatform.PlatformAbstractions.dll",
         "build/netcoreapp1.0/Microsoft.TestPlatform.TestHost.props",
@@ -1439,7 +1471,7 @@
         "lib/uap10.0/Microsoft.VisualStudio.TestPlatform.Common.dll",
         "lib/uap10.0/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll",
         "lib/uap10.0/testhost.dll",
-        "microsoft.testplatform.testhost.16.9.0-preview-20210106-01.nupkg.sha512",
+        "microsoft.testplatform.testhost.16.9.0-preview-20210127-04.nupkg.sha512",
         "microsoft.testplatform.testhost.nuspec"
       ]
     },
@@ -1617,10 +1649,10 @@
         "nuget.frameworks.nuspec"
       ]
     },
-    "NUnit/3.13.0": {
-      "sha512": "G+BOONgJKtNtprjGQ54l0m+Vq2VFCMh/H6ljuHfqrRlX6YkNy0GjMd5Nn0NpJidGpRd4gAOJsBqNuxr7Kgc/5g==",
+    "NUnit/3.13.1": {
+      "sha512": "vWBvrSelmTYwqHWvO3dA63z7cOpaFR/3nJ9MMVLBkWeaWa7oiglPPm5g1h96B4i2XXqjFexxhR5MyMjmIJYPfg==",
       "type": "package",
-      "path": "nunit/3.13.0",
+      "path": "nunit/3.13.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1637,7 +1669,7 @@
         "lib/net45/nunit.framework.xml",
         "lib/netstandard2.0/nunit.framework.dll",
         "lib/netstandard2.0/nunit.framework.xml",
-        "nunit.3.13.0.nupkg.sha512",
+        "nunit.3.13.1.nupkg.sha512",
         "nunit.nuspec"
       ]
     },
@@ -3697,8 +3729,8 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "Microsoft.NET.Test.Sdk >= 16.9.0-preview-20210106-01",
-      "NUnit >= 3.13.0",
+      "Microsoft.NET.Test.Sdk >= 16.9.0-preview-20210127-04",
+      "NUnit >= 3.13.1",
       "NUnit3TestAdapter >= 4.0.0-beta.1"
     ]
   },
@@ -3708,11 +3740,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
+      "projectUniqueName": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
       "projectName": "HueShift2Tests",
-      "projectPath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
+      "projectPath": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2Tests\\HueShift2Tests.csproj",
       "packagesPath": "C:\\Users\\mehol\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2Tests\\obj\\",
+      "outputPath": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\mehol\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -3743,11 +3775,11 @@
         "dependencies": {
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
-            "version": "[16.9.0-preview-20210106-01, )"
+            "version": "[16.9.0-preview-20210127-04, )"
           },
           "NUnit": {
             "target": "Package",
-            "version": "[3.13.0, )"
+            "version": "[3.13.1, )"
           },
           "NUnit3TestAdapter": {
             "target": "Package",

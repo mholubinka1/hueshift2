@@ -1644,11 +1644,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2\\HueShift2.csproj",
+      "projectUniqueName": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2\\HueShift2.csproj",
       "projectName": "HueShift2",
-      "projectPath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2\\HueShift2.csproj",
+      "projectPath": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2\\HueShift2.csproj",
       "packagesPath": "C:\\Users\\mehol\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mehol\\git\\github\\hueshift-2\\HueShift2\\HueShift2\\obj\\",
+      "outputPath": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\mehol\\AppData\\Roaming\\NuGet\\NuGet.Config",
