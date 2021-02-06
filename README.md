@@ -2,8 +2,5 @@
 
 
 
-PS: I love Sarah
-
-
 
 
