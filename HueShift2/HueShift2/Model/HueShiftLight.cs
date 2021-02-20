@@ -33,8 +33,7 @@ namespace HueShift2.Model
         public void Refresh(Light light, DateTime currentTime)
         {
             var isOn = light.State.On;
-            //FIXME: this logic means lights can't change back, will probably need a different flag...
-            //A light set to manual and then turned off is the same state when turned back on, immediately shifting BACK to manual before a command can be issued
+            //FIXME: this needs testing
             if (isOn)
             {
                 if (this.ControlState == LightControlState.HueShift)
@@ -48,7 +47,7 @@ namespace HueShift2.Model
                 {
                     if (this.State.PowerState == LightPowerState.Off)
                     {
-                        this.ControlState == LightControlState.HueShift;
+                        this.ControlState = LightControlState.HueShift;
                     }
                 }
             }

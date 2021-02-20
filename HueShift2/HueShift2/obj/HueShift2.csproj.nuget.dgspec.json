@@ -82,7 +82,7 @@
             },
             "Serilog": {
               "target": "Package",
-              "version": "[2.10.1-dev-01265, )"
+              "version": "[2.10.1-dev-01285, )"
             },
             "Serilog.Extensions.Logging": {
               "target": "Package",
@@ -106,7 +106,7 @@
             },
             "TimeZoneConverter": {
               "target": "Package",
-              "version": "[3.3.0, )"
+              "version": "[3.4.0, )"
             }
           },
           "imports": [
@@ -124,7 +124,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
         }
       }
     }
