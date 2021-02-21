@@ -18,13 +18,13 @@
           "Newtonsoft.Json": "12.0.3",
           "Q42.HueApi": "3.17.0",
           "Q42.HueApi.ColorConverters": "3.14.0",
-          "Serilog": "2.10.1-dev-01265",
+          "Serilog": "2.10.1-dev-01285",
           "Serilog.Extensions.Logging": "3.0.2-dev-10284",
           "Serilog.Settings.Configuration": "3.2.0-dev-00264",
           "Serilog.Sinks.Console": "4.0.0-dev-00839",
           "Serilog.Sinks.File": "5.0.0-dev-00909",
           "SolarCalculator": "3.0.6",
-          "TimeZoneConverter": "3.3.0"
+          "TimeZoneConverter": "3.4.0"
         },
         "runtime": {
           "HueShift2.dll": {}
@@ -422,7 +422,7 @@
           }
         }
       },
-      "Serilog/2.10.1-dev-01265": {
+      "Serilog/2.10.1-dev-01285": {
         "runtime": {
           "lib/netstandard2.1/Serilog.dll": {
             "assemblyVersion": "2.0.0.0",
@@ -433,7 +433,7 @@
       "Serilog.Extensions.Logging/3.0.2-dev-10284": {
         "dependencies": {
           "Microsoft.Extensions.Logging": "5.0.0",
-          "Serilog": "2.10.1-dev-01265"
+          "Serilog": "2.10.1-dev-01285"
         },
         "runtime": {
           "lib/netstandard2.0/Serilog.Extensions.Logging.dll": {
@@ -446,7 +446,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyModel": "3.0.0",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "5.0.0",
-          "Serilog": "2.10.1-dev-01265"
+          "Serilog": "2.10.1-dev-01285"
         },
         "runtime": {
           "lib/netstandard2.0/Serilog.Settings.Configuration.dll": {
@@ -457,7 +457,7 @@
       },
       "Serilog.Sinks.Console/4.0.0-dev-00839": {
         "dependencies": {
-          "Serilog": "2.10.1-dev-01265"
+          "Serilog": "2.10.1-dev-01285"
         },
         "runtime": {
           "lib/netcoreapp2.0/Serilog.Sinks.Console.dll": {
@@ -468,7 +468,7 @@
       },
       "Serilog.Sinks.File/5.0.0-dev-00909": {
         "dependencies": {
-          "Serilog": "2.10.1-dev-01265"
+          "Serilog": "2.10.1-dev-01285"
         },
         "runtime": {
           "lib/netcoreapp3.0/Serilog.Sinks.File.dll": {
@@ -517,11 +517,11 @@
       },
       "System.Security.Principal.Windows/5.0.0": {},
       "System.Text.Json/4.6.0": {},
-      "TimeZoneConverter/3.3.0": {
+      "TimeZoneConverter/3.4.0": {
         "runtime": {
           "lib/netstandard2.0/TimeZoneConverter.dll": {
-            "assemblyVersion": "3.3.0.0",
-            "fileVersion": "3.3.0.0"
+            "assemblyVersion": "3.4.0.0",
+            "fileVersion": "3.4.0.0"
           }
         }
       }
@@ -764,12 +764,12 @@
       "path": "q42.hueapi.colorconverters/3.14.0",
       "hashPath": "q42.hueapi.colorconverters.3.14.0.nupkg.sha512"
     },
-    "Serilog/2.10.1-dev-01265": {
+    "Serilog/2.10.1-dev-01285": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-A2RHMthlCfmnp8NnceKnu6nGAxSSNmY3C0Eenzo+Iu5eOv+tJym6ZSXCU1AlVPoYv+pzfV1nNqKxZSnWxJpFiw==",
-      "path": "serilog/2.10.1-dev-01265",
-      "hashPath": "serilog.2.10.1-dev-01265.nupkg.sha512"
+      "sha512": "sha512-ldoo2Rufn/RYdBYX180xxvGEdRu8QG3/zuZD+ZnpvTlOP5BwHcHnGEL27HORjxFTC9dP/KtIPmTvv/jRQcnY6Q==",
+      "path": "serilog/2.10.1-dev-01285",
+      "hashPath": "serilog.2.10.1-dev-01285.nupkg.sha512"
     },
     "Serilog.Extensions.Logging/3.0.2-dev-10284": {
       "type": "package",
@@ -834,12 +834,12 @@
       "path": "system.text.json/4.6.0",
       "hashPath": "system.text.json.4.6.0.nupkg.sha512"
     },
-    "TimeZoneConverter/3.3.0": {
+    "TimeZoneConverter/3.4.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OeXMqNZ1Xt/9ehELN2khz8vT8wckg8VVa6Rx+XeYTdEIMaKETlSXkCzj4TuCGQ0L2SgXdpjGSh1XwZVusZE2Yw==",
-      "path": "timezoneconverter/3.3.0",
-      "hashPath": "timezoneconverter.3.3.0.nupkg.sha512"
+      "sha512": "sha512-4rqXd06uLqaLPGpO+whrZnSTJyG3SG5DEbeldMTvaGit0+gI6XLVb9YMnfM+5wtV0DDM1QPd/QhbE6j5vJCWDw==",
+      "path": "timezoneconverter/3.4.0",
+      "hashPath": "timezoneconverter.3.4.0.nupkg.sha512"
     }
   }
 }

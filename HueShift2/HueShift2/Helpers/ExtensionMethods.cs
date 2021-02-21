@@ -52,8 +52,22 @@ namespace HueShift2.Helpers
             return ids;
         }
 
+        public static ColourMode ToColourMode(this string mode)
+        {
+            switch (mode)
+            {
+                case "xy":
+                    return ColourMode.XY;
+                case "ct":
+                    return ColourMode.CT;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
         public static bool ArrayEquals(double[] @this, double[] other)
         {
+            if (@this == null)
             if (@this.Length != other.Length) return false;
             for (var i = 0; i < @this.Length; i++)
             {

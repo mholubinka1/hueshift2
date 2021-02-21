@@ -8,6 +8,7 @@ namespace HueShift2.Model
 {
     public class Colour
     {
+        public ColourMode Mode { get; private set; }
         public double[] ColourCoordinates { get; private set; }
         public int? ColourTemperature { get; private set; }
         public int? Hue { get; private set; }
@@ -31,6 +32,7 @@ namespace HueShift2.Model
 
         public Colour(State state)
         {
+            this.Mode = state.ColorMode.ToColourMode();
             this.ColourCoordinates = state.ColorCoordinates;
             this.ColourTemperature = state.ColorTemperature;
             this.Hue = state.Hue;
@@ -39,6 +41,7 @@ namespace HueShift2.Model
 
         private void Clear()
         {
+            Mode = ColourMode.None;
             ColourCoordinates = null;
             ColourTemperature = null;
             Hue = null;
@@ -68,16 +71,25 @@ namespace HueShift2.Model
 
         public bool Matches(State lightState)
         {
-            switch(lightState.ColorMode)
+            if (this.Mode != lightState.ColorMode.ToColourMode()) return false;
+            switch(this.Mode)
             {
-                case "xy":
+                case ColourMode.XY:
                     return ExtensionMethods.ArrayEquals(this.ColourCoordinates, lightState.ColorCoordinates);
-                case "ct":
+                case ColourMode.CT:
                     return this.ColourTemperature == lightState.ColorTemperature;
                 default:
                     //return this.Hue == lightState.Hue && this.Saturation == lightState.Saturation;
                     throw new NotImplementedException();
             }
         }
+    }
+
+    public enum ColourMode
+    {
+        None,
+        XY,
+        CT,
+        Other
     }
 }
