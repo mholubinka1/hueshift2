@@ -83,6 +83,16 @@ namespace HueShift2.Model
                     throw new NotImplementedException();
             }
         }
+
+        public override string ToString()
+        {
+            var @base = $"Mode: {this.Mode.ToString()}";
+            @base += this.ColourCoordinates == null ? "" : $" xy: {this.ColourCoordinates}";
+            @base += this.ColourTemperature == null ? "" : $" ct: {this.ColourTemperature}";
+            @base += this.Hue == null ? "" : $" hue: {this.Hue}";
+            @base += this.Saturation == null ? "" : $" sat: {this.Saturation}";
+            return @base;
+        }
     }
 
     public enum ColourMode

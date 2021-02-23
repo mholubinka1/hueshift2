@@ -25,5 +25,5 @@ services:
       TZ: 'Europe/London'
     volumes:
       - /home/pi/.config/hueshift2:/config
-      - /var/log/hueshift2:/log
+      - /home/pi/hueshift2:/log
     restart: unless-stopped

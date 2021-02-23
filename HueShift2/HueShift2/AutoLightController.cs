@@ -54,7 +54,7 @@ namespace HueShift2
 
         public async Task<DateTime?> Execute(DateTime? lastRunTime)
         {
-            logger.LogInformation("Executing automatic light control...");
+            logger.LogDebug("Executing automatic light control...");
             var currentTime = DateTime.Now;
             if (!transitionProvider.ShouldPerformTransition(currentTime, lastRunTime))
             {

@@ -56,7 +56,7 @@ namespace HueShift2
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"HueShift-2 does not support OSX");
+                logger.LogError(e, $"HueShift2 does not support OSX");
                 throw;
             }
         }
@@ -74,23 +74,42 @@ namespace HueShift2
                 sunrise.Clamp(midnight + autoTransitionTimeLimits.SunriseLower, midnight + autoTransitionTimeLimits.SunriseUpper),
                 sunset.Clamp(midnight + autoTransitionTimeLimits.SunsetLower, midnight + autoTransitionTimeLimits.SunsetUpper)
             );
+            logger.LogDebug("Auto transition times refreshed: \n"
+                + $"Day: {transitionTimes.Day.ToString()} \n" + $"Night: {transitionTimes.Night.ToString()} \n");
         }
 
         public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime)
         {
             RefreshTransitionTimes();
-            if (lastRunTime == null) return true;            
-            if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day) return true;
-            if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night) return true;
+            if (lastRunTime == null) return true;
+            if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day)
+            {
+                logger.LogDebug("Performing day transition.");
+                return true;
+            }
+            if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night)
+            {
+                logger.LogDebug("Performing night transition.");
+                return true;
+            }
             return false;
         }
 
         public TimeSpan? GetTransitionDuration(DateTime currentTime, DateTime? lastRunTime)
         {
             var options = appOptionsDelegate.CurrentValue;
-            if (lastRunTime == null) return TimeSpan.FromSeconds(options.StandardTransitionTime);
-            if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day) return TimeSpan.FromSeconds(options.TransitionTimeAtSunriseAndSunset);
-            if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night) return TimeSpan.FromSeconds(options.TransitionTimeAtSunriseAndSunset);
+            if (lastRunTime == null)
+            {
+                logger.LogDebug($"Transition duration: {options.StandardTransitionTime} seconds.");
+                return TimeSpan.FromSeconds(options.StandardTransitionTime);
+            }
+            if ((lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day) ||
+                (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night))
+            {
+                logger.LogDebug($"Transition duration: {options.TransitionTimeAtSunriseAndSunset} seconds.");
+                return TimeSpan.FromSeconds(options.TransitionTimeAtSunriseAndSunset);
+            }
+            logger.LogDebug($"Transition duration: {options.StandardTransitionTime} seconds.");
             return TimeSpan.FromSeconds(options.StandardTransitionTime);
         }
 
@@ -108,7 +127,9 @@ namespace HueShift2
             var target = (currentTime <= transitionTimes.Day || currentTime >= transitionTimes.Night) 
                 ? colourTemperatures.Night : colourTemperatures.Day;
             var colour =  new Colour(target);
-            return new LightState(colour);
+            var targetLightState = new LightState(colour);
+            logger.LogDebug("Transition target lightstate: \n" + targetLightState.ToString());
+            return targetLightState;
         }
     }
 }

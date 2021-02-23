@@ -54,7 +54,7 @@ namespace HueShift2
 
         private async Task RefreshLights(DateTime currentTime)
         {
-            logger.LogInformation("Refreshing lights...");
+            logger.LogDebug("Refreshing lights...");
             await clientManager.AssertConnected();
             this.lightsOnNetwork = await DiscoverLights();
             this.hueShiftLights = hueShiftLights.Trim(lightsOnNetwork);
@@ -75,8 +75,12 @@ namespace HueShift2
                 else
                 {
                     var expectedLight = this.hueShiftLights[light.Id];
-                    //log end of transition and change of controlstate
+                    var staleControlState = expectedLight.ControlState;
                     expectedLight.Refresh(light, currentTime);
+                    if (staleControlState != expectedLight.ControlState)
+                    {
+                        logger.LogInformation($"ID: {light.Id,-4} Name: {light.Name,-20} changed from {staleControlState} to {expectedLight.ControlState}");
+                    }
                     if (isExcluded)
                     {
                         expectedLight.Exclude();
@@ -84,7 +88,7 @@ namespace HueShift2
                     await Sync(light, expectedLight, currentTime, duration);
                 }
             }
-            logger.LogInformation("Lights refreshed.");
+            logger.LogDebug("Lights refreshed.");
             return;
         }
 
@@ -94,8 +98,11 @@ namespace HueShift2
 
         private async Task Sync(Light light, HueShiftLight expectedLight, DateTime currentTime, TimeSpan duration)
         {
-            if (expectedLight.ControlState == LightControlState.Excluded ||
-                expectedLight.ControlState == LightControlState.Manual) return;
+            if (expectedLight.ControlState == LightControlState.Excluded || expectedLight.ControlState == LightControlState.Manual ||
+                expectedLight.State.PowerState == LightPowerState.Off)
+            {
+                return;
+            }
             if (expectedLight.State.Matches(light.State)) return;
             var command = new LightCommand
             {
@@ -118,10 +125,11 @@ namespace HueShift2
         public async Task ExecuteTransitionCommand(LightCommand command, DateTime currentTime, bool resumeControl)
         {
             await RefreshLights(currentTime);
+            ListManual();
+            ListExcluded();
             var commandIds = this.hueShiftLights.SelectLightsToControl(resumeControl);
             if (commandIds.Count() > 0)
             {
-                //TODO: add verbose logging of transitions
                 await client.SendCommandAsync(command, commandIds);
                 foreach (var idLightPair in this.hueShiftLights)
                 {
