@@ -74,13 +74,14 @@ namespace HueShift2
                 sunrise.Clamp(midnight + autoTransitionTimeLimits.SunriseLower, midnight + autoTransitionTimeLimits.SunriseUpper),
                 sunset.Clamp(midnight + autoTransitionTimeLimits.SunsetLower, midnight + autoTransitionTimeLimits.SunsetUpper)
             );
-            logger.LogDebug("Auto transition times refreshed: \n"
-                + $"Day: {transitionTimes.Day.ToString()} \n" + $"Night: {transitionTimes.Night.ToString()} \n");
+            if (transitionTimes.Day.Date != transitionTimes.Night.Date) throw new InvalidOperationException();
+            logger.LogDebug($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString()} | Night: {transitionTimes.Night.ToString()}");
         }
 
         public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime)
         {
-            RefreshTransitionTimes();
+            if (this.transitionTimes == null) RefreshTransitionTimes();
+            if (DateTime.Now.Date != transitionTimes.Day.Date) RefreshTransitionTimes();
             if (lastRunTime == null) return true;
             if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day)
             {
@@ -115,9 +116,21 @@ namespace HueShift2
 
         public bool IsReset(DateTime currentTime, DateTime? lastRunTime)
         {
-            if (lastRunTime == null) return true;
-            if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day) return true;
-            if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night) return false;
+            if (lastRunTime == null)
+            {
+                logger.LogInformation($"First Run: taking control of non-excluded lights.");
+                return true;
+            }
+            if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day)
+            {
+                logger.LogInformation($"Sunrise Transition: taking control of non-excluded lights.");
+                return true;
+            }
+            if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night)
+            {
+                logger.LogInformation($"Night Transition: light control unaffected.");
+                return false;
+            }
             return false;
         }
 
@@ -128,7 +141,7 @@ namespace HueShift2
                 ? colourTemperatures.Night : colourTemperatures.Day;
             var colour =  new Colour(target);
             var targetLightState = new LightState(colour);
-            logger.LogDebug("Transition target lightstate: \n" + targetLightState.ToString());
+            logger.LogDebug($"Transition target lightstate: {targetLightState.ToString(true)}");
             return targetLightState;
         }
     }

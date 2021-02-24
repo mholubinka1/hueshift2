@@ -42,14 +42,14 @@ namespace HueShift2
         {
             var transitionDuration = transitionProvider.GetTransitionDuration(currentTime, lastRunTime);
             var resumeControl = transitionProvider.IsReset(currentTime, lastRunTime);
-            var targetColourTemperature = transitionProvider.TargetLightState(currentTime).Colour.ColourTemperature;
+            var targetLightState = transitionProvider.TargetLightState(currentTime);
             logger.LogInformation("Performing transition...");
             var command = new LightCommand
             {
-                ColorTemperature = targetColourTemperature,
+                ColorTemperature = targetLightState.Colour.ColourTemperature,
                 TransitionTime = transitionDuration
             };
-            await lightManager.ExecuteTransitionCommand(command, currentTime, resumeControl);
+            await lightManager.ExecuteTransitionCommand(targetLightState, command, currentTime, resumeControl);
         }
 
         public async Task<DateTime?> Execute(DateTime? lastRunTime)

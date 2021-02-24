@@ -112,6 +112,7 @@ namespace HueShift2
                 Hue = expectedLight.State.Colour.Hue,
                 Saturation = expectedLight.State.Colour.Saturation,
             };
+            logger.LogInformation($"Syncing light | Id: {light.Id} Name: {light.Name} | from: {new LightState(light.State).ToString(true)} | to: {expectedLight.State.ToString(true)}");
             await client.SendCommandAsync(command, new string[] { light.Id });
             return;
         }
@@ -122,12 +123,15 @@ namespace HueShift2
             return;
         }
 
-        public async Task ExecuteTransitionCommand(LightCommand command, DateTime currentTime, bool resumeControl)
+        public async Task ExecuteTransitionCommand(LightState target, LightCommand command, DateTime currentTime, bool resumeControl)
         {
             await RefreshLights(currentTime);
-            ListManual();
-            ListExcluded();
             var commandIds = this.hueShiftLights.SelectLightsToControl(resumeControl);
+            var logMessage = $"Commanding lights:";
+            foreach(var id in commandIds)
+            {
+                logMessage += $"\nID: {id} Name: {this.lightsOnNetwork.First(x => x.Id == id).Name} | from: {hueShiftLights[id].State.ToString(true)} | to: {target.ToString(true)}";
+            }
             if (commandIds.Count() > 0)
             {
                 await client.SendCommandAsync(command, commandIds);
@@ -179,10 +183,10 @@ namespace HueShift2
             }
             else
             {
-                var logMessage = "Excluded lights: \n";
+                var logMessage = "Excluded lights:";
                 foreach (var id in excludedLightIds)
                 {
-                    logMessage += $"ID: {id} Name: {ids[id].Name} \n";
+                    logMessage += $"\nID: {id} Name: {ids[id].Name}";
                 }
                 logger.LogInformation(logMessage);
             }
@@ -201,10 +205,10 @@ namespace HueShift2
             }
             else
             {
-                var logMessage = "Manually controlled lights: \n";
+                var logMessage = "Manually controlled lights:";
                 foreach (var id in manualLightIds)
                 {
-                    logMessage += $"ID: {id} Name: {ids[id].Name} \n";
+                    logMessage += $"\nID: {id} Name: {ids[id].Name}";
                 }
                 logger.LogInformation(logMessage);
             }

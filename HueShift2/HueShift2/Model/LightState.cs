@@ -82,21 +82,20 @@ namespace HueShift2.Model
 
         public bool Matches(State lightState)
         {
-            if (this.Brightness != lightState.Brightness) return false;
             return this.Colour.Matches(lightState);
         }
 
         public string ToString(bool targetState)
         {
-            var @base = $"Brightness: {this.Brightness} Scene: {this.Scene}\n" + "Colour: ["+ this.Colour.ToString() +"]";
+            var @base = $"Brightness: {this.Brightness} Scene: {this.Scene} Colour: ["+ this.Colour.ToString() +"]";
             if (targetState)
             {
                 return @base;
             }
-            var returnString = $"Power: {this.PowerState.ToString()}\n" + @base;
+            var returnString = $"Power: {this.PowerState.ToString()} " + @base;
             if (this.PowerState == LightPowerState.Transitioning)
             {
-                returnString += "\n" + $"Transition: [" + this.Transition.ToString() + "]";
+                returnString += $" Transition: [" + this.Transition.ToString() + "]";
             }
             return returnString;
             

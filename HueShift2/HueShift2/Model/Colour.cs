@@ -16,16 +16,19 @@ namespace HueShift2.Model
 
         public Colour(double[] colourCoordinates)
         {
+            this.Mode = ColourMode.XY;
             this.ColourCoordinates = colourCoordinates;
         }
 
         public Colour(int? colourTemperature)
         {
+            this.Mode = ColourMode.CT;
             this.ColourTemperature = colourTemperature;
         }
 
         public Colour(int? hue, int? saturation)
         {
+            this.Mode = ColourMode.Other;
             this.Hue = hue;
             this.Saturation = saturation;
         }
@@ -53,19 +56,23 @@ namespace HueShift2.Model
             this.Clear();
             if (command.ColorCoordinates != null)
             {
+                this.Mode = ColourMode.XY;
                 this.ColourCoordinates = command.ColorCoordinates;
                 return;
             }
             if (command.ColorTemperature != null)
             {
+                this.Mode = ColourMode.CT;
                 this.ColourTemperature = command.ColorTemperature;
                 return;
             }
             if (command.Hue != null && command.Saturation != null)
             {
+                this.Mode = ColourMode.Other;
                 this.Hue = command.Hue;
                 this.Saturation = command.Saturation;
             }
+            this.Mode = ColourMode.None;
             throw new InvalidOperationException();
         }
 
