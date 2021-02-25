@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using TimeZoneConverter;
@@ -75,7 +76,7 @@ namespace HueShift2
                 sunset.Clamp(midnight + autoTransitionTimeLimits.SunsetLower, midnight + autoTransitionTimeLimits.SunsetUpper)
             );
             if (transitionTimes.Day.Date != transitionTimes.Night.Date) throw new InvalidOperationException();
-            logger.LogDebug($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString()} | Night: {transitionTimes.Night.ToString()}");
+            logger.LogDebug($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString(CultureInfo.InvariantCulture)} | Night: {transitionTimes.Night.ToString(CultureInfo.InvariantCulture)}");
         }
 
         public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime)

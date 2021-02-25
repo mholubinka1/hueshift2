@@ -42,7 +42,14 @@ namespace HueShift2
             var discoveredLights = (await client.GetLightsAsync()).ToList();
             if (discoveredLights.Count - lightsOnNetwork.Count >= 0)
             {
-                logger.LogInformation($"Discovered {discoveredLights.Count - lightsOnNetwork.Count} new lights on the network.");
+                if(discoveredLights.Count - lightsOnNetwork.Count == 0)
+                {
+                    logger.LogDebug($"Discovered {discoveredLights.Count - lightsOnNetwork.Count} new lights on the network.");
+                }
+                else
+                {
+                    logger.LogInformation($"Discovered {discoveredLights.Count - lightsOnNetwork.Count} new lights on the network.");
+                }
             }
             else
             {
@@ -75,11 +82,16 @@ namespace HueShift2
                 else
                 {
                     var expectedLight = this.hueShiftLights[light.Id];
+                    var stalePowerState = expectedLight.State.PowerState;
                     var staleControlState = expectedLight.ControlState;
                     expectedLight.Refresh(light, currentTime);
+                    if (stalePowerState != expectedLight.State.PowerState)
+                    {
+                        logger.LogInformation($"ID: {light.Id,-4} Name: {light.Name,-20} | Power state changed from {stalePowerState} to {expectedLight.State.PowerState}");
+                    }
                     if (staleControlState != expectedLight.ControlState)
                     {
-                        logger.LogInformation($"ID: {light.Id,-4} Name: {light.Name,-20} changed from {staleControlState} to {expectedLight.ControlState}");
+                        logger.LogInformation($"ID: {light.Id,-4} Name: {light.Name,-20} | Control state changed from {staleControlState} to {expectedLight.ControlState}");
                     }
                     if (isExcluded)
                     {
@@ -127,26 +139,26 @@ namespace HueShift2
         {
             await RefreshLights(currentTime);
             var commandIds = this.hueShiftLights.SelectLightsToControl(resumeControl);
-            var logMessage = $"Commanding lights:";
+            var logCommandMessage = $"Commanding lights:";
             foreach(var id in commandIds)
             {
-                logMessage += $"\nID: {id} Name: {this.lightsOnNetwork.First(x => x.Id == id).Name} | from: {hueShiftLights[id].State.ToString(true)} | to: {target.ToString(true)}";
+                logCommandMessage += $"\nID: {id} Name: {this.lightsOnNetwork.First(x => x.Id == id).Name} | from: {hueShiftLights[id].State.ToString(true)} | to: {target.ToString(true)}";
             }
-            if (commandIds.Count() > 0)
+            logger.LogInformation(logCommandMessage);
+            if (commandIds.Count() > 0) await client.SendCommandAsync(command, commandIds);
+            var logExpectedMessage = $"New light states in memory:";
+            foreach (var idLightPair in this.hueShiftLights)
             {
-                await client.SendCommandAsync(command, commandIds);
-                foreach (var idLightPair in this.hueShiftLights)
+                if (commandIds.Any(i => i == idLightPair.Key))
                 {
-                    if(commandIds.Any(i => i == idLightPair.Key))
-                    {
-                        idLightPair.Value.TakeControl();
-                        idLightPair.Value.ExecuteTransitionCommand(command, currentTime);
-                    }
-                    else
-                    {
-                        idLightPair.Value.ExecuteInstantaneousCommand(command);
-                    }
+                    idLightPair.Value.TakeControl();
+                    idLightPair.Value.ExecuteTransitionCommand(command, currentTime);
                 }
+                else
+                {
+                    idLightPair.Value.ExecuteInstantaneousCommand(command);
+                }
+                logExpectedMessage += $"\nID: {idLightPair.Key} Name: {this.lightsOnNetwork.First(x => x.Id == idLightPair.Key).Name} | {idLightPair.Value.State.ToString(true)}";
             }
             return;
         }
