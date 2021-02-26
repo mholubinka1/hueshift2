@@ -178,7 +178,7 @@ namespace HueShift2
                 var logMessage = "Lights on network: \n";
                 foreach (var light in lightsOnNetwork)
                 {
-                    logMessage += $"ID: {light.Id,-4} Name: {light.Name,-20} ModelID: {light.ModelId,-10} ProductID: {light.ProductId,-10} \n";
+                    logMessage += $"ID: {light.Id,-4} Name: {light.Name,-20} ModelID: {light.ModelId,-10} ProductID: {light.ProductId,-10}";
                 }
                 logger.LogInformation(logMessage);
             }
