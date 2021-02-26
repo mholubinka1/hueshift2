@@ -111,7 +111,7 @@ namespace HueShift2
         private async Task Sync(Light light, HueShiftLight expectedLight, DateTime currentTime, TimeSpan duration)
         {
             if (expectedLight.ControlState == LightControlState.Excluded || expectedLight.ControlState == LightControlState.Manual ||
-                expectedLight.State.PowerState == LightPowerState.Off)
+                expectedLight.State.PowerState == LightPowerState.Off || expectedLight.State.PowerState == LightPowerState.Transitioning)
             {
                 return;
             }
