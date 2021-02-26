@@ -17,10 +17,11 @@ docker-build-master:
 docker-build:
   stage: build
   script:
-    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
+    - docker push "$DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
   except:
     - master
   tags:
-    - docker
+    - docker  
+
     

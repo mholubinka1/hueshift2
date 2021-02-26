@@ -33,12 +33,11 @@ namespace HueShift2.Model
         public void Refresh(Light light, DateTime currentTime)
         {
             var isOn = light.State.On;
-            //FIXME: this needs testing
             if (isOn)
             {
                 if (this.ControlState == LightControlState.HueShift)
                 {
-                    if (!this.State.Matches(light.State))
+                    if (!this.State.Matches(light.State) && this.State.PowerState != LightPowerState.Transitioning)
                     {
                         this.ControlState = LightControlState.Manual;
                     }
