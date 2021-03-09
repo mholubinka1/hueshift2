@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HueShift2
+namespace HueShift2.Host
 {
     public class LightScheduler : ILightScheduler
     {

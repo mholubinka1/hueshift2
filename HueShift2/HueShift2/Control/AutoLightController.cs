@@ -1,18 +1,15 @@
 ﻿using HueShift2.Configuration;
 using HueShift2.Configuration.Model;
 using HueShift2.Interfaces;
-using HueShift2.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Q42.HueApi;
-using Q42.HueApi.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace HueShift2
+namespace HueShift2.Control
 {
     public class AutoLightController: ILightController
     {

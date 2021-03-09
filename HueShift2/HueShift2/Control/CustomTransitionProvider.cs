@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HueShift2
+namespace HueShift2.Control
 {
     public class CustomTransitionProvider : ITransitionProvider
     {

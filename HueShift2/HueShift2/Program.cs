@@ -1,4 +1,6 @@
 ﻿using HueShift2.Configuration;
+using HueShift2.Control;
+using HueShift2.Host;
 using HueShift2.Configuration.Model;
 using HueShift2.Interfaces;
 using Microsoft.Extensions.Configuration;

@@ -9,10 +9,9 @@ using Q42.HueApi.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace HueShift2
+namespace HueShift2.Control
 {
     public class LightManager : ILightManager
     {
@@ -23,7 +22,7 @@ namespace HueShift2
         private ILocalHueClient client;
 
         private List<Light> lightsOnNetwork;
-        private IDictionary<string, HueShiftLight> hueShiftLights;
+        private IDictionary<string, HueShiftLight> lightsInMemory;
 
         public LightManager(ILogger<LightManager> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, IHueClientManager clientManager, ILocalHueClient client)
         {
@@ -32,7 +31,7 @@ namespace HueShift2
             this.clientManager = clientManager;
             this.client = client;
             this.lightsOnNetwork = new List<Light>();
-            this.hueShiftLights = new Dictionary<string, HueShiftLight>();
+            this.lightsInMemory = new Dictionary<string, HueShiftLight>();
         }
 
         #region Light Discovery
@@ -64,24 +63,24 @@ namespace HueShift2
             logger.LogDebug("Refreshing lights...");
             await clientManager.AssertConnected();
             this.lightsOnNetwork = await DiscoverLights();
-            this.hueShiftLights = hueShiftLights.Trim(lightsOnNetwork);
+            this.lightsInMemory = this.lightsInMemory.Trim(lightsOnNetwork);
             var excludedLights = appOptionsDelegate.CurrentValue.LightsToExclude;
             var duration = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
             foreach (var light in lightsOnNetwork)
             {
                 var isExcluded = excludedLights.Any(x => x == light.Id);
-                if (!this.hueShiftLights.ContainsKey(light.Id))
+                if (!this.lightsInMemory.ContainsKey(light.Id))
                 {
                     var hueShiftLight = new HueShiftLight(light);
                     if (isExcluded)
                     {
                         hueShiftLight.Exclude();
                     }
-                    this.hueShiftLights.Add(hueShiftLight.Id, hueShiftLight);
+                    this.lightsInMemory.Add(hueShiftLight.Id, hueShiftLight);
                 }
                 else
                 {
-                    var expectedLight = this.hueShiftLights[light.Id];
+                    var expectedLight = this.lightsInMemory[light.Id];
                     var stalePowerState = expectedLight.State.PowerState;
                     var staleControlState = expectedLight.ControlState;
                     expectedLight.Refresh(light, currentTime);
@@ -138,16 +137,16 @@ namespace HueShift2
         public async Task ExecuteTransitionCommand(HueShiftLightState target, LightCommand command, DateTime currentTime, bool resumeControl)
         {
             await RefreshLights(currentTime);
-            var commandIds = this.hueShiftLights.SelectLightsToControl(resumeControl);
+            var commandIds = this.lightsInMemory.SelectLightsToControl(resumeControl);
             var logCommandMessage = $"Commanding lights:";
             foreach(var id in commandIds)
             {
-                logCommandMessage += $"\nID: {id} Name: {this.lightsOnNetwork.First(x => x.Id == id).Name} | from: {hueShiftLights[id].State.ToString(true)} | to: {target.ToString(true)}";
+                logCommandMessage += $"\nID: {id} Name: {this.lightsOnNetwork.First(x => x.Id == id).Name} | from: {this.lightsInMemory[id].State.ToString(true)} | to: {target.ToString(true)}";
             }
             logger.LogInformation(logCommandMessage);
             if (commandIds.Count() > 0) await client.SendCommandAsync(command, commandIds);
             var logExpectedMessage = $"New light states in memory:";
-            foreach (var idLightPair in this.hueShiftLights)
+            foreach (var idLightPair in this.lightsInMemory)
             {
                 if (commandIds.Any(i => i == idLightPair.Key))
                 {
@@ -175,10 +174,10 @@ namespace HueShift2
             }
             else
             {
-                var logMessage = "Lights on network: \n";
+                var logMessage = "Lights on network:";
                 foreach (var light in lightsOnNetwork)
                 {
-                    logMessage += $"ID: {light.Id,-4} Name: {light.Name,-20} ModelID: {light.ModelId,-10} ProductID: {light.ProductId,-10}";
+                    logMessage += $"\nID: {light.Id,-4} Name: {light.Name,-20} ModelID: {light.ModelId,-10} ProductID: {light.ProductId,-10}";
                 }
                 logger.LogInformation(logMessage);
             }
@@ -208,7 +207,7 @@ namespace HueShift2
         public void ListManual()
         {
             var ids = this.lightsOnNetwork.ToDictionary(x => x.Id, x => x);
-            var manualLightIds = this.hueShiftLights.Values.Where(x => x.ControlState == LightControlState.Manual)
+            var manualLightIds = this.lightsInMemory.Values.Where(x => x.ControlState == LightControlState.Manual)
                 .Select(x => x.Id)
                 .ToArray();
             if (manualLightIds.Length == 0)

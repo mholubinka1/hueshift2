@@ -8,7 +8,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HueShift2
+namespace HueShift2.Control
 {
     public class LocalHueClientManager : IHueClientManager
     {

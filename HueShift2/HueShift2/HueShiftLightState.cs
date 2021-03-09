@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HueShift2,
+namespace HueShift2
     public class HueShiftLightState
     {
         public LightPowerState PowerState { get; private set; }

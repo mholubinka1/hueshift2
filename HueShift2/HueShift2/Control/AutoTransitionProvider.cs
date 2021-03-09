@@ -8,13 +8,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Text;
 using TimeZoneConverter;
 
-namespace HueShift2
+namespace HueShift2.Control
 {
     public class AutoTransitionProvider : ITransitionProvider
     {
