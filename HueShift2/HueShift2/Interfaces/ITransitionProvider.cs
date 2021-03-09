@@ -13,7 +13,7 @@ namespace HueShift2.Interfaces
         public TimeSpan? GetTransitionDuration(DateTime currentTime, DateTime? lastRunTime);
 
         public bool IsReset(DateTime currentTime, DateTime? lastRunTime);
-        public LightState TargetLightState(DateTime currentTime);
+        public HueShiftLightState TargetLightState(DateTime currentTime);
         
     }
 }

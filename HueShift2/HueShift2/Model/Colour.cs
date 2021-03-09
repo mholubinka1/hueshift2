@@ -101,12 +101,4 @@ namespace HueShift2.Model
             return @base;
         }
     }
-
-    public enum ColourMode
-    {
-        None,
-        XY,
-        CT,
-        Other
-    }
 }

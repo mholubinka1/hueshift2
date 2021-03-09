@@ -1,39 +1,30 @@
-﻿using Q42.HueApi;
+﻿using HueShift2.Model;
+using Q42.HueApi;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HueShift2.Model
+namespace HueShift2
 {
     public class HueShiftLight
     {
         public readonly string Id;
-
         public LightControlState ControlState {get; set;}
-        public LightState State { get; private set; }
+        public HueShiftLightState State { get; private set; }
 
         public HueShiftLight(Light light)
         {
             Id = light.Id;
             ControlState = LightControlState.HueShift;
-            State = new LightState(light.State);
-        }
-
-        public void ExecuteTransitionCommand(LightCommand command, DateTime currentTime)
-        {
-            if(this.ControlState != LightControlState.HueShift) throw new InvalidOperationException();
-            this.State.ExecuteTransitionCommand(command, currentTime);
-        }
-
-        public void ExecuteInstantaneousCommand(LightCommand command)
-        {
-            this.State.ExecuteInstantaneousCommand(command);
+            State = new HueShiftLightState(light.State);
         }
 
         public void Refresh(Light light, DateTime currentTime)
         {
-            var isOn = light.State.On;
-            if (isOn)
+            var on = light.State.On;
+            //TODO: 1. turning lights "to expected on state" turns brightness up to 100%
+            //TODO: 2. turning on the lights "to a new state - different brightness and/or colour state" sets lights to Hybrid Manual
+            if (on)
             {
                 if (this.ControlState == LightControlState.HueShift)
                 {
@@ -50,7 +41,7 @@ namespace HueShift2.Model
                     }
                 }
             }
-            this.State.Refresh(currentTime, isOn);
+            this.State.Refresh(currentTime, on);
         }
 
         public void TakeControl()
@@ -62,5 +53,20 @@ namespace HueShift2.Model
         {
             this.ControlState = LightControlState.Excluded;
         }
+
+        #region Execute Transitions
+
+        public void ExecuteTransitionCommand(LightCommand command, DateTime currentTime)
+        {
+            if (this.ControlState != LightControlState.HueShift) throw new InvalidOperationException();
+            this.State.ExecuteTransitionCommand(command, currentTime);
+        }
+
+        public void ExecuteInstantaneousCommand(LightCommand command)
+        {
+            this.State.ExecuteInstantaneousCommand(command);
+        }
+
+        #endregion
     }
 }

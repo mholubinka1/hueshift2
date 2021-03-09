@@ -124,7 +124,7 @@ namespace HueShift2
                 Hue = expectedLight.State.Colour.Hue,
                 Saturation = expectedLight.State.Colour.Saturation,
             };
-            logger.LogInformation($"Syncing light | Id: {light.Id} Name: {light.Name} | from: {new LightState(light.State).ToString(true)} | to: {expectedLight.State.ToString(true)}");
+            logger.LogInformation($"Syncing light | Id: {light.Id} Name: {light.Name} | from: {new HueShiftLightState(light.State).ToString(true)} | to: {expectedLight.State.ToString(true)}");
             await client.SendCommandAsync(command, new string[] { light.Id });
             return;
         }
@@ -135,7 +135,7 @@ namespace HueShift2
             return;
         }
 
-        public async Task ExecuteTransitionCommand(LightState target, LightCommand command, DateTime currentTime, bool resumeControl)
+        public async Task ExecuteTransitionCommand(HueShiftLightState target, LightCommand command, DateTime currentTime, bool resumeControl)
         {
             await RefreshLights(currentTime);
             var commandIds = this.hueShiftLights.SelectLightsToControl(resumeControl);

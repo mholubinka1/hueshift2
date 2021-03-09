@@ -29,7 +29,7 @@ namespace HueShift2
             throw new NotImplementedException();
         }
 
-        public LightState TargetLightState(DateTime currentTime)
+        public HueShiftLightState TargetLightState(DateTime currentTime)
         {
             throw new NotImplementedException();
         }

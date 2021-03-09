@@ -135,13 +135,13 @@ namespace HueShift2
             return false;
         }
 
-        public LightState TargetLightState(DateTime currentTime)
+        public HueShiftLightState TargetLightState(DateTime currentTime)
         {
             var colourTemperatures = appOptionsDelegate.CurrentValue.ColourTemperature;
             var target = (currentTime <= transitionTimes.Day || currentTime >= transitionTimes.Night) 
                 ? colourTemperatures.Night : colourTemperatures.Day;
             var colour =  new Colour(target);
-            var targetLightState = new LightState(colour);
+            var targetLightState = new HueShiftLightState(colour);
             logger.LogDebug($"Transition target lightstate: {targetLightState.ToString(true)}");
             return targetLightState;
         }

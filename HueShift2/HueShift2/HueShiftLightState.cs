@@ -1,12 +1,12 @@
 ﻿using HueShift2.Configuration.Model;
+using HueShift2.Model;
 using Q42.HueApi;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HueShift2.Model
-{
-    public class LightState
+namespace HueShift2,
+    public class HueShiftLightState
     {
         public LightPowerState PowerState { get; private set; }
         public byte Brightness { get; private set; }
@@ -15,12 +15,12 @@ namespace HueShift2.Model
 
         public Transition Transition;
 
-        public LightState(Colour colour)
+        public HueShiftLightState(Colour colour)
         {
             this.Colour = colour;
         }
 
-        public LightState(State state)
+        public HueShiftLightState(State state)
         {
             this.PowerState = state.On.ToPowerState();
             this.Brightness = state.Brightness;
