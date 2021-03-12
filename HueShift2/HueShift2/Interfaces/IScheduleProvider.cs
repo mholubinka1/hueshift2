@@ -6,7 +6,7 @@ using System.Text;
 
 namespace HueShift2.Interfaces
 {
-    public interface ITransitionProvider
+    public interface IScheduleProvider
     {
         public HueShiftMode Mode();
         public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime);

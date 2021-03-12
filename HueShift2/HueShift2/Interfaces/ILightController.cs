@@ -1,12 +1,15 @@
-﻿using HueShift2.Configuration;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HueShift2.Interfaces
 {
     public interface ILightController
     {
-        public HueShiftMode Mode();
-        public Task<DateTime?> Execute(DateTime? lastRunTime);
+        public Task ExecuteTransitionCommand();
+
+        public Task ExecuteSynchronisationCommand();
     }
 }

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "uDFkI9cP1F1Le0IzW+nDrCH+qN72xrRif4LjkuAFAwmfCwVpUMN1TqfXh0JXnbUvn/u2IjaB2kHWFUNlRIAuIA==",
+  "dgSpecHash": "lH/SPFmpynt8fQLw+jnQs/0kEZITbCTueq5/0Gt8F4Fivrwtljm03fRTGr7wVZ3pWKjG1Xb/4KiggnSFTM/Aow==",
   "success": true,
   "projectFilePath": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2\\HueShift2.csproj",
   "expectedPackageFiles": [
@@ -35,6 +35,7 @@
     "C:\\Users\\mehol\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\mehol\\.nuget\\packages\\optional\\4.0.0\\optional.4.0.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\q42.hueapi\\3.17.0\\q42.hueapi.3.17.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\q42.hueapi.colorconverters\\3.14.0\\q42.hueapi.colorconverters.3.14.0.nupkg.sha512",
     "C:\\Users\\mehol\\.nuget\\packages\\serilog\\2.10.1-dev-01285\\serilog.2.10.1-dev-01285.nupkg.sha512",

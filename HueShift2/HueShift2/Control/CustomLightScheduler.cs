@@ -11,16 +11,16 @@ using System.Threading.Tasks;
 
 namespace HueShift2.Control
 {
-    public class CustomLightController : ILightController
+    public class CustomLightScheduler : ILightScheduler
     {
         private readonly HueShiftMode mode;
-        private readonly ILogger<CustomLightController> logger;
+        private readonly ILogger<CustomLightScheduler> logger;
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
         private IHueClientManager clientManager;
         private ILocalHueClient client;
 
-        public CustomLightController(ILogger<CustomLightController> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, IOptionsMonitor<CustomScheduleOptions> scheduleOptionsDelegate,
+        public CustomLightScheduler(ILogger<CustomLightScheduler> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, IOptionsMonitor<CustomScheduleOptions> scheduleOptionsDelegate,
             IHueClientManager clientManager, ILocalHueClient client)
         {
             this.mode = HueShiftMode.Auto;

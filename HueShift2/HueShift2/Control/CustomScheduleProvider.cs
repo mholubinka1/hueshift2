@@ -7,7 +7,7 @@ using System.Text;
 
 namespace HueShift2.Control
 {
-    public class CustomTransitionProvider : ITransitionProvider
+    public class CustomScheduleProvider : IScheduleProvider
     {
         public HueShiftMode Mode()
         {

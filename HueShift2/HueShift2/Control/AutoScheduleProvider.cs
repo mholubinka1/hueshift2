@@ -14,16 +14,16 @@ using TimeZoneConverter;
 
 namespace HueShift2.Control
 {
-    public class AutoTransitionProvider : ITransitionProvider
+    public class AutoScheduleProvider : IScheduleProvider
     {
         private readonly HueShiftMode mode;
-        private readonly ILogger<AutoTransitionProvider> logger;
+        private readonly ILogger<AutoScheduleProvider> logger;
         private readonly IConfiguration configuration; 
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
         private AutoTransitionTimes transitionTimes;
 
-        public AutoTransitionProvider(ILogger<AutoTransitionProvider> logger, IConfiguration configuration, IOptionsMonitor<HueShiftOptions> appOptionsDelegate)
+        public AutoScheduleProvider(ILogger<AutoScheduleProvider> logger, IConfiguration configuration, IOptionsMonitor<HueShiftOptions> appOptionsDelegate)
         {
             this.mode = HueShiftMode.Auto;
             this.logger = logger;
