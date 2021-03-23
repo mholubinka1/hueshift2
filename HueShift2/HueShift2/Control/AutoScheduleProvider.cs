@@ -74,7 +74,7 @@ namespace HueShift2.Control
                 sunset.Clamp(midnight + autoTransitionTimeLimits.SunsetLower, midnight + autoTransitionTimeLimits.SunsetUpper)
             );
             if (transitionTimes.Day.Date != transitionTimes.Night.Date) throw new InvalidOperationException();
-            logger.LogDebug($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString(CultureInfo.InvariantCulture)} | Night: {transitionTimes.Night.ToString(CultureInfo.InvariantCulture)}");
+            logger.LogInformation($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString(CultureInfo.InvariantCulture)} | Night: {transitionTimes.Night.ToString(CultureInfo.InvariantCulture)}");
         }
 
         public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime)
