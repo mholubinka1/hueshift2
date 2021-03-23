@@ -23,7 +23,7 @@ namespace HueShift2.Control
         public void Refresh(Light networkLight, DateTime currentTime)
         {
             this.NetworkLight = networkLight;
-            var on = NetworkLight.State.On;
+            var isOn = NetworkLight.State.On;
 
 
 
@@ -32,7 +32,7 @@ namespace HueShift2.Control
 
             //TODO: 1. turning lights "to expected on state" turns brightness up to 100%
             //TODO: 2. turning on the lights "to a new state - different brightness and/or colour state" sets lights to Hybrid Manual
-            if (on)
+            if (isOn)
             {
                 if (this.AppControlState == LightControlState.HueShift)
                 {
@@ -45,7 +45,7 @@ namespace HueShift2.Control
                 {
                     if (this.State.PowerState == LightPowerState.Off)
                     {
-                        this.ControlState = LightControlState.HueShift;
+                        this.ControlState = LightControlSt   Wate.HueShift;
                     }
                 }
             }

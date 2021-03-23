@@ -59,7 +59,7 @@ namespace HueShift2.Control
             foreach (var discoveredLight in discoveredLights)
             {
                 var id = discoveredLight.Id;
-                var isExcluded = excludedLights.Any(x => x == light.Id);
+                var isExcluded = excludedLights.Any(x => x == discoveredLight.Id);
                 if (!lights.ContainsKey(id))
                 {
                     var light = new LightMemoryPair(discoveredLight);
@@ -84,19 +84,19 @@ namespace HueShift2.Control
                     }
                 }
             }
-            if (syncCommands.Any()) Synchronise(syncCommands);
+            if (syncCommands.Any()) await Synchronise(syncCommands);
             return lights;
         }
 
         public async Task Synchronise(IDictionary<string, LightCommand> syncCommands)
         {
-            foreach (var command in commands)
+            foreach (var command in syncCommands)
             {
-                await client.SendCommandAsync(command.Content, command.Ids);
+                await client.SendCommandAsync(command.Value, new[] { command.Key });
             }
         }
 
-        public asnyc Task Transition()
+        public async Task Transition()
         {
 
         }
