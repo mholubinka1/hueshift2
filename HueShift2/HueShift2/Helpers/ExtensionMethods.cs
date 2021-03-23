@@ -19,9 +19,9 @@ namespace HueShift2.Helpers
             return dt;
         }
 
-        public static IDictionary<string, LightMemoryPair> Trim(this IDictionary<string, LightMemoryPair> dict, IList<Light> networkLights)
+        public static IDictionary<string, LightControlPair> Trim(this IDictionary<string, LightControlPair> dict, IList<Light> networkLights)
         {
-            var trimmedDict = new Dictionary<string, LightMemoryPair>();
+            var trimmedDict = new Dictionary<string, LightControlPair>();
             foreach (var id in networkLights.Select(x => x.Id))
             {
                 if (dict.ContainsKey(id))
@@ -64,6 +64,15 @@ namespace HueShift2.Helpers
                     throw new NotSupportedException();
             }
         }
+
+        #region Light Equality
+
+        public static bool LightEquals(this Light @this, AppLight expectedLight)
+        {
+            return false;
+        }
+
+        #endregion
 
         public static bool ArrayEquals(double[] @this, double[] other)
         {

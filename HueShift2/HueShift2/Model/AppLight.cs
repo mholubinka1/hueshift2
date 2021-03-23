@@ -8,18 +8,11 @@ namespace HueShift2.Model
 {
     public class AppLight
     {
-        public HueShiftLightState State { get; private set; }
+        public AppLightState State { get; set; }
 
         public AppLight(Light light)
         {
-            Id = light.Id;
-            ControlState = LightControlState.HueShift;
-            State = new HueShiftLightState(light.State);
-        }
-
-        public void Refresh(Light light, DateTime currentTime)
-        {
-            
+            State = new AppLightState(light.State);
         }
 
         #region Execute Transitions

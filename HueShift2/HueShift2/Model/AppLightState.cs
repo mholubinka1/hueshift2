@@ -7,51 +7,26 @@ using System.Text;
 
 namespace HueShift2
 {
-    public class HueShiftLightState
+    public class AppLightState
     {
-        public LightPowerState PowerState { get; private set; }
         public byte Brightness { get; private set; }
         public string Scene { get; private set; }
         public Colour Colour { get; private set; }
 
-        public Transition Transition;
-
-        public HueShiftLightState(Colour colour)
+        public AppLightState(Colour colour)
         {
             this.Colour = colour;
         }
 
-        public HueShiftLightState(State state)
+        public AppLightState(State state)
         {
-            this.PowerState = state.On.ToPowerState();
             this.Brightness = state.Brightness;
             this.Colour = new Colour(state);
         }
 
         public void Refresh(DateTime currentTime, bool isOn)
         {
-            if (isOn)
-            {
-                if (this.PowerState == LightPowerState.Transitioning)
-                {
-                    if (this.Transition == null) throw new NullReferenceException();
-                    if (this.Transition.IsExpired(currentTime))
-                    {
-                        this.PowerState = LightPowerState.On;
-                        this.Transition = null;
-                    }
-                }
-                else
-                {
-                    this.PowerState = LightPowerState.On;
-                    this.Transition = null;
-                }
-            }
-            else
-            {
-                this.PowerState = LightPowerState.Off;
-                this.Transition = null;
-            }
+
         }
 
         public void ExecuteTransitionCommand(LightCommand command, DateTime currentTime)

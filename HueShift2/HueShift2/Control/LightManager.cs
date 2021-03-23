@@ -22,7 +22,7 @@ namespace HueShift2.Control
         private IHueClientManager clientManager;
         private ILocalHueClient client;
 
-        private IDictionary<string, LightMemoryPair> lights;
+        private IDictionary<string, LightControlPair> lights;
 
         public LightManager(ILogger<LightManager> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, IHueClientManager clientManager, ILocalHueClient client)
         {
@@ -30,7 +30,7 @@ namespace HueShift2.Control
             this.appOptionsDelegate = appOptionsDelegate;
             this.clientManager = clientManager;
             this.client = client;
-            this.lights = new Dictionary<string, LightMemoryPair>();
+            this.lights = new Dictionary<string, LightControlPair>();
         }
 
         private async Task<IList<Light>> Discover()
@@ -49,7 +49,7 @@ namespace HueShift2.Control
             }
         }
 
-        public async Task<IDictionary<string, LightMemoryPair>> Refresh(DateTime currentTime)
+        public async Task<IDictionary<string, LightControlPair>> Refresh(DateTime currentTime)
         {
             await clientManager.AssertConnected();
             var discoveredLights = await Discover();
@@ -62,7 +62,7 @@ namespace HueShift2.Control
                 var isExcluded = excludedLights.Any(x => x == discoveredLight.Id);
                 if (!lights.ContainsKey(id))
                 {
-                    var light = new LightMemoryPair(discoveredLight);
+                    var light = new LightControlPair(discoveredLight);
                     if (isExcluded) light.Exclude();
                     lights.Add(id, light);
                 }
@@ -100,5 +100,5 @@ namespace HueShift2.Control
         {
 
         }
-    }S
+    }
 }
