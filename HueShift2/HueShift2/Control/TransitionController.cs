@@ -8,5 +8,9 @@ namespace HueShift2.Control
 {
     public class TransitionController
     {
+        public TransitionController()
+        {
+
+        }
     }
 }
