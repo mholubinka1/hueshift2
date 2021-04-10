@@ -32,24 +32,19 @@ namespace HueShift2.Helpers
             return trimmedDict;
         }
 
-        public static string[] SelectLightsToControl(this IDictionary<string, AppLight> dict, bool resumeControl)
+        public static void Reset(this IDictionary<string, LightControlPair> controlPairs)
         {
-            string[] ids;
-            if (resumeControl)
+            foreach (var controlPair in controlPairs)
             {
-                ids = dict.Values
-                    .Where(x => x.ControlState == LightControlState.HueShift && x.State.PowerState == LightPowerState.On)
-                    .Select(x => x.Id)
-                    .ToArray();
+                controlPair.Value.Reset();
             }
-            else
-            {
-                ids = dict.Values
-                    .Where(x => x.ControlState != LightControlState.Excluded && x.State.PowerState == LightPowerState.On)
-                    .Select(x => x.Id)
-                    .ToArray();
-            }
-            return ids;
+        }
+
+        public static LightControlPair[] SelectLightsToControl(this IDictionary<string, LightControlPair> controlPairs)
+        {
+            var commandLights = controlPairs.Where(x => x.Value.AppControlState == LightControlState.HueShift && x.Value.PowerState == LightPowerState.On)
+                .Select(x => x.Value).ToArray();
+            return commandLights;
         }
 
         public static ColourMode ToColourMode(this string mode)
@@ -65,14 +60,46 @@ namespace HueShift2.Helpers
             }
         }
 
-        #region Light Equality
-
-        public static bool LightEquals(this Light @this, AppLight expectedLight)
+        public static LightCommand ToCommand(this AppLightState expectedLight)
         {
-            return false;
+            switch (expectedLight.Colour.Mode)
+            {
+                case ColourMode.XY:
+                    return new LightCommand
+                    {
+                        Brightness = expectedLight.Brightness,
+                        ColorCoordinates = expectedLight.Colour.ColourCoordinates,
+                    };
+
+                case ColourMode.CT:
+                    return new LightCommand
+                    {
+                        Brightness = expectedLight.Brightness,
+                        ColorTemperature = expectedLight.Colour.ColourTemperature,
+                    };
+                case ColourMode.Other:
+                case ColourMode.None:
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
-        #endregion
+        #region Light Equality
+
+        public static bool ColourEquals(this State @this, AppLightState expectedLight)
+        {
+            if (expectedLight.Colour.Mode != @this.ColorMode.ToColourMode()) return false;
+            switch (expectedLight.Colour.Mode)
+            {
+                case ColourMode.XY:
+                    return ExtensionMethods.ArrayEquals(expectedLight.Colour.ColourCoordinates, @this.ColorCoordinates);
+                case ColourMode.CT:
+                    return expectedLight.Colour.ColourTemperature == @this.ColorTemperature;
+                default:
+                    //return this.Hue == lightState.Hue && this.Saturation == lightState.Saturation;
+                    throw new NotImplementedException();
+            }
+        }
 
         public static bool ArrayEquals(double[] @this, double[] other)
         {
@@ -90,5 +117,7 @@ namespace HueShift2.Helpers
             var equals = (Math.Abs(@this - other) <= 0.00000001);
             return equals;
         }
+
+        #endregion
     }
 }

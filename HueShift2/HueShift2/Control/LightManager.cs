@@ -2,6 +2,7 @@
 using HueShift2.Helpers;
 using HueShift2.Interfaces;
 using HueShift2.Logging;
+using HueShift2.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Q42.HueApi;
@@ -36,7 +37,8 @@ namespace HueShift2.Control
         private async Task<IList<Light>> Discover()
         {
             var discoveredLights = (await client.GetLightsAsync()).ToList();
-            logger.LogDiscovery(discoveredLights, lights.Values.Select(x => x.CachedLight).ToList());
+            logger.LogDiscovery(discoveredLights, lights.Values);
+            Exclude();
             return discoveredLights;
         }
 
@@ -49,56 +51,146 @@ namespace HueShift2.Control
             }
         }
 
-        public async Task<IDictionary<string, LightControlPair>> Refresh(DateTime currentTime)
+        private async Task Synchronise(IDictionary<string, LightCommand> syncCommands)
+        {
+            foreach (var command in syncCommands)
+            {
+                var light = this.lights[command.Key];
+                logger.LogInformation($"Syncing light | Id: {light.Properties.Id} Name: {light.Properties.Name} | " +
+                    $"from: {new AppLightState(light.NetworkLight)} | " +
+                    $"to: {light.ExpectedLight}");
+                await client.SendCommandAsync(command.Value, new[] { command.Key });
+            }
+        }
+
+        public async Task Refresh(DateTime currentTime)
         {
             await clientManager.AssertConnected();
             var discoveredLights = await Discover();
             var excludedLights = appOptionsDelegate.CurrentValue.LightsToExclude;
-            lights = lights.Trim(discoveredLights);
+            this.lights = this.lights.Trim(discoveredLights);
             var syncCommands = new Dictionary<string, LightCommand>();
             foreach (var discoveredLight in discoveredLights)
             {
                 var id = discoveredLight.Id;
                 var isExcluded = excludedLights.Any(x => x == discoveredLight.Id);
-                if (!lights.ContainsKey(id))
+                if (!this.lights.ContainsKey(id))
                 {
                     var light = new LightControlPair(discoveredLight);
                     if (isExcluded) light.Exclude();
-                    lights.Add(id, light);
+                    this.lights.Add(id, light);
                 }
                 else
                 {
-                    
-                    lights[id].Refresh(discoveredLight, currentTime);
+                    this.lights[id].Refresh(discoveredLight.State, currentTime);
                     if (isExcluded)
                     {
-                        lights[id].Exclude();
+                        this.lights[id].Exclude();
                     }
                     else
                     {
-                        LightCommand syncCommand;
-                        if (lights[id].RequiresSync(out syncCommand))
+                        this.lights[id].Unexclude();
+                        if (this.lights[id].RequiresSync(out LightCommand syncCommand))
                         {
+                            syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
                             syncCommands.Add(id, syncCommand);
                         }
                     }
                 }
             }
             if (syncCommands.Any()) await Synchronise(syncCommands);
-            return lights;
+            foreach(var idLightPair in lights)
+            {
+                if(idLightPair.Key != idLightPair.Value.Properties.Id)
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+            return;
         }
 
-        public async Task Synchronise(IDictionary<string, LightCommand> syncCommands)
+        public async Task Transition(AppLightState target, LightCommand command, DateTime currentTime, bool reset)
         {
-            foreach (var command in syncCommands)
+            await Refresh(currentTime);
+            if (reset) lights.Reset();
+            var commandLights = lights.SelectLightsToControl();
+            var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
+            logger.LogCommand(commandLights, target);
+            if (commandIds.Length > 0) await client.SendCommandAsync(command, commandIds);
+            foreach (var light in this.lights.Values)
             {
-                await client.SendCommandAsync(command.Value, new[] { command.Key });
+                if(commandIds.Any(i => i == light.Properties.Id))
+                {
+                    light.ExecuteCommand(command, currentTime);
+                }
+                else
+                {
+                    light.ExecuteInstantaneousCommand(command);
+                }
+            }
+            logger.LogUpdate(this.lights.Values);
+            return;
+        }
+
+        #region Output
+
+        public void PrintAll()
+        {
+            if (lights.Count == 0)
+            {
+                logger.LogWarning("Lights on network: none");
+            }
+            else
+            {
+                logger.LogInformation("Lights on network:");
+                logger.LogLightProperties(lights.Values);
             }
         }
 
-        public async Task Transition()
+        public void PrintScheduled()
         {
-
+            var controlledLights = lights.Values.Where(x => x.AppControlState == LightControlState.HueShift).ToArray();
+            if (controlledLights.Length == 0)
+            {
+                logger.LogWarning("Lights under control: none");
+            }
+            else
+            {
+                logger.LogInformation("Lights under control:");
+                logger.LogLightProperties(controlledLights);
+            }
         }
+
+        public void PrintManual()
+        {
+            var manualLights = lights.Values.Where(x => x.AppControlState == LightControlState.Manual).ToArray();
+            if (manualLights.Length == 0)
+            {
+                logger.LogInformation("Manually controlled lights: none");
+            }
+            else
+            {
+                logger.LogInformation("Manually controlled lights:");
+                logger.LogLightProperties(manualLights);
+            }
+        }
+
+        public void PrintExcluded()
+        {
+            var excludedIds = appOptionsDelegate.CurrentValue.LightsToExclude;
+            if (excludedIds.Length == 0)
+            {
+                logger.LogInformation("Excluded lights: none");
+            }
+            else
+            {
+                var excludedLights = lights.Values.Where(x => excludedIds.Contains(x.Properties.Id));
+                logger.LogInformation("Excluded lights:");
+                logger.LogLightProperties(excludedLights);
+            }
+            return;
+        }
+
+        #endregion
     }
 }

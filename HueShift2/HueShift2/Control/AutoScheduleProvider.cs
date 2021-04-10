@@ -139,9 +139,9 @@ namespace HueShift2.Control
             var target = (currentTime <= transitionTimes.Day || currentTime >= transitionTimes.Night) 
                 ? colourTemperatures.Night : colourTemperatures.Day;
             var colour =  new Colour(target);
-            var targetLightState = new AppLightState(colour);
-            logger.LogDebug($"Transition target lightstate: {targetLightState.ToString(true)}");
-            return targetLightState;
+            var targetLight = new AppLightState(colour);
+            logger.LogDebug($"Transition target lightstate: {targetLight}");
+            return targetLight;
         }
     }
 }

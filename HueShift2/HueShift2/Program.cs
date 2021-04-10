@@ -48,7 +48,7 @@ namespace HueShift2
                         services.AddSingleton<ILocalHueClient>(client => new LocalHueClient(hostContext.Configuration["HueShiftOptions:BridgeProperties:IpAddress"]));
                         services.AddSingleton<IConfigFileHelper, ConfigFileHelper>();
                         services.AddSingleton<IHueClientManager, LocalHueClientManager>();
-                        services.AddSingleton<ILightManager, OldLightManager>();
+                        services.AddSingleton<ILightManager, LightManager>();
                         services.AddScoped<IScheduleProvider, AutoScheduleProvider>();
                         services.AddScoped<IScheduleProvider, CustomScheduleProvider>();
                         services.AddSingleton<ILightScheduler, AutoLightScheduler>();

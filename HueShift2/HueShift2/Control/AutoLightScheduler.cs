@@ -1,6 +1,7 @@
 ﻿using HueShift2.Configuration;
 using HueShift2.Configuration.Model;
 using HueShift2.Interfaces;
+using HueShift2.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Q42.HueApi;
@@ -35,18 +36,37 @@ namespace HueShift2.Control
             return mode;
         }
 
+        private LightCommand CreateAutoCommand(AppLightState light, TimeSpan? duration, bool resumeControl)
+        {
+            LightCommand command;
+            if (resumeControl)
+            {
+                command = new LightCommand
+                {
+                    Brightness = 254,
+                    ColorTemperature = light.Colour.ColourTemperature,
+                    TransitionTime = duration
+                };
+            }
+            else
+            {
+                command = new LightCommand
+                {
+                    ColorTemperature = light.Colour.ColourTemperature,
+                    TransitionTime = duration
+                };
+            }
+            return command;
+        }
+
         private async Task ExecuteTransition(DateTime currentTime, DateTime? lastRunTime)
         {
             var transitionDuration = scheduleProvider.GetTransitionDuration(currentTime, lastRunTime);
-            var resumeControl = scheduleProvider.IsReset(currentTime, lastRunTime);
+            var reset = scheduleProvider.IsReset(currentTime, lastRunTime);
             var targetLightState = scheduleProvider.TargetLightState(currentTime);
             logger.LogInformation("Performing transition...");
-            var command = new LightCommand
-            {
-                ColorTemperature = targetLightState.Colour.ColourTemperature,
-                TransitionTime = transitionDuration
-            };
-            await lightManager.ExecuteTransition(targetLightState, command, currentTime, resumeControl);
+            var command = CreateAutoCommand(targetLightState, transitionDuration, reset);
+            await lightManager.Transition(targetLightState, command, currentTime, reset);
         }
 
         public async Task<DateTime?> Execute(DateTime? lastRunTime)
@@ -56,7 +76,7 @@ namespace HueShift2.Control
             if (!scheduleProvider.ShouldPerformTransition(currentTime, lastRunTime))
             {
                 logger.LogDebug("No transition to perform.");
-                await lightManager.ExecuteRefresh(currentTime);
+                await lightManager.Refresh(currentTime);
                 return currentTime;
             }
             await ExecuteTransition(currentTime, lastRunTime);

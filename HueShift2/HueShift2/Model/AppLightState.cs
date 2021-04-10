@@ -1,22 +1,16 @@
-﻿using HueShift2.Configuration.Model;
-using HueShift2.Model;
+﻿using HueShift2.Model;
 using Q42.HueApi;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HueShift2
+namespace HueShift2.Model
 {
     public class AppLightState
     {
-        public byte Brightness { get; private set; }
-        public string Scene { get; private set; }
-        public Colour Colour { get; private set; }
-
-        public AppLightState(Colour colour)
-        {
-            this.Colour = colour;
-        }
+        public byte Brightness { get; set; }
+        public string Scene { get; set; }
+        public Colour Colour { get; set; }
 
         public AppLightState(State state)
         {
@@ -24,57 +18,24 @@ namespace HueShift2
             this.Colour = new Colour(state);
         }
 
-        public void Refresh(DateTime currentTime, bool isOn)
+        public AppLightState(AppLightState appLight)
         {
-
+            this.Brightness = appLight.Brightness;
+            this.Scene = appLight.Scene;
+            this.Colour = new Colour(appLight.Colour);
         }
 
-        public void ExecuteTransitionCommand(LightCommand command, DateTime currentTime)
+        public AppLightState(Colour colour)
         {
-            if(command.TransitionTime != null)
-            {
-                this.PowerState = LightPowerState.Transitioning;
-                this.Transition = new Transition(currentTime, (TimeSpan)command.TransitionTime);
-            }
-            else
-            {
-                this.PowerState = LightPowerState.On;
-            }
-            if(command.Brightness != null)
-            {
-                this.Brightness = (byte)command.Brightness;
-            }
-            this.Colour.ExecuteCommand(command);
+            this.Colour = new Colour(colour);
         }
 
-        public void ExecuteInstantaneousCommand(LightCommand command)
+        public override string ToString()
         {
-            if (command.Brightness != null)
-            {
-                this.Brightness = (byte)command.Brightness;
-            }
-            this.Colour.ExecuteCommand(command);
-        }
-
-        public bool Matches(State lightState)
-        {
-            return this.Colour.Matches(lightState);
-        }
-
-        public string ToString(bool targetState)
-        {
-            var @base = $"Brightness: {this.Brightness} Scene: {this.Scene} Colour: ["+ this.Colour.ToString() +"]";
-            if (targetState)
-            {
-                return @base;
-            }
-            var returnString = $"Power: {this.PowerState.ToString()} " + @base;
-            if (this.PowerState == LightPowerState.Transitioning)
-            {
-                returnString += $" Transition: [" + this.Transition.ToString() + "]";
-            }
-            return returnString;
-            
+            var @base = $"brightness: {this.Brightness}";
+            @base += string.IsNullOrWhiteSpace(this.Scene) ? "" : $" scene: {this.Scene}";
+            @base += this.Colour.ToString();
+            return @base;
         }
     }
 }

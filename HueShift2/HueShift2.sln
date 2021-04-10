@@ -9,7 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{7568C5AE-C9D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0028D23E-10B3-4376-A4D3-A48B707828BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HueShift2Tests", "HueShift2Tests\HueShift2Tests.csproj", "{54413C50-648D-4DEC-BF21-781B1F2A9641}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HueShift2Tests", "HueShift2Tests\HueShift2Tests.csproj", "{54413C50-648D-4DEC-BF21-781B1F2A9641}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{306D15A5-523D-4E4A-9DA6-C9E3927A1EAD}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
