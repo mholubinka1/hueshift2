@@ -26,8 +26,8 @@ namespace HueShift2.Configuration
             }
             dynamic response = JObject.Parse(geolocationResponse);
             return new Geolocation(
-                (double)response.latitude,
-                (double)response.longitude);
+                (double) response.latitude,
+                (double) response.longitude);
         }
     }
 }

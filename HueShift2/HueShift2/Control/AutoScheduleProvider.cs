@@ -79,8 +79,11 @@ namespace HueShift2.Control
 
         public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime)
         {
+            // refresh transition times if sunrise and sunset times are not present
             if (this.transitionTimes == null) RefreshTransitionTimes();
-            if (DateTime.Now.Date != transitionTimes.Day.Date) RefreshTransitionTimes();
+            // refresh transition times close to transition to cover the effect of clocks changing and moving sunrise and sunset times
+            if (transitionTimes.Day - currentTime < new TimeSpan(2, 0, 0) ||
+                transitionTimes.Night - currentTime < new TimeSpan(2, 0, 0)) RefreshTransitionTimes();
             if (lastRunTime == null) return true;
             if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day)
             {
