@@ -25,6 +25,8 @@ namespace HueShift2.Control
 
         private IDictionary<string, LightControlPair> lights;
 
+        private bool resetOccurred;
+
         public LightManager(ILogger<LightManager> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, IHueClientManager clientManager, ILocalHueClient client)
         {
             this.logger = logger;
@@ -90,7 +92,7 @@ namespace HueShift2.Control
                     else
                     {
                         this.lights[id].Unexclude();
-                        if (this.lights[id].RequiresSync(out LightCommand syncCommand))
+                        if (this.lights[id].RequiresSync(resetOccurred, out LightCommand syncCommand))
                         {
                             syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
                             syncCommands.Add(id, syncCommand);
@@ -112,7 +114,11 @@ namespace HueShift2.Control
         public async Task Transition(AppLightState target, LightCommand command, DateTime currentTime, bool reset)
         {
             await Refresh(currentTime);
-            if (reset) lights.Reset();
+            if (reset)
+            {
+                lights.Reset();
+                resetOccurred = true;
+            }
             var commandLights = lights.SelectLightsToControl();
             var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             logger.LogCommand(commandLights, target);

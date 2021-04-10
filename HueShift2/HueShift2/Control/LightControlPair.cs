@@ -17,9 +17,7 @@ namespace HueShift2.Control
         public State NetworkLight { get; private set; }
         public AppLightState ExpectedLight { get; private set; }
 
-        public Transition Transition;
-
-        private bool hasBeenTurnedOnToday;
+        public Transition Transition { get; private set; }
 
         public LightControlPair(Light networkLight)
         {
@@ -80,14 +78,14 @@ namespace HueShift2.Control
             }
         }
 
-        public bool RequiresSync(out LightCommand syncCommand)
+        public bool RequiresSync(bool resetOccurred, out LightCommand syncCommand)
         {
-            var brightness = hasBeenTurnedOnToday ? this.ExpectedLight.Brightness : 254;
+            var brightness = resetOccurred ? this.ExpectedLight.Brightness : (byte)254;
             if (this.NetworkLight.ColourEquals(this.ExpectedLight))
             {
-                if(!hasBeenTurnedOnToday)
+                if (resetOccurred)
                 {
-                    syncCommand = new LightCommand { Brightness = 254, };
+                    syncCommand = new LightCommand { Brightness = brightness };
                     return true;
                 }
                 syncCommand = null;
@@ -103,7 +101,6 @@ namespace HueShift2.Control
             {
                 this.AppControlState = LightControlState.HueShift;
             }
-            hasBeenTurnedOnToday = false;
         }
 
         private void ClearColourState()
