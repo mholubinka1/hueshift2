@@ -28,7 +28,8 @@ namespace HueShift2
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             var pollingFrequency = Math.Max(appOptionsDelegate.CurrentValue.PollingFrequency * 1000, appOptionsDelegate.CurrentValue.StandardTransitionTime);
-            await lightManager.OutputLightsOnNetwork(DateTime.Now);
+            await lightManager.Refresh(DateTime.Now);
+            lightManager.PrintAll();
             while (!cancellationToken.IsCancellationRequested)
             {
                 await lightScheduler.RunAsync();
