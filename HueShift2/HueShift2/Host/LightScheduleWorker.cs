@@ -11,35 +11,35 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HueShift2
+namespace HueShift2.Host
 {
-    public class LightScheduler : ILightScheduler
+    public class LightScheduleWorker : ILightScheduleWorker
     {
-        private readonly ILogger<LightScheduler> logger;
+        private readonly ILogger<LightScheduleWorker> logger;
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
-        private readonly IEnumerable<ILightController> lightControllers;
+        private readonly IEnumerable<ILightScheduler> lightSchedulers;
 
         private DateTime? lastRunTime;
 
-        public LightScheduler(ILogger<LightScheduler> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate,
-            IEnumerable<ILightController> lightControllers)
+        public LightScheduleWorker(ILogger<LightScheduleWorker> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate,
+            IEnumerable<ILightScheduler> lightSchedulers)
         {
             this.logger = logger;
             this.appOptionsDelegate = appOptionsDelegate;
-            this.lightControllers = lightControllers;
+            this.lightSchedulers = lightSchedulers;
         }
 
-        private ILightController ResolveController()
+        private ILightScheduler ResolveScheduler()
         {
-            var controller = lightControllers.First(x => x.Mode() == appOptionsDelegate.CurrentValue.Mode);
+            var controller = lightSchedulers.First(x => x.Mode() == appOptionsDelegate.CurrentValue.Mode);
             return controller;
         }
 
         public async Task RunAsync()
         {
-            var controller = ResolveController();
-            var currentTime = await controller.Execute(lastRunTime);
+            var scheduler = ResolveScheduler();
+            var currentTime = await scheduler.Execute(lastRunTime);
             lastRunTime = currentTime;
         }
     }

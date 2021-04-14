@@ -429,6 +429,15 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
+      "Optional/4.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Optional.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Optional.dll": {}
+        }
+      },
       "Q42.HueApi/3.17.0": {
         "type": "package",
         "dependencies": {
@@ -1286,6 +1295,25 @@
         "packageIcon.png"
       ]
     },
+    "Optional/4.0.0": {
+      "sha512": "Q9NdZ39K/tPuV8JDs6ntRxW3idN9J4jSoBK/2ovld+Gh8if4Yhs+OTPvI84mN5YGAI3pzbhLcNUrm+VFKutC3Q==",
+      "type": "package",
+      "path": "optional/4.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net35/Optional.dll",
+        "lib/net35/Optional.xml",
+        "lib/net45/Optional.dll",
+        "lib/net45/Optional.xml",
+        "lib/netstandard1.0/Optional.dll",
+        "lib/netstandard1.0/Optional.xml",
+        "lib/netstandard2.0/Optional.dll",
+        "lib/netstandard2.0/Optional.xml",
+        "optional.4.0.0.nupkg.sha512",
+        "optional.nuspec"
+      ]
+    },
     "Q42.HueApi/3.17.0": {
       "sha512": "8C4TLYElVBbrBI9B2sbY5l4jvaIv1wx4x2Tg/oQ1R2VmPDKzA6kr96cpnSZdp+9e4iCHZdWQAt8WEBm1BnHsMA==",
       "type": "package",
@@ -1627,6 +1655,7 @@
       "Microsoft.Extensions.Hosting >= 5.0.0",
       "Microsoft.Extensions.Options >= 5.0.0",
       "Newtonsoft.Json >= 12.0.3",
+      "Optional >= 4.0.0",
       "Q42.HueApi >= 3.17.0",
       "Q42.HueApi.ColorConverters >= 3.14.0",
       "Serilog >= 2.10.1-dev-01285",
@@ -1639,7 +1668,8 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mehol\\.nuget\\packages\\": {}
+    "C:\\Users\\mehol\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
@@ -1650,8 +1680,12 @@
       "packagesPath": "C:\\Users\\mehol\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\mehol\\git\\github\\hueshift2\\HueShift2\\HueShift2\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\mehol\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -1709,6 +1743,10 @@
             "target": "Package",
             "version": "[12.0.3, )"
           },
+          "Optional": {
+            "target": "Package",
+            "version": "[4.0.0, )"
+          },
           "Q42.HueApi": {
             "target": "Package",
             "version": "[3.17.0, )"
@@ -1761,7 +1799,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

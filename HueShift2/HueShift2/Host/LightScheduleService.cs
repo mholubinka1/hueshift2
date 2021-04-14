@@ -9,15 +9,15 @@ using System;
 
 namespace HueShift2
 {
-    public class LightSchedulerService : BackgroundService
+    public class LightScheduleService : BackgroundService
     {
-        private readonly ILogger<LightSchedulerService> logger;
+        private readonly ILogger<LightScheduleService> logger;
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
         private readonly ILightManager lightManager;
-        private readonly ILightScheduler lightScheduler;
+        private readonly ILightScheduleWorker lightScheduler;
 
-        public LightSchedulerService(ILogger<LightSchedulerService> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, ILightManager lightManager, ILightScheduler lightScheduler)
+        public LightScheduleService(ILogger<LightScheduleService> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, ILightManager lightManager, ILightScheduleWorker lightScheduler)
         {
             this.logger = logger;
             this.appOptionsDelegate = appOptionsDelegate;
