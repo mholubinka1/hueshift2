@@ -1,0 +1,29 @@
+version: "3:
+
+services:
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    network_mode: none
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --debug --label-enable --cleanup --schedule "0 0 3 * * ?"
+    restart: always
+  hueshift2:
+    depends_on:
+      - watchtower
+    container_name: hueshift2
+    image: mholubinka1/hueshift2:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "6454:6454/udp"
+      - "6454:6454"
+    environment:
+      TZ: 'Europe/London'
+    volumes:
+      - /home/pi/.config/hueshift2:/config
+      - /home/pi/hueshift2:/log
+    restart: unless-stopped

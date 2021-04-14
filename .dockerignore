@@ -1,0 +1,5 @@
+.git
+.github
+**/[B|b]in
+**/[O|o]bj
+.xlsx

@@ -1,0 +1,27 @@
+image: docker:latest
+services:
+  - docker:dind
+before_script:
+  - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+
+docker-build-master:
+  stage: build
+  script:
+    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE" .
+    - docker push "$DOCKER_REGISTRY_IMAGE"
+  only:
+    - master
+  tags:
+    - docker
+
+docker-build:
+  stage: build
+  script:
+    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
+    - docker push "$DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
+  except:
+    - master
+  tags:
+    - docker  
+
+    
