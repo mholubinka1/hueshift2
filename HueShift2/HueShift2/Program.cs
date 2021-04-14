@@ -1,4 +1,6 @@
 ﻿using HueShift2.Configuration;
+using HueShift2.Control;
+using HueShift2.Host;
 using HueShift2.Configuration.Model;
 using HueShift2.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -47,12 +49,12 @@ namespace HueShift2
                         services.AddSingleton<IConfigFileHelper, ConfigFileHelper>();
                         services.AddSingleton<IHueClientManager, LocalHueClientManager>();
                         services.AddSingleton<ILightManager, LightManager>();
-                        services.AddScoped<ITransitionProvider, AutoTransitionProvider>();
-                        services.AddScoped<ITransitionProvider, CustomTransitionProvider>();
-                        services.AddSingleton<ILightController, AutoLightController>();
-                        services.AddSingleton<ILightController, CustomLightController>();
-                        services.AddSingleton<ILightScheduler, LightScheduler>();
-                        services.AddHostedService<LightSchedulerService>();
+                        services.AddScoped<IScheduleProvider, AutoScheduleProvider>();
+                        services.AddScoped<IScheduleProvider, CustomScheduleProvider>();
+                        services.AddSingleton<ILightScheduler, AutoLightScheduler>();
+                        services.AddSingleton<ILightScheduler, CustomLightScheduler>();
+                        services.AddSingleton<ILightScheduleWorker, LightScheduleWorker>();
+                        services.AddHostedService<LightScheduleService>();
                     });
                 Log.Information("Host created successfully.");
                 await host.Build().RunAsync();

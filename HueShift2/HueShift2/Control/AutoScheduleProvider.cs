@@ -8,24 +8,22 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Text;
 using TimeZoneConverter;
 
-namespace HueShift2
+namespace HueShift2.Control
 {
-    public class AutoTransitionProvider : ITransitionProvider
+    public class AutoScheduleProvider : IScheduleProvider
     {
         private readonly HueShiftMode mode;
-        private readonly ILogger<AutoTransitionProvider> logger;
+        private readonly ILogger<AutoScheduleProvider> logger;
         private readonly IConfiguration configuration; 
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
         private AutoTransitionTimes transitionTimes;
 
-        public AutoTransitionProvider(ILogger<AutoTransitionProvider> logger, IConfiguration configuration, IOptionsMonitor<HueShiftOptions> appOptionsDelegate)
+        public AutoScheduleProvider(ILogger<AutoScheduleProvider> logger, IConfiguration configuration, IOptionsMonitor<HueShiftOptions> appOptionsDelegate)
         {
             this.mode = HueShiftMode.Auto;
             this.logger = logger;
@@ -76,13 +74,16 @@ namespace HueShift2
                 sunset.Clamp(midnight + autoTransitionTimeLimits.SunsetLower, midnight + autoTransitionTimeLimits.SunsetUpper)
             );
             if (transitionTimes.Day.Date != transitionTimes.Night.Date) throw new InvalidOperationException();
-            logger.LogDebug($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString(CultureInfo.InvariantCulture)} | Night: {transitionTimes.Night.ToString(CultureInfo.InvariantCulture)}");
+            logger.LogInformation($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString(CultureInfo.InvariantCulture)} | Night: {transitionTimes.Night.ToString(CultureInfo.InvariantCulture)}");
         }
 
         public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime)
         {
+            // refresh transition times if sunrise and sunset times are not present
             if (this.transitionTimes == null) RefreshTransitionTimes();
-            if (DateTime.Now.Date != transitionTimes.Day.Date) RefreshTransitionTimes();
+            // refresh transition times close to transition to cover the effect of clocks changing and moving sunrise and sunset times
+            if (transitionTimes.Day - currentTime < new TimeSpan(2, 0, 0) ||
+                transitionTimes.Night - currentTime < new TimeSpan(2, 0, 0)) RefreshTransitionTimes();
             if (lastRunTime == null) return true;
             if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day)
             {
@@ -135,15 +136,15 @@ namespace HueShift2
             return false;
         }
 
-        public LightState TargetLightState(DateTime currentTime)
+        public AppLightState TargetLightState(DateTime currentTime)
         {
             var colourTemperatures = appOptionsDelegate.CurrentValue.ColourTemperature;
             var target = (currentTime <= transitionTimes.Day || currentTime >= transitionTimes.Night) 
                 ? colourTemperatures.Night : colourTemperatures.Day;
             var colour =  new Colour(target);
-            var targetLightState = new LightState(colour);
-            logger.LogDebug($"Transition target lightstate: {targetLightState.ToString(true)}");
-            return targetLightState;
+            var targetLight = new AppLightState(colour);
+            logger.LogDebug($"Transition target lightstate: {targetLight}");
+            return targetLight;
         }
     }
 }

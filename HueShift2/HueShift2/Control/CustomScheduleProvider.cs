@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HueShift2
+namespace HueShift2.Control
 {
-    public class CustomTransitionProvider : ITransitionProvider
+    public class CustomScheduleProvider : IScheduleProvider
     {
         public HueShiftMode Mode()
         {
@@ -29,7 +29,7 @@ namespace HueShift2
             throw new NotImplementedException();
         }
 
-        public LightState TargetLightState(DateTime currentTime)
+        public AppLightState TargetLightState(DateTime currentTime)
         {
             throw new NotImplementedException();
         }
