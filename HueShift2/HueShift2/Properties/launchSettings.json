@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "HueShift2": {
-      "commandName": "Project",
-      "commandLineArgs": "--config-file \"config/hueshift2-config.json\""
-    }
-  }
-}
