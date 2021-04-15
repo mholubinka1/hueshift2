@@ -25,6 +25,8 @@ namespace HueShift2.Control
 
         private IDictionary<string, LightControlPair> lights;
 
+        private static object _lock = new object();
+
         public LightManager(ILogger<LightManager> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, IHueClientManager clientManager, ILocalHueClient client)
         {
             this.logger = logger;
@@ -32,6 +34,7 @@ namespace HueShift2.Control
             this.clientManager = clientManager;
             this.client = client;
             this.lights = new Dictionary<string, LightControlPair>();
+
         }
 
         private async Task<IList<Light>> Discover()
@@ -68,29 +71,32 @@ namespace HueShift2.Control
             await clientManager.AssertConnected();
             var discoveredLights = await Discover();
             var excludedLights = appOptionsDelegate.CurrentValue.LightsToExclude;
-            this.lights = this.lights.Trim(discoveredLights);
             var syncCommands = new Dictionary<string, LightCommand>();
-            foreach (var discoveredLight in discoveredLights)
+            lock (_lock)
             {
-                var id = discoveredLight.Id;
-                var isExcluded = excludedLights.Any(x => x == discoveredLight.Id);
-                if (!this.lights.ContainsKey(id))
+                this.lights = this.lights.Trim(discoveredLights);
+                foreach (var discoveredLight in discoveredLights)
                 {
-                    var light = new LightControlPair(discoveredLight);
-                    light.Exclude(isExcluded);
-                    this.lights.Add(id, light);
-                }
-                else
-                {
-                    var light = this.lights[id];
-                    var staleProperties = new Tuple<LightPowerState, LightControlState, bool>(light.PowerState, light.AppControlState, light.ResetOccurred);
-                    light.Refresh(discoveredLight.State, currentTime);
-                    light.Exclude(isExcluded);
-                    logger.LogRefresh(staleProperties, light);
-                    if (this.lights[id].RequiresSync(out LightCommand syncCommand))
+                    var id = discoveredLight.Id;
+                    var isExcluded = excludedLights.Any(x => x == discoveredLight.Id);
+                    if (!this.lights.ContainsKey(id))
                     {
-                        syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
-                        syncCommands.Add(id, syncCommand);
+                        var light = new LightControlPair(discoveredLight);
+                        light.Exclude(isExcluded);
+                        this.lights.Add(id, light);
+                    }
+                    else
+                    {
+                        var light = this.lights[id];
+                        var staleProperties = new Tuple<LightPowerState, LightControlState, bool>(light.PowerState, light.AppControlState, light.ResetOccurred);
+                        light.Refresh(discoveredLight.State, currentTime);
+                        light.Exclude(isExcluded);
+                        logger.LogRefresh(staleProperties, light);
+                        if (this.lights[id].RequiresSync(out LightCommand syncCommand))
+                        {
+                            syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
+                            syncCommands.Add(id, syncCommand);
+                        }
                     }
                 }
             }
