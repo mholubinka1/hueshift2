@@ -84,7 +84,7 @@ namespace HueShift2.Control
         public bool RequiresSync(out LightCommand syncCommand)
         {
             syncCommand = null;
-            if (this.PowerState != LightPowerState.On)
+            if (this.PowerState != LightPowerState.On || this.AppControlState != LightControlState.HueShift)
             {
                 return false;
             }
