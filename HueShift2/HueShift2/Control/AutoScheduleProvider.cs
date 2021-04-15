@@ -77,33 +77,42 @@ namespace HueShift2.Control
             logger.LogInformation($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString(CultureInfo.InvariantCulture)} | Night: {transitionTimes.Night.ToString(CultureInfo.InvariantCulture)}");
         }
 
-        private bool RefreshRequired(DateTime currentTime)
+        private bool RefreshRequired(DateTime currentTime, DateTime? lastRunTime)
         {
+            if (lastRunTime == null) return true;
             if (this.transitionTimes == null) return true;
             var isDaytime = (currentTime >= transitionTimes.Day && currentTime < transitionTimes.Night);
             if (isDaytime)
             {
-                if (transitionTimes.Night - currentTime < new TimeSpan(2, 0, 0)) return true;
+                if (transitionTimes.Night - currentTime < new TimeSpan(2, 0, 0) &&
+                    transitionTimes.Night - lastRunTime >= new TimeSpan(2, 0, 0))
+                {
+                    return true;
+                }
             }
             else
             {
-                if (transitionTimes.Day - currentTime < new TimeSpan(2, 0, 0)) return true;
+                if (transitionTimes.Day - currentTime < new TimeSpan(2, 0, 0) &&
+                    transitionTimes.Day - lastRunTime >= new TimeSpan(2, 0, 0))
+                {
+                    return true;
+                }
             }
             return false;
         }
 
         public bool TransitionRequired(DateTime currentTime, DateTime? lastRunTime)
         {
-            if (RefreshRequired(currentTime)) RefreshTransitionTimes();
+            if (RefreshRequired(currentTime, lastRunTime)) RefreshTransitionTimes();
             if (lastRunTime == null) return true;
             if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day)
             {
-                logger.LogDebug("Performing day transition...");
+                logger.LogInformation("Performing day transition...");
                 return true;
             }
             if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night)
             {
-                logger.LogDebug("Performing night transition...");
+                logger.LogInformation("Performing night transition...");
                 return true;
             }
             return false;

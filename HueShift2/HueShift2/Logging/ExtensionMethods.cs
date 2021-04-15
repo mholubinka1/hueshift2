@@ -14,13 +14,6 @@ namespace HueShift2.Logging
     {
         #region LightManager
 
-        public static void LogLightProperties<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)
-        {
-            foreach (var light in lights)
-            {
-                logger.LogInformation($"ID: {light.Properties.Id,-4} Name: {light.Properties.Name,-20} ModelID: {light.Properties.ModelId,-10} ProductID: {light.Properties.ProductId,-10}");
-            }
-        }
 
         public static void LogCommand<T>(this ILogger<T> logger, IEnumerable<LightControlPair> commandLights, AppLightState target)
         {
@@ -28,6 +21,14 @@ namespace HueShift2.Logging
             foreach (var light in commandLights)
             {
                 logger.LogInformation($"ID: {light.Properties.Id} Name: {light.Properties.Name} | from: {light.ExpectedLight} | to: {target}");
+            }
+        }
+
+        public static void LogLightProperties<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)
+        {
+            foreach (var light in lights)
+            {
+                logger.LogInformation($"ID: {light.Properties.Id,-4} Name: {light.Properties.Name,-20} ModelID: {light.Properties.ModelId,-10} ProductID: {light.Properties.ProductId,-10}");
             }
         }
 
@@ -56,6 +57,30 @@ namespace HueShift2.Logging
                 logger.LogLightProperties(lostLights);
             }
             return;
+        }
+
+        public static void LogRefresh<T>(this ILogger<T> logger, Tuple<LightPowerState, LightControlState, bool> staleProperties, LightControlPair light)
+        {
+            if (staleProperties.Item1 == light.PowerState &&
+                staleProperties.Item2 == light.AppControlState &&
+                staleProperties.Item3 == light.ResetOccurred)
+            {
+                return;
+            }
+            var refreshMessage = $"Refreshed light | ID: {light.Properties.Id} Name: {light.Properties.Name}";
+            if (staleProperties.Item1 != light.PowerState)
+            {
+                refreshMessage += $" | Power state changed from {staleProperties.Item1} to {light.PowerState}";
+            }
+            if (staleProperties.Item2 != light.AppControlState)
+            {
+                refreshMessage += $" | Control state changed from {staleProperties.Item2} to {light.AppControlState}";
+            }
+            if (staleProperties.Item3 != light.ResetOccurred)
+            {
+                refreshMessage += staleProperties.Item3 ? $" | Light reset." : $" | Reset scheduled.";
+            }
+            logger.LogInformation(refreshMessage);
         }
 
         public static void LogUpdate<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)

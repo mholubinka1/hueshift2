@@ -16,10 +16,8 @@ namespace HueShift2.Control
         public LightControlState AppControlState { get; private set; }
         public State NetworkLight { get; private set; }
         public AppLightState ExpectedLight { get; private set; }
-
         public Transition Transition { get; private set; }
-
-        private bool resetOccurred;
+        public bool ResetOccurred { get; private set; }
 
         public LightControlPair(Light networkLight)
         {
@@ -28,7 +26,7 @@ namespace HueShift2.Control
             this.AppControlState = LightControlState.HueShift;
             this.NetworkLight = networkLight.State;
             this.ExpectedLight = new AppLightState(this.NetworkLight);
-            this.resetOccurred = false;
+            this.ResetOccurred = false;
         }
 
         public void RefreshTransition(bool isOn, DateTime currentTime)
@@ -44,7 +42,6 @@ namespace HueShift2.Control
                         this.Transition = null;
                     }
                 }
-
             }
             else
             {
@@ -64,7 +61,7 @@ namespace HueShift2.Control
                 switch (this.AppControlState)
                 {
                     case LightControlState.HueShift:
-                        if (this.NetworkLight.ColourEquals(this.ExpectedLight) && this.PowerState != LightPowerState.Transitioning)
+                        if (!this.NetworkLight.ColourEquals(this.ExpectedLight) && this.PowerState != LightPowerState.Transitioning)
                         {
                             this.AppControlState = LightControlState.Manual;
                         }
@@ -79,6 +76,10 @@ namespace HueShift2.Control
                         break;
                 }
             }
+            if (this.PowerState != LightPowerState.Transitioning)
+            {
+                this.PowerState = isOn ? LightPowerState.On : LightPowerState.Off;
+            }
         }
 
         public bool RequiresSync(out LightCommand syncCommand)
@@ -90,13 +91,12 @@ namespace HueShift2.Control
             }
             if (this.NetworkLight.ColourEquals(this.ExpectedLight))
             {
-                if (this.resetOccurred)
+                if (this.ResetOccurred)
                 {
-                    var brightness = (byte)254;
-                    this.resetOccurred = false;
-                    if (this.NetworkLight.Brightness != brightness)
+                    this.ResetOccurred = false;
+                    if (this.NetworkLight.Brightness != this.ExpectedLight.Brightness)
                     {
-                        syncCommand = new LightCommand { Brightness = brightness };
+                        syncCommand = new LightCommand { Brightness = this.ExpectedLight.Brightness };
                         return true;
                     }
                 }
@@ -112,7 +112,7 @@ namespace HueShift2.Control
             {
                 this.AppControlState = LightControlState.HueShift;
             }
-            this.resetOccurred = true;
+            this.ResetOccurred = true;
         }
 
         private void ClearColourState()
@@ -177,21 +177,19 @@ namespace HueShift2.Control
             ChangeColour(command);
         }
 
-        #region Exclusion
-
-        public void Exclude()
+        public void Exclude(bool isExcluded)
         {
-            AppControlState = LightControlState.Excluded;
-        }
-
-        public void Unexclude()
-        {
-            if(this.AppControlState == LightControlState.Excluded)
+            if (isExcluded)
             {
-                this.AppControlState = LightControlState.HueShift;
+                AppControlState = LightControlState.Excluded;
+            }
+            else
+            {
+                if (this.AppControlState == LightControlState.Excluded)
+                {
+                    this.AppControlState = LightControlState.HueShift;
+                }
             }
         }
-
-        #endregion
     }
 }

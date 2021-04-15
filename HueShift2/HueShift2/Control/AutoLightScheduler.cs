@@ -64,7 +64,6 @@ namespace HueShift2.Control
             var transitionDuration = scheduleProvider.GetTransitionDuration(currentTime, lastRunTime);
             var reset = scheduleProvider.IsReset(currentTime, lastRunTime);
             var targetLightState = scheduleProvider.TargetLightState(currentTime);
-            logger.LogInformation("Performing transition...");
             var command = CreateAutoCommand(targetLightState, transitionDuration, reset);
             await lightManager.Transition(targetLightState, command, currentTime, reset);
         }
