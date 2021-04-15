@@ -32,8 +32,8 @@ namespace HueShift2.Model
 
         public override string ToString()
         {
-            var @base = $"brightness: {this.Brightness}";
-            @base += string.IsNullOrWhiteSpace(this.Scene) ? "" : $" scene: {this.Scene}";
+            var @base = $"brightness: {this.Brightness} ";
+            @base += string.IsNullOrWhiteSpace(this.Scene) ? "" : $"scene: {this.Scene} ";
             @base += this.Colour.ToString();
             return @base;
         }

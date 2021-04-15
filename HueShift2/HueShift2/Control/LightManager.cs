@@ -34,6 +34,7 @@ namespace HueShift2.Control
             this.clientManager = clientManager;
             this.client = client;
             this.lights = new Dictionary<string, LightControlPair>();
+            this.resetOccurred = false;
         }
 
         private async Task<IList<Light>> Discover()
@@ -92,7 +93,7 @@ namespace HueShift2.Control
                     else
                     {
                         this.lights[id].Unexclude();
-                        if (this.lights[id].RequiresSync(resetOccurred, out LightCommand syncCommand))
+                        if (this.lights[id].RequiresSync(out LightCommand syncCommand))
                         {
                             syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
                             syncCommands.Add(id, syncCommand);
@@ -113,12 +114,11 @@ namespace HueShift2.Control
 
         public async Task Transition(AppLightState target, LightCommand command, DateTime currentTime, bool reset)
         {
-            await Refresh(currentTime);
             if (reset)
             {
                 lights.Reset();
-                resetOccurred = true;
             }
+            await Refresh(currentTime);
             var commandLights = lights.SelectLightsToControl();
             var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             logger.LogCommand(commandLights, target);

@@ -73,7 +73,7 @@ namespace HueShift2.Control
         {
             logger.LogDebug("Executing automatic light control...");
             var currentTime = DateTime.Now;
-            if (!scheduleProvider.ShouldPerformTransition(currentTime, lastRunTime))
+            if (!scheduleProvider.TransitionRequired(currentTime, lastRunTime))
             {
                 logger.LogDebug("No transition to perform.");
                 await lightManager.Refresh(currentTime);

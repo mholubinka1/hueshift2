@@ -77,22 +77,33 @@ namespace HueShift2.Control
             logger.LogInformation($"Auto transition times refreshed | Day: {transitionTimes.Day.ToString(CultureInfo.InvariantCulture)} | Night: {transitionTimes.Night.ToString(CultureInfo.InvariantCulture)}");
         }
 
-        public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime)
+        private bool RefreshRequired(DateTime currentTime)
         {
-            // refresh transition times if sunrise and sunset times are not present
-            if (this.transitionTimes == null) RefreshTransitionTimes();
-            // refresh transition times close to transition to cover the effect of clocks changing and moving sunrise and sunset times
-            if (transitionTimes.Day - currentTime < new TimeSpan(2, 0, 0) ||
-                transitionTimes.Night - currentTime < new TimeSpan(2, 0, 0)) RefreshTransitionTimes();
+            if (this.transitionTimes == null) return true;
+            var isDaytime = (currentTime >= transitionTimes.Day && currentTime < transitionTimes.Night);
+            if (isDaytime)
+            {
+                if (transitionTimes.Night - currentTime < new TimeSpan(2, 0, 0)) return true;
+            }
+            else
+            {
+                if (transitionTimes.Day - currentTime < new TimeSpan(2, 0, 0)) return true;
+            }
+            return false;
+        }
+
+        public bool TransitionRequired(DateTime currentTime, DateTime? lastRunTime)
+        {
+            if (RefreshRequired(currentTime)) RefreshTransitionTimes();
             if (lastRunTime == null) return true;
             if (lastRunTime < transitionTimes.Day && currentTime >= transitionTimes.Day)
             {
-                logger.LogDebug("Performing day transition.");
+                logger.LogDebug("Performing day transition...");
                 return true;
             }
             if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night)
             {
-                logger.LogDebug("Performing night transition.");
+                logger.LogDebug("Performing night transition...");
                 return true;
             }
             return false;

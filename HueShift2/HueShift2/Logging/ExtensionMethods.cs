@@ -27,7 +27,7 @@ namespace HueShift2.Logging
             logger.LogInformation($"Sending command to lights:");
             foreach (var light in commandLights)
             {
-                logger.LogInformation($"ID: {light.Properties.Id} Name: {light.Properties.Name} | from: {light} | to: {target}");
+                logger.LogInformation($"ID: {light.Properties.Id} Name: {light.Properties.Name} | from: {light.ExpectedLight} | to: {target}");
             }
         }
 
@@ -63,7 +63,7 @@ namespace HueShift2.Logging
             logger.LogInformation($"New light states in memory:");
             foreach (var light in lights)
             {
-                logger.LogInformation($"\nID: {light.Properties.Id} Name: {light.Properties.Name} | {light.ExpectedLight}");
+                logger.LogInformation($"ID: {light.Properties.Id} Name: {light.Properties.Name} | {light.ExpectedLight}");
             }
         }
 

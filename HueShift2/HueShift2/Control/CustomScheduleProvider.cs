@@ -19,7 +19,7 @@ namespace HueShift2.Control
             throw new NotImplementedException();
         }
 
-        public bool ShouldPerformTransition(DateTime currentTime, DateTime? lastRunTime)
+        public bool TransitionRequired(DateTime currentTime, DateTime? lastRunTime)
         {
             throw new NotImplementedException();
         }

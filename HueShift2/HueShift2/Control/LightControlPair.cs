@@ -19,6 +19,8 @@ namespace HueShift2.Control
 
         public Transition Transition { get; private set; }
 
+        private bool resetOccurred;
+
         public LightControlPair(Light networkLight)
         {
             this.Properties = new LightProperties(networkLight);
@@ -26,6 +28,7 @@ namespace HueShift2.Control
             this.AppControlState = LightControlState.HueShift;
             this.NetworkLight = networkLight.State;
             this.ExpectedLight = new AppLightState(this.NetworkLight);
+            this.resetOccurred = false;
         }
 
         public void RefreshTransition(bool isOn, DateTime currentTime)
@@ -78,17 +81,25 @@ namespace HueShift2.Control
             }
         }
 
-        public bool RequiresSync(bool resetOccurred, out LightCommand syncCommand)
+        public bool RequiresSync(out LightCommand syncCommand)
         {
-            var brightness = resetOccurred ? this.ExpectedLight.Brightness : (byte)254;
+            syncCommand = null;
+            if (this.PowerState != LightPowerState.On)
+            {
+                return false;
+            }
             if (this.NetworkLight.ColourEquals(this.ExpectedLight))
             {
-                if (resetOccurred)
+                if (this.resetOccurred)
                 {
-                    syncCommand = new LightCommand { Brightness = brightness };
-                    return true;
+                    var brightness = (byte)254;
+                    this.resetOccurred = false;
+                    if (this.NetworkLight.Brightness != brightness)
+                    {
+                        syncCommand = new LightCommand { Brightness = brightness };
+                        return true;
+                    }
                 }
-                syncCommand = null;
                 return false;
             }
             syncCommand = this.ExpectedLight.ToCommand();
@@ -101,6 +112,7 @@ namespace HueShift2.Control
             {
                 this.AppControlState = LightControlState.HueShift;
             }
+            this.resetOccurred = true;
         }
 
         private void ClearColourState()
