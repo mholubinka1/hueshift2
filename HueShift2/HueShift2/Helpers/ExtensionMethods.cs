@@ -70,7 +70,6 @@ namespace HueShift2.Helpers
                         Brightness = expectedLight.Brightness,
                         ColorCoordinates = expectedLight.Colour.ColourCoordinates,
                     };
-
                 case ColourMode.CT:
                     return new LightCommand
                     {

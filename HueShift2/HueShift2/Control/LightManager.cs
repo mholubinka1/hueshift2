@@ -34,7 +34,6 @@ namespace HueShift2.Control
             this.clientManager = clientManager;
             this.client = client;
             this.lights = new Dictionary<string, LightControlPair>();
-
         }
 
         private async Task<IList<Light>> Discover()
