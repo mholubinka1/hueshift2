@@ -75,7 +75,7 @@ namespace HueShift2.Control
             if (!scheduleProvider.TransitionRequired(currentTime, lastRunTime))
             {
                 logger.LogDebug("No transition to perform.");
-                await lightManager.Refresh(currentTime);
+                lightManager.Refresh(currentTime);
                 return currentTime;
             }
             await ExecuteTransition(currentTime, lastRunTime);

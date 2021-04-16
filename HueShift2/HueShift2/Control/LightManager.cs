@@ -65,10 +65,10 @@ namespace HueShift2.Control
             }
         }
 
-        public async Task Refresh(DateTime currentTime)
+        public void Refresh(DateTime currentTime)
         {
-            await clientManager.AssertConnected();
-            var discoveredLights = await Discover();
+            clientManager.AssertConnected().Wait();
+            var discoveredLights = Discover().Result;
             var excludedLights = appOptionsDelegate.CurrentValue.LightsToExclude;
             var syncCommands = new Dictionary<string, LightCommand>();
             this.lights = this.lights.Trim(discoveredLights);
@@ -96,7 +96,7 @@ namespace HueShift2.Control
                     }
                 }
             }
-            if (syncCommands.Any()) await Synchronise(syncCommands);
+            if (syncCommands.Any()) Synchronise(syncCommands).Wait();
             foreach(var idLightPair in lights)
             {
                 if(idLightPair.Key != idLightPair.Value.Properties.Id)
@@ -113,7 +113,7 @@ namespace HueShift2.Control
             {
                 this.lights.Reset();
             }
-            await Refresh(currentTime);
+            Refresh(currentTime);
             PrintScheduled();
             var commandLights = this.lights.SelectLightsToControl();
             logger.LogCommand(commandLights, target);
