@@ -14,7 +14,7 @@ namespace HueShift2.Model
 
         public AppLightState(State state)
         {
-            this.Brightness = (byte)254;
+            this.Brightness = state.Brightness;
             this.Colour = new Colour(state);
         }
 

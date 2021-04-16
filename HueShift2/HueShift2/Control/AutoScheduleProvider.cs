@@ -81,7 +81,7 @@ namespace HueShift2.Control
         {
             if (lastRunTime == null) return true;
             if (this.transitionTimes == null) return true;
-            if (currentTime.Date != transitionTimes.Night.Date) return true;
+            if ((currentTime.Date - transitionTimes.Night.Date).TotalDays > 0) return true;
             if (transitionTimes.Day - currentTime < new TimeSpan(1, 0, 0) &&
                 transitionTimes.Day - lastRunTime >= new TimeSpan(1, 0, 0))
             {
@@ -102,8 +102,6 @@ namespace HueShift2.Control
             if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night)
             {
                 logger.LogInformation("Performing night transition...");
-                var target = transitionTimes.Day + new TimeSpan(23, 0, 0);
-                RefreshTransitionTimes(target);
                 return true;
             }
             return false;

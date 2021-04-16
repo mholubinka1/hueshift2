@@ -62,6 +62,7 @@ namespace HueShift2.Control
         private async Task ExecuteTransition(DateTime currentTime, DateTime? lastRunTime)
         {
             var transitionDuration = scheduleProvider.GetTransitionDuration(currentTime, lastRunTime);
+            scheduleProvider.AdvanceRefresh();
             var reset = scheduleProvider.IsReset(currentTime, lastRunTime);
             var targetLightState = scheduleProvider.TargetLightState(currentTime);
             var command = CreateAutoCommand(targetLightState, transitionDuration, reset);
