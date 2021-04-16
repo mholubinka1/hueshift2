@@ -71,31 +71,28 @@ namespace HueShift2.Control
             var discoveredLights = await Discover();
             var excludedLights = appOptionsDelegate.CurrentValue.LightsToExclude;
             var syncCommands = new Dictionary<string, LightCommand>();
-            lock (_lock)
+            this.lights = this.lights.Trim(discoveredLights);
+            foreach (var discoveredLight in discoveredLights)
             {
-                this.lights = this.lights.Trim(discoveredLights);
-                foreach (var discoveredLight in discoveredLights)
+                var id = discoveredLight.Id;
+                var isExcluded = excludedLights.Any(x => x == discoveredLight.Id);
+                if (!this.lights.ContainsKey(id))
                 {
-                    var id = discoveredLight.Id;
-                    var isExcluded = excludedLights.Any(x => x == discoveredLight.Id);
-                    if (!this.lights.ContainsKey(id))
+                    var light = new LightControlPair(discoveredLight);
+                    light.Exclude(isExcluded);
+                    this.lights.Add(id, light);
+                }
+                else
+                {
+                    var light = this.lights[id];
+                    var staleProperties = new Tuple<LightPowerState, LightControlState, bool>(light.PowerState, light.AppControlState, light.ResetOccurred);
+                    light.Refresh(discoveredLight.State, currentTime);
+                    light.Exclude(isExcluded);
+                    logger.LogRefresh(staleProperties, light);
+                    if (this.lights[id].RequiresSync(out LightCommand syncCommand))
                     {
-                        var light = new LightControlPair(discoveredLight);
-                        light.Exclude(isExcluded);
-                        this.lights.Add(id, light);
-                    }
-                    else
-                    {
-                        var light = this.lights[id];
-                        var staleProperties = new Tuple<LightPowerState, LightControlState, bool>(light.PowerState, light.AppControlState, light.ResetOccurred);
-                        light.Refresh(discoveredLight.State, currentTime);
-                        light.Exclude(isExcluded);
-                        logger.LogRefresh(staleProperties, light);
-                        if (this.lights[id].RequiresSync(out LightCommand syncCommand))
-                        {
-                            syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
-                            syncCommands.Add(id, syncCommand);
-                        }
+                        syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
+                        syncCommands.Add(id, syncCommand);
                     }
                 }
             }
@@ -119,8 +116,8 @@ namespace HueShift2.Control
             await Refresh(currentTime);
             PrintScheduled();
             var commandLights = this.lights.SelectLightsToControl();
-            var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             logger.LogCommand(commandLights, target);
+            var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             if (commandIds.Length > 0) await client.SendCommandAsync(command, commandIds);
             foreach (var light in this.lights.Values)
             {
