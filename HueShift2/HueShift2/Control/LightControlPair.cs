@@ -162,11 +162,7 @@ namespace HueShift2.Control
             {
                 this.PowerState = LightPowerState.On;
             }
-            if (command.Brightness != null)
-            {
-                this.ExpectedLight.Brightness = (byte)command.Brightness;
-            }
-            ChangeColour(command);
+            ExecuteInstantaneousCommand(command);
         }
 
         public void ExecuteInstantaneousCommand(LightCommand command)
@@ -174,6 +170,10 @@ namespace HueShift2.Control
             if (command.Brightness != null)
             {
                 this.ExpectedLight.Brightness = (byte)command.Brightness;
+            }
+            else
+            {
+                this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
             }
             ChangeColour(command);
         }

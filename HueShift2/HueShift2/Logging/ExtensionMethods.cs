@@ -14,7 +14,6 @@ namespace HueShift2.Logging
     {
         #region LightManager
 
-
         public static void LogCommand<T>(this ILogger<T> logger, IEnumerable<LightControlPair> commandLights, AppLightState target)
         {
             logger.LogInformation($"Sending command to lights:");

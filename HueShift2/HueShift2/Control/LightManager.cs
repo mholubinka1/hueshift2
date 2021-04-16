@@ -118,6 +118,7 @@ namespace HueShift2.Control
                 this.lights.Reset();
             }
             await Refresh(currentTime);
+            PrintScheduled();
             var commandLights = this.lights.SelectLightsToControl();
             var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             logger.LogCommand(commandLights, target);
@@ -141,15 +142,9 @@ namespace HueShift2.Control
 
         public void PrintAll()
         {
-            if (lights.Count == 0)
-            {
-                logger.LogWarning("Lights on network: none");
-            }
-            else
-            {
-                logger.LogInformation("Lights on network:");
-                logger.LogLightProperties(lights.Values);
-            }
+            PrintScheduled();
+            PrintManual();
+            PrintExcluded();
         }
 
         public void PrintScheduled()

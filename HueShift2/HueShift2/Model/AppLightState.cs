@@ -8,7 +8,7 @@ namespace HueShift2.Model
 {
     public class AppLightState
     {
-        public byte Brightness { get; set; }
+        public byte? Brightness { get; set; }
         public string Scene { get; set; }
         public Colour Colour { get; set; }
 
@@ -32,7 +32,7 @@ namespace HueShift2.Model
 
         public override string ToString()
         {
-            var @base = $"brightness: {this.Brightness} ";
+            var @base = this.Brightness == null ? "" : $"brightness: {this.Brightness} ";
             @base += string.IsNullOrWhiteSpace(this.Scene) ? "" : $"scene: {this.Scene} ";
             @base += this.Colour.ToString();
             return @base;
