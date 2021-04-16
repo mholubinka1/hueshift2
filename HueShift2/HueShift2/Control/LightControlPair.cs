@@ -42,6 +42,10 @@ namespace HueShift2.Control
                         this.Transition = null;
                     }
                 }
+                else
+                {
+                    this.PowerState = LightPowerState.On;
+                }
             }
             else
             {
@@ -55,13 +59,12 @@ namespace HueShift2.Control
             this.NetworkLight = networkLight;
             this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
             var isOn = NetworkLight.On;
-            RefreshTransition(isOn, currentTime);
             if (isOn)
             {
                 switch (this.AppControlState)
                 {
                     case LightControlState.HueShift:
-                        if (!this.NetworkLight.ColourEquals(this.ExpectedLight) && this.PowerState != LightPowerState.Transitioning)
+                        if (!this.NetworkLight.ColourEquals(this.ExpectedLight) && this.PowerState == LightPowerState.On)
                         {
                             this.AppControlState = LightControlState.Manual;
                         }
@@ -76,10 +79,7 @@ namespace HueShift2.Control
                         break;
                 }
             }
-            if (this.PowerState != LightPowerState.Transitioning)
-            {
-                this.PowerState = isOn ? LightPowerState.On : LightPowerState.Off;
-            }
+            RefreshTransition(isOn, currentTime);
         }
 
         public bool RequiresSync(out LightCommand syncCommand)
@@ -94,9 +94,10 @@ namespace HueShift2.Control
                 if (this.ResetOccurred)
                 {
                     this.ResetOccurred = false;
-                    if (this.NetworkLight.Brightness != this.ExpectedLight.Brightness)
+                    var brightness = (byte)254;
+                    if (this.NetworkLight.Brightness != brightness)
                     {
-                        syncCommand = new LightCommand { Brightness = this.ExpectedLight.Brightness };
+                        syncCommand = new LightCommand { Brightness = brightness };
                         return true;
                     }
                 }

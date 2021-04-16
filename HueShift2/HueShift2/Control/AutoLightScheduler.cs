@@ -78,7 +78,6 @@ namespace HueShift2.Control
                 await lightManager.Refresh(currentTime);
                 return currentTime;
             }
-            await lightManager.Refresh(currentTime);
             await ExecuteTransition(currentTime, lastRunTime);
             return currentTime;
         }
