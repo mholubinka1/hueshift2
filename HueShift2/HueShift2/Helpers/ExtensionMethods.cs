@@ -47,6 +47,19 @@ namespace HueShift2.Helpers
             return commandLights;
         }
 
+        public static LightControlPair[] Filter(this LightControlPair[] commandLights, AppLightState targetState)
+        {
+            var filtered = new List<LightControlPair>();
+            foreach (var light in commandLights)
+            {
+                if (!light.ExpectedLight.Equals(targetState))
+                {
+                    filtered.Add(light);
+                }
+            }
+            return filtered.ToArray();
+        }
+
         public static ColourMode ToColourMode(this string mode)
         {
             switch (mode)
@@ -113,7 +126,8 @@ namespace HueShift2.Helpers
 
         public static bool DoubleEquals(double @this, double other)
         {
-            var equals = (Math.Abs(@this - other) <= 0.00000001);
+            var precision = 0.00000001d;
+            var equals = (Math.Abs(@this - other) <= precision);
             return equals;
         }
 

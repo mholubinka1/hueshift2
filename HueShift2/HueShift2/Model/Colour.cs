@@ -6,7 +6,7 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class Colour
+    public class Colour : IEquatable<Colour>
     {
         public ColourMode Mode { get; set; }
         public double[] ColourCoordinates { get; set; }
@@ -49,6 +49,41 @@ namespace HueShift2.Model
             this.ColourTemperature = other.ColourTemperature;
             this.Hue = other.Hue;
             this.Saturation = other.Saturation;
+        }
+
+        public bool Equals(Colour other)
+        {
+            if (this.Mode == other.Mode)
+            {
+                switch (this.Mode)
+                {
+                    case ColourMode.XY:
+                        return ExtensionMethods.ArrayEquals(this.ColourCoordinates, other.ColourCoordinates);
+                    case ColourMode.CT:
+                        return this.ColourTemperature == other.ColourTemperature;
+                    default:
+                        //return this.Hue == lightState.Hue && this.Saturation == lightState.Saturation;
+                        throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                if(ExtensionMethods.ArrayEquals(this.ColourCoordinates, other.ColourCoordinates))
+                {
+                    return true;
+                }
+                throw new NotImplementedException();
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as AppLightState);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Mode, ColourCoordinates, ColourTemperature, Hue, Saturation);
         }
 
         public override string ToString()

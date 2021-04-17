@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Q42.HueApi;
 using Q42.HueApi.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,8 +25,6 @@ namespace HueShift2.Control
         private ILocalHueClient client;
 
         private IDictionary<string, LightControlPair> lights;
-
-        private static object _lock = new object();
 
         public LightManager(ILogger<LightManager> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, IHueClientManager clientManager, ILocalHueClient client)
         {
@@ -65,10 +64,10 @@ namespace HueShift2.Control
             }
         }
 
-        public void Refresh(DateTime currentTime)
+        public async Task Refresh(DateTime currentTime)
         {
-            clientManager.AssertConnected().Wait();
-            var discoveredLights = Discover().Result;
+            await clientManager.AssertConnected();
+            var discoveredLights = await Discover();
             var excludedLights = appOptionsDelegate.CurrentValue.LightsToExclude;
             var syncCommands = new Dictionary<string, LightCommand>();
             this.lights = this.lights.Trim(discoveredLights);
@@ -96,7 +95,7 @@ namespace HueShift2.Control
                     }
                 }
             }
-            if (syncCommands.Any()) Synchronise(syncCommands).Wait();
+            if (syncCommands.Any()) await Synchronise(syncCommands);
             foreach(var idLightPair in lights)
             {
                 if(idLightPair.Key != idLightPair.Value.Properties.Id)
@@ -113,9 +112,10 @@ namespace HueShift2.Control
             {
                 this.lights.Reset();
             }
-            Refresh(currentTime);
+            await Refresh(currentTime);
             PrintScheduled();
             var commandLights = this.lights.SelectLightsToControl();
+            commandLights = commandLights.Filter(target);
             logger.LogCommand(commandLights, target);
             var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             if (commandIds.Length > 0) await client.SendCommandAsync(command, commandIds);

@@ -9,7 +9,7 @@ namespace HueShift2.Interfaces
 {
     public interface ILightManager
     {
-        public void Refresh(DateTime currentTime);
+        public Task Refresh(DateTime currentTime);
         public Task Transition(AppLightState target, LightCommand command, DateTime currentTime, bool resumeControl);
         public void PrintAll();
         public void PrintScheduled();

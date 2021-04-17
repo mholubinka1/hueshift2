@@ -16,10 +16,13 @@ namespace HueShift2.Logging
 
         public static void LogCommand<T>(this ILogger<T> logger, IEnumerable<LightControlPair> commandLights, AppLightState target)
         {
-            logger.LogInformation($"Sending command to lights:");
-            foreach (var light in commandLights)
+            if (commandLights.Any())
             {
-                logger.LogInformation($"ID: {light.Properties.Id} Name: {light.Properties.Name} | from: {light.ExpectedLight} | to: {target}");
+                logger.LogInformation($"Sending command to lights:");
+                foreach (var light in commandLights)
+                {
+                    logger.LogInformation($"ID: {light.Properties.Id} Name: {light.Properties.Name} | from: {light.ExpectedLight} | to: {target}");
+                }
             }
         }
 

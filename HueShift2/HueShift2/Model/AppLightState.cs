@@ -6,10 +6,9 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class AppLightState
+    public class AppLightState : IEquatable<AppLightState>
     {
         public byte? Brightness { get; set; }
-        public string Scene { get; set; }
         public Colour Colour { get; set; }
 
         public AppLightState(State state)
@@ -21,7 +20,6 @@ namespace HueShift2.Model
         public AppLightState(AppLightState appLight)
         {
             this.Brightness = appLight.Brightness;
-            this.Scene = appLight.Scene;
             this.Colour = new Colour(appLight.Colour);
         }
 
@@ -30,10 +28,25 @@ namespace HueShift2.Model
             this.Colour = new Colour(colour);
         }
 
+        public bool Equals(AppLightState other)
+        {
+            var brightness = other.Brightness == null || other.Brightness == this.Brightness;
+            return brightness && this.Colour.Equals(other.Colour);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as AppLightState);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Brightness, Colour);
+        }
+
         public override string ToString()
         {
             var @base = this.Brightness == null ? "" : $"brightness: {this.Brightness} ";
-            @base += string.IsNullOrWhiteSpace(this.Scene) ? "" : $"scene: {this.Scene} ";
             @base += this.Colour.ToString();
             return @base;
         }
