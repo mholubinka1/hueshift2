@@ -1,4 +1,5 @@
-﻿using HueShift2.Model;
+﻿using HueShift2.Interfaces;
+using HueShift2.Model;
 using Q42.HueApi;
 using System;
 using System.Collections.Generic;
@@ -6,10 +7,15 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class AppLightState : IEquatable<AppLightState>
+    public class AppLightState : IDeepCloneable<AppLightState> , IEquatable<AppLightState> 
     {
         public byte? Brightness { get; set; }
         public Colour Colour { get; set; }
+
+        public AppLightState()
+        {
+
+        }
 
         public AppLightState(State state)
         {
@@ -17,15 +23,18 @@ namespace HueShift2.Model
             this.Colour = new Colour(state);
         }
 
-        public AppLightState(AppLightState appLight)
-        {
-            this.Brightness = appLight.Brightness;
-            this.Colour = new Colour(appLight.Colour);
-        }
-
         public AppLightState(Colour colour)
         {
-            this.Colour = new Colour(colour);
+            this.Colour = colour.DeepClone();
+        }
+
+        public AppLightState DeepClone()
+        {
+            return new AppLightState
+            {
+                Brightness = this.Brightness,
+                Colour = this.Colour.DeepClone()
+            };
         }
 
         public bool Equals(AppLightState other)

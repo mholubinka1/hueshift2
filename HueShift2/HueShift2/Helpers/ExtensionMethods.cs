@@ -132,5 +132,20 @@ namespace HueShift2.Helpers
         }
 
         #endregion
+
+        #region Cloning
+
+        public static double[] DeepClone(this double[] @this)
+        {
+            if (@this == null) return null;
+            var cloned = new List<double>();
+            foreach (var element in @this)
+            {
+                cloned.Add(element);
+            }
+            return cloned.ToArray();
+        }
+
+        #endregion
     }
 }

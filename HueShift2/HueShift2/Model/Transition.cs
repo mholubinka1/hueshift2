@@ -1,4 +1,5 @@
-﻿using Q42.HueApi;
+﻿using HueShift2.Interfaces;
+using Q42.HueApi;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class Transition
+    public class Transition: IDeepCloneable<Transition>
     {
         public readonly DateTime StartedTime;
         public readonly TimeSpan Duration;
@@ -17,7 +18,7 @@ namespace HueShift2.Model
             Duration = duration;
         }
 
-        public Transition Clone()
+        public Transition DeepClone()
         {
             return new Transition(this.StartedTime, this.Duration);
         }

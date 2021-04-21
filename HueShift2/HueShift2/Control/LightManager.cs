@@ -84,10 +84,11 @@ namespace HueShift2.Control
                 else
                 {
                     var light = this.lights[id];
-                    var staleProperties = new Tuple<LightPowerState, LightControlState, bool>(light.PowerState, light.AppControlState, light.ResetOccurred);
+                    var staleLight = new CachedControlPair(light);
                     light.Refresh(discoveredLight.State, currentTime);
                     light.Exclude(isExcluded);
-                    logger.LogRefresh(staleProperties, light);
+                    //log new light ... reinvestigate cloning of some kind (create a barebones cached light model)
+                    logger.LogRefresh(staleLight, light);
                     if (this.lights[id].RequiresSync(out LightCommand syncCommand))
                     {
                         syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);

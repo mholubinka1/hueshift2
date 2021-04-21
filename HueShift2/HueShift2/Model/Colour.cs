@@ -1,4 +1,5 @@
 ﻿using HueShift2.Helpers;
+using HueShift2.Interfaces;
 using Q42.HueApi;
 using System;
 using System.Collections.Generic;
@@ -6,13 +7,18 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class Colour : IEquatable<Colour>
+    public class Colour : IDeepCloneable<Colour> , IEquatable<Colour>
     {
         public ColourMode Mode { get; set; }
         public double[] ColourCoordinates { get; set; }
         public int? ColourTemperature { get; set; }
         public int? Hue { get; set; }
         public int? Saturation { get; set; }
+
+        public Colour()
+        {
+
+        }
 
         public Colour(double[] colourCoordinates)
         {
@@ -36,7 +42,7 @@ namespace HueShift2.Model
         public Colour(State state)
         {
             this.Mode = state.ColorMode.ToColourMode();
-            this.ColourCoordinates = state.ColorCoordinates;
+            this.ColourCoordinates = state.ColorCoordinates.DeepClone();
             this.ColourTemperature = state.ColorTemperature;
             this.Hue = state.Hue;
             this.Saturation = state.Saturation;
@@ -44,11 +50,21 @@ namespace HueShift2.Model
 
         public Colour(Colour other)
         {
-            this.Mode = other.Mode;
-            this.ColourCoordinates = other.ColourCoordinates;
             this.ColourTemperature = other.ColourTemperature;
             this.Hue = other.Hue;
             this.Saturation = other.Saturation;
+        }
+
+        public Colour DeepClone()
+        {
+            return new Colour
+            {
+                Mode = this.Mode,
+                ColourCoordinates = this.ColourCoordinates.DeepClone(),
+                ColourTemperature = this.ColourTemperature,
+                Hue = this.Hue,
+                Saturation = this.Saturation,
+            };
         }
 
         public bool Equals(Colour other)

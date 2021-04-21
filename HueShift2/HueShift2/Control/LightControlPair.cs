@@ -194,5 +194,23 @@ namespace HueShift2.Control
                 }
             }
         }
+
+        public override string ToString()
+        {
+            var @base = $"Control Pair | Id: {this.Properties.Id} Name: {this.Properties.Name} | {this.PowerState} - Control: {this.AppControlState}";
+            if (this.PowerState == LightPowerState.Transitioning)
+            {
+                var remaining = ((this.Transition.StartedTime + this.Transition.Duration) - DateTime.Now).TotalSeconds;
+                @base += $" | Transition Time Remaining: {remaining}s\n";
+            }
+            else
+            {
+                @base += "\n";
+            }
+            var networkLight = $"Network Light | brightness: {this.NetworkLight.Brightness} mode: {this.NetworkLight.ColorMode.ToColourMode()}" +
+                $"xy:[{ string.Join(",", this.NetworkLight.ColorCoordinates)}] ct: {this.NetworkLight.ColorTemperature} hue: {this.NetworkLight.Hue} sat: {this.NetworkLight.Saturation}\n";
+            var expectedLight = this.ExpectedLight.ToString() + "\n";
+            return @base + networkLight + expectedLight;
+        }
     }
 }

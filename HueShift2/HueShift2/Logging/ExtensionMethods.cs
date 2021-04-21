@@ -61,27 +61,29 @@ namespace HueShift2.Logging
             return;
         }
 
-        public static void LogRefresh<T>(this ILogger<T> logger, Tuple<LightPowerState, LightControlState, bool> staleProperties, LightControlPair light)
+        public static void LogRefresh<T>(this ILogger<T> logger, CachedControlPair stale, LightControlPair refreshed)
         {
-            if (staleProperties.Item1 == light.PowerState &&
-                staleProperties.Item2 == light.AppControlState &&
-                staleProperties.Item3 == light.ResetOccurred)
+            if (stale.PowerState == refreshed.PowerState &&
+                stale.AppControlState == refreshed.AppControlState &&
+                stale.ResetOccurred == refreshed.ResetOccurred)
             {
                 return;
             }
-            var refreshMessage = $"Refreshed light | ID: {light.Properties.Id} Name: {light.Properties.Name}";
-            if (staleProperties.Item1 != light.PowerState)
+            var refreshMessage = $"Refreshed light | ID: {refreshed.Properties.Id} Name: {refreshed.Properties.Name}";
+            if (stale.PowerState != refreshed.PowerState)
             {
-                refreshMessage += $" | Power state changed from {staleProperties.Item1} to {light.PowerState}";
+                refreshMessage += $" | Power state changed from {stale.PowerState} to {refreshed.PowerState}";
             }
-            if (staleProperties.Item2 != light.AppControlState)
+            if (stale.AppControlState != refreshed.AppControlState)
             {
-                refreshMessage += $" | Control state changed from {staleProperties.Item2} to {light.AppControlState}";
+                refreshMessage += $" | Control state changed from {stale.AppControlState} to {refreshed.AppControlState}";
             }
-            if (staleProperties.Item3 != light.ResetOccurred)
+            if (refreshed.ResetOccurred != refreshed.ResetOccurred)
             {
-                refreshMessage += staleProperties.Item3 ? $" | Light reset." : $" | Reset scheduled.";
+                refreshMessage += refreshed.ResetOccurred ? $" | Light reset." : $" | Reset scheduled.";
             }
+            logger.LogInformation(stale.ToString());
+            logger.LogInformation(refreshed.ToString());
             logger.LogInformation(refreshMessage);
         }
 
