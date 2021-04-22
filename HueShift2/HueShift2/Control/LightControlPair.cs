@@ -1,4 +1,5 @@
 ﻿using HueShift2.Helpers;
+using HueShift2.Logging;
 using HueShift2.Model;
 using Q42.HueApi;
 using System;
@@ -207,9 +208,8 @@ namespace HueShift2.Control
             {
                 @base += "\n";
             }
-            var networkLight = $"Network Light | brightness: {this.NetworkLight.Brightness} mode: {this.NetworkLight.ColorMode.ToColourMode()}" +
-                $"xy:[{ string.Join(",", this.NetworkLight.ColorCoordinates)}] ct: {this.NetworkLight.ColorTemperature} hue: {this.NetworkLight.Hue} sat: {this.NetworkLight.Saturation}\n";
-            var expectedLight = this.ExpectedLight.ToString() + "\n";
+            var networkLight = $"Network Light | " + this.NetworkLight.ToLogString() + "\n";
+            var expectedLight = $"Expected Light | " + this.ExpectedLight.ToString();
             return @base + networkLight + expectedLight;
         }
     }

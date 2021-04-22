@@ -1,4 +1,5 @@
 ﻿using HueShift2.Control;
+using HueShift2.Helpers;
 using HueShift2.Model;
 using Microsoft.Extensions.Logging;
 using Q42.HueApi;
@@ -97,5 +98,15 @@ namespace HueShift2.Logging
         }
 
         #endregion
+
+        public static string ToLogString(this State @this)
+        {
+            var log = $"brightness: {@this.Brightness} mode: {@this.ColorMode.ToColourMode()}";
+            log += @this.ColorCoordinates == null ? "" : $" xy: [{string.Join(",", @this.ColorCoordinates)}]";
+            log += @this.ColorTemperature == null ? "" : $" ct: {@this.ColorTemperature}";
+            log += @this.Hue == null ? "" : $" hue: {@this.Hue}";
+            log += @this.Saturation == null ? "" : $" sat: {@this.Saturation}";
+            return log;
+        }
     }
 }

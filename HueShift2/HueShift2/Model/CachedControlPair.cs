@@ -24,7 +24,10 @@ namespace HueShift2.Model
             this.AppControlState = light.AppControlState;
             this.NetworkLight = new AppLightState(light.NetworkLight);
             this.ExpectedLight = light.ExpectedLight.DeepClone();
-            this.Transition = light.Transition.DeepClone();
+            if (light.Transition != null)
+            {
+                this.Transition = light.Transition.DeepClone();
+            }
             this.ResetOccurred = light.ResetOccurred;
         }
 
@@ -41,7 +44,7 @@ namespace HueShift2.Model
                 @base += "\n";
             }
             var networkLight = $"Network Light | " + this.NetworkLight.ToString() + "\n";
-            var expectedLight = $"Expected Light | " + this.ExpectedLight.ToString() + "\n";
+            var expectedLight = $"Expected Light | " + this.ExpectedLight.ToString();
             return @base + networkLight + expectedLight;
         }
     }
