@@ -52,7 +52,7 @@ namespace HueShift2.Control
             }
         }
 
-        private async Task Synchronise(IDictionary<string, LightCommand> syncCommands)
+        private async Task Synchronise(IDictionary<string, LightCommand> syncCommands, DateTime currentTime)
         {
             foreach (var command in syncCommands)
             {
@@ -60,6 +60,7 @@ namespace HueShift2.Control
                 logger.LogInformation($"Syncing light | Id: {light.Properties.Id} Name: {light.Properties.Name} | " +
                     $"from: {new AppLightState(light.NetworkLight)} | " +
                     $"to: {light.ExpectedLight}");
+                light.ExecuteSync();
                 await client.SendCommandAsync(command.Value, new[] { command.Key });
             }
         }
@@ -96,7 +97,7 @@ namespace HueShift2.Control
                     }
                 }
             }
-            if (syncCommands.Any()) await Synchronise(syncCommands);
+            if (syncCommands.Any()) await Synchronise(syncCommands, currentTime);
             foreach(var idLightPair in lights)
             {
                 if(idLightPair.Key != idLightPair.Value.Properties.Id)
@@ -119,7 +120,6 @@ namespace HueShift2.Control
             commandLights = commandLights.Filter(target);
             logger.LogCommand(commandLights, target);
             var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
-            if (commandIds.Length > 0) await client.SendCommandAsync(command, commandIds);
             foreach (var light in this.lights.Values)
             {
                 if(commandIds.Any(i => i == light.Properties.Id))
@@ -131,6 +131,7 @@ namespace HueShift2.Control
                     light.ExecuteInstantaneousCommand(command);
                 }
             }
+            if (commandIds.Length > 0) await client.SendCommandAsync(command, commandIds);
             logger.LogUpdate(this.lights.Values);
             return;
         }

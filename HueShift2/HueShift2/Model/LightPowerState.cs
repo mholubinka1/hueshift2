@@ -9,6 +9,7 @@ namespace HueShift2.Model
         On,
         Off,
         Transitioning,
+        Syncing,
     }
 
     public static class HelperMethods

@@ -69,6 +69,10 @@ namespace HueShift2.Control
                         {
                             this.AppControlState = LightControlState.Manual;
                         }
+                        if (this.NetworkLight.ColourEquals(this.ExpectedLight) && this.PowerState == LightPowerState.Syncing)
+                        {
+                            this.PowerState = LightPowerState.On;
+                        }
                         break;
                     case LightControlState.Manual:
                         if (this.PowerState == LightPowerState.Off)
@@ -179,6 +183,11 @@ namespace HueShift2.Control
                 this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
             }
             ChangeColour(command);
+        }
+
+        public void ExecuteSync()
+        {
+            this.PowerState = LightPowerState.Syncing;
         }
 
         public void Exclude(bool isExcluded)
