@@ -139,8 +139,8 @@ namespace HueShift2.Control
             }
             if (lastRunTime < transitionTimes.Night && currentTime >= transitionTimes.Night)
             {
-                logger.LogInformation($"Night Transition: light control unaffected.");
-                return false;
+                logger.LogInformation($"Night Transition: taking control of non-excluded lights.");
+                return true;
             }
             return false;
         }
