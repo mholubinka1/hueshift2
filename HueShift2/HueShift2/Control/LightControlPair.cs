@@ -161,9 +161,7 @@ namespace HueShift2.Control
             if (command.TransitionTime != null)
             {
                 this.PowerState = LightPowerState.Transitioning;
-                var asyncTolerance = 5;
-                this.Transition = new Transition(currentTime, 
-                    ((TimeSpan)command.TransitionTime).Add(new TimeSpan(0,0, asyncTolerance)));
+                this.Transition = new Transition(currentTime, ((TimeSpan)command.TransitionTime));
             }
             else
             {
