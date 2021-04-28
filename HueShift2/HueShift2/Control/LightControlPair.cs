@@ -210,15 +210,11 @@ namespace HueShift2.Control
             var @base = $"Control Pair | Id: {this.Properties.Id} Name: {this.Properties.Name} | {this.PowerState} - Control: {this.AppControlState}";
             if (this.PowerState == LightPowerState.Transitioning)
             {
-                var remaining = (DateTime.Now - (this.Transition.StartedTime + this.Transition.Duration)).TotalSeconds;
-                @base += $" | Transition Time Remaining: {remaining}s\n";
+                var remaining = ((this.Transition.StartedTime + this.Transition.Duration) - DateTime.Now).TotalSeconds;
+                @base += $" | Transition Time Remaining: {remaining}s";
             }
-            else
-            {
-                @base += "\n";
-            }
-            var networkLight = $"Network Light | " + this.NetworkLight.ToLogString() + "\n";
-            var expectedLight = $"Expected Light | " + this.ExpectedLight.ToString();
+            var networkLight = $" | Network Light | " + this.NetworkLight.ToLogString();
+            var expectedLight = $" | Expected Light | " + this.ExpectedLight.ToString();
             return @base + networkLight + expectedLight;
         }
     }

@@ -37,14 +37,15 @@ namespace HueShift2.Model
             if (this.PowerState == LightPowerState.Transitioning)
             {
                 var remaining = ((this.Transition.StartedTime + this.Transition.Duration) - DateTime.Now).TotalSeconds;
-                @base += $" | Transition Time Remaining: {remaining}s\n";
+                remaining = remaining < 0 ? 0 : remaining; 
+                @base += $" | Transition Time Remaining: {remaining}s";
             }
             else
             {
                 @base += "\n";
             }
-            var networkLight = $"Network Light | " + this.NetworkLight.ToString() + "\n";
-            var expectedLight = $"Expected Light | " + this.ExpectedLight.ToString();
+            var networkLight = $" | Network Light | " + this.NetworkLight.ToString();
+            var expectedLight = $" | Expected Light | " + this.ExpectedLight.ToString();
             return @base + networkLight + expectedLight;
         }
     }
