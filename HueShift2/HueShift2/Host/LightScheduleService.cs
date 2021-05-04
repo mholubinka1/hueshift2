@@ -32,8 +32,16 @@ namespace HueShift2
             lightManager.PrintAll();
             while (!cancellationToken.IsCancellationRequested)
             {
-                await lightScheduler.RunAsync();
-                await Task.Delay(pollingFrequency, cancellationToken);
+                try
+                {
+                    await lightScheduler.RunAsync();
+                    await Task.Delay(pollingFrequency, cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "RunAsync failed.");
+                    logger.LogInformation("Retrying...");
+                }
             }
         }
     

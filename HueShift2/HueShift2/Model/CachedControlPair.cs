@@ -35,10 +35,8 @@ namespace HueShift2.Model
         {
             var @base = $"Cached Pair | Id: {this.Properties.Id} Name: {this.Properties.Name} | {this.PowerState} - Control: {this.AppControlState}";
             if (this.PowerState == LightPowerState.Transitioning)
-            {
-                var remaining = ((this.Transition.StartedTime + this.Transition.Duration) - DateTime.Now).TotalSeconds;
-                remaining = remaining < 0 ? 0 : remaining; 
-                @base += $" | Transition Time Remaining: {remaining}s";
+            {;
+                @base += $" | Transition Time Remaining: {this.Transition.SecondsRemaining}s";
             }
             else
             {
