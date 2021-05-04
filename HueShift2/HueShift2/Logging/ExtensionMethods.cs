@@ -83,8 +83,8 @@ namespace HueShift2.Logging
             {
                 refreshMessage += refreshed.ResetOccurred ? $" | Light reset." : $" | Reset scheduled.";
             }
-            logger.LogInformation(stale.ToString());
-            logger.LogInformation(refreshed.ToString());
+            logger.LogDebug(stale.ToString());
+            logger.LogDebug(refreshed.ToString());
             logger.LogInformation(refreshMessage);
         }
 
