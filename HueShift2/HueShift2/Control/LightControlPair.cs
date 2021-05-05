@@ -102,7 +102,8 @@ namespace HueShift2.Control
                     this.ResetOccurred = false;
                     if (this.NetworkLight.Brightness != brightness)
                     {
-                        syncCommand = new LightCommand { Brightness = brightness };
+                        syncCommand = this.ExpectedLight.ToCommand();
+                        syncCommand.Brightness = brightness;
                         return true;
                     }
                 }

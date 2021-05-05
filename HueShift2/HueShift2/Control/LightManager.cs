@@ -52,16 +52,19 @@ namespace HueShift2.Control
             }
         }
 
-        private async Task Synchronise(IDictionary<string, LightCommand> syncCommands, DateTime currentTime)
+        private async Task Synchronise(IDictionary<string, LightCommand> syncCommandsPairs, DateTime currentTime)
         {
-            foreach (var command in syncCommands)
+            foreach (var pair in syncCommandsPairs)
             {
-                var light = this.lights[command.Key];
+                var id = pair.Key;
+                var syncCommand = pair.Value;
+                var light = this.lights[id];
+                light.ExecuteInstantaneousCommand(syncCommand);
                 logger.LogInformation($"Syncing light | Id: {light.Properties.Id} Name: {light.Properties.Name} | " +
                     $"from: {new AppLightState(light.NetworkLight)} | " +
                     $"to: {light.ExpectedLight}");
                 light.ExecuteSync();
-                await client.SendCommandAsync(command.Value, new[] { command.Key });
+                await client.SendCommandAsync(syncCommand, new[] { id });
             }
         }
 

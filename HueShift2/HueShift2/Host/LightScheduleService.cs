@@ -39,8 +39,7 @@ namespace HueShift2
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, "RunAsync failed.");
-                    logger.LogInformation("Retrying...");
+                    logger.LogError(e, "RunAsync failed. Retrying...");
                 }
             }
         }
