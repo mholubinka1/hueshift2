@@ -13,6 +13,7 @@ namespace HueShift2.Configuration
 
         public Geolocator(IConfigurationSection config)
         {
+            if (config == null) throw new ArgumentNullException();
             this.config = config;
         }
 
