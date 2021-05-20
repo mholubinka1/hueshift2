@@ -11,7 +11,7 @@ FROM build-env as test-runner
 WORKDIR /app/HueShift2Tests/
 CMD ["dotnet", "test", "--logger:trx"]
 
-FROM build-env as unit-test
+FROM build-env as unit-tests
 WORKDIR /app/HueShift2Tests/
 RUN dotnet test --logger:trx
 
