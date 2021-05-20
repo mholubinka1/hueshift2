@@ -5,7 +5,7 @@ COPY HueShift2/HueShift2/*.csproj ./HueShift2/
 COPY HueShift2/HueShift2Tests/*.csproj ./HueShift2Tests/
 RUN dotnet restore
 
-COPY Hueshift2/* ./
+COPY Hueshift2 ./
 RUN dotnet build
 FROM build-env as test-runner
 WORKDIR /app/HueShift2Tests/
