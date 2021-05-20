@@ -3,8 +3,11 @@ services:
   - docker:dind
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin "$DOCKER_REGISTRY"
+  
+stages:
+  - build
 
-docker-build-master:
+build-master:
   stage: build
   script:
     - docker build --pull -t "$DOCKER_REGISTRY_IMAGE" .
@@ -13,15 +16,20 @@ docker-build-master:
     - master
   tags:
     - docker
-
-docker-build:
+    
+build-dev:
   stage: build
   script:
-    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
-    - docker push "$DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
+    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE:dev" .
+    - docker push "$DOCKER_REGISTRY_IMAGE:dev"
   except:
     - master
   tags:
     - docker
+
+  
+
+
+
 
     
