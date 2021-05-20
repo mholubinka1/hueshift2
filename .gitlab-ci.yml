@@ -2,7 +2,7 @@ image: docker:latest
 services:
   - docker:dind
 before_script:
-  - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin "$DOCKER_REGISTRY"
 
 docker-build-master:
   stage: build
@@ -22,6 +22,6 @@ docker-build:
   except:
     - master
   tags:
-    - docker  
+    - docker
 
     
