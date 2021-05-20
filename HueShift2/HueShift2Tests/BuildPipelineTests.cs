@@ -27,7 +27,7 @@ namespace HueShift2.UnitTests
         public void BuildPipeline_TestAlwaysPasses()
         {
             var @true = true;
-            Assert.That(@true == true);
+            Assert.That(@true == true);  
         }
     }
 }

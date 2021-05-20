@@ -19,6 +19,7 @@ namespace HueShift2.Configuration
 
         public async Task<Geolocation> Get()
         {
+            //confirm config is present
             var geolocationUri = new Uri(config["Uri"] + config["Key"]);
             string geolocationResponse;
             using (var client = new HttpClient())

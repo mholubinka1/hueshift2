@@ -1,15 +1,18 @@
 ﻿using HueShift2.Configuration;
-using Microsoft.Extensions.Configuration;
-using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HueShift2.UnitTests.Configuration
 {
+    [TestFixture]
     public class GeolocatorTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            //create config object
+        }
+
         [Test]
         public void Constructor_IConfigurationSectionIsNull_ThrowsNullArgumentException()
         {
@@ -17,6 +20,10 @@ namespace HueShift2.UnitTests.Configuration
             Assert.Throws<ArgumentNullException>(() => new Geolocator(null));
         }
 
+        [Test]
+        public void Get_ReturnsGeolocation()
+        {
 
+        }
     }
 }
