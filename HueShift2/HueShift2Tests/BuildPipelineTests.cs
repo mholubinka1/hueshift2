@@ -16,12 +16,12 @@ namespace HueShift2.UnitTests
 
         }
 
-        [Test]
+        /*[Test]
         public void BuildPipeline_TestAlwaysFails()
         {
             var @false = false;
             Assert.That(@false == true);
-        }
+        }*/
 
         [Test]
         public void BuildPipeline_TestAlwaysPasses()
