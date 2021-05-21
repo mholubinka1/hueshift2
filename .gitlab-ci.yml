@@ -18,10 +18,10 @@ build-master:
   artifacts:
     when: always
     paths:
-      - unit_test_report.xml
+      - ./unit_test_report.xml
     reports:
       junit:
-        - unit_test_report.xml
+        - ./unit_test_report.xml
   only:
     - master
   tags:
