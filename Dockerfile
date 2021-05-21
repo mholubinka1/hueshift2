@@ -15,7 +15,6 @@ LABEL unit-test=true
 WORKDIR /app/HueShift2Tests/
 RUN dotnet test --results-directory ./ --logger:"junit;LogFileName=unit_test_report.xml"
 
-
 FROM build-env AS publish
 WORKDIR /app/HueShift2/
 RUN dotnet publish -c Release -o out
