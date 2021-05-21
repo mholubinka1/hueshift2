@@ -10,7 +10,7 @@ stages:
 build-master:
   stage: build
   script:
-    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE" .
+    - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE" .
     - docker push "$DOCKER_REGISTRY_IMAGE"
   only:
     - master
@@ -20,7 +20,7 @@ build-master:
 build-dev:
   stage: build
   script:
-    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE:dev" .
+    - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE:dev" .
     - docker push "$DOCKER_REGISTRY_IMAGE:dev"
   except:
     - master
