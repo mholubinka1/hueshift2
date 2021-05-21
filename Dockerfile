@@ -11,7 +11,7 @@ FROM build-env AS test-runner
 WORKDIR /app/HueShift2Tests/
 
 FROM build-env AS unit-test
-LABEL unit-test=true
+LABEL unit-test
 WORKDIR /app/HueShift2Tests/
 RUN dotnet test --results-directory ./ --logger "trx;LogFileName=unit_test_report.xml"
 
