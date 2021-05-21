@@ -7,16 +7,16 @@ RUN dotnet restore
 
 COPY HueShift2 ./
 RUN dotnet build
-FROM build-env as test-runner
+FROM build-env AS test-runner
 WORKDIR /app/HueShift2Tests/
-CMD ["dotnet", "test", "--logger:trx"]
 
-FROM build-env as unit-test
+FROM build-env AS unit-test
+LABEL unit-test=true
 WORKDIR /app/HueShift2Tests/
 RUN dotnet test --results-directory ./ --logger "trx;LogFileName=unit_test_report.xml"
 
 
-FROM build-env as publish
+FROM build-env AS publish
 WORKDIR /app/HueShift2/
 RUN dotnet publish -c Release -o out
 
