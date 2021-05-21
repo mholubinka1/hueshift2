@@ -38,13 +38,15 @@ build-dev:
     - docker push "$DOCKER_REGISTRY_IMAGE"
   after_script:
     - id=`docker images --filter "label=unit-test" -q`
-    - docker container create --name test-report $id
-    - docker cp test-report:/app/HueShift2Tests/unit_test_report.xml .
+    - docker container create --name test-reports $id
+    - docker cp test-reports:/app/HueShift2Tests/unit_test_report.xml .
+    - docker cp test-reports:/app/HueShift2Tests/coverage .
     - docker rm test-report
   artifacts:
     when: always
     paths:
       - ./unit_test_report.xml
+      - ./coverage
     reports:
       junit:
         - ./unit_test_report.xml

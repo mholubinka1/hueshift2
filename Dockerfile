@@ -13,7 +13,7 @@ WORKDIR /app/HueShift2Tests/
 FROM build-env AS unit-test
 LABEL unit-test=true
 WORKDIR /app/HueShift2Tests/
-RUN dotnet test --results-directory ./ --logger:"junit;LogFileName=unit_test_report.xml"
+RUN dotnet test --results-directory ./ --logger:"junit;LogFileName=unit_test_report.xml" /p:CollectCoverage=true /p:CoverletOutput='coverage' /p:CoverletOutputFormat=opencover
 
 FROM build-env AS publish
 WORKDIR /app/HueShift2/
