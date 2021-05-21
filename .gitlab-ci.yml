@@ -6,12 +6,26 @@ before_script:
   
 stages:
   - build
+  - code-coverage
+  - cleanup
 
 build-master:
   stage: build
   script:
-    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE" .
+    - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE" .
     - docker push "$DOCKER_REGISTRY_IMAGE"
+  after_script:
+    - id=`docker images --filter "label=unit-test" -q`
+    - docker container create --name test-report $id
+    - docker cp test-report:/app/HueShift2Tests/unit_test_report.xml .
+    - docker rm test-report
+  artifacts:
+    when: always
+    paths:
+      - ./unit_test_report.xml
+    reports:
+      junit:
+        - ./unit_test_report.xml
   only:
     - master
   tags:
@@ -20,16 +34,21 @@ build-master:
 build-dev:
   stage: build
   script:
-    - docker build --pull -t "$DOCKER_REGISTRY_IMAGE:dev" .
-    - docker push "$DOCKER_REGISTRY_IMAGE:dev"
+    - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE" .
+    - docker push "$DOCKER_REGISTRY_IMAGE"
+  after_script:
+    - id=`docker images --filter "label=unit-test" -q`
+    - docker container create --name test-report $id
+    - docker cp test-report:/app/HueShift2Tests/unit_test_report.xml .
+    - docker rm test-report
+  artifacts:
+    when: always
+    paths:
+      - ./unit_test_report.xml
+    reports:
+      junit:
+        - ./unit_test_report.xml
   except:
     - master
   tags:
     - docker
-
-  
-
-
-
-
-    

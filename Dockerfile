@@ -7,18 +7,17 @@ RUN dotnet restore
 
 COPY HueShift2 ./
 RUN dotnet build
-FROM build-env as test-runner
+FROM build-env AS test-runner
 WORKDIR /app/HueShift2Tests/
-CMD ["dotnet", "test", "--logger:trx"]
 
-FROM build-env as unit-test
+FROM build-env AS unit-test
+LABEL unit-test=true
 WORKDIR /app/HueShift2Tests/
-RUN dotnet test --logger:trx
+RUN dotnet test --results-directory ./ --logger:"junit;LogFileName=unit_test_report.xml"
 
 
-FROM build-env as publish
-COPY /app/HueShift2/. ./
-WORKDIR /app
+FROM build-env AS publish
+WORKDIR /app/HueShift2/
 RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/runtime:5.0 AS runtime
@@ -30,5 +29,5 @@ VOLUME /log
 ENV UDPPORT 6454
 EXPOSE ${UDPPORT}
 EXPOSE ${UDPPORT}/udp
-COPY --from=build-env /app/out ./
+COPY --from=publish /app/HueShift2/out ./
 ENTRYPOINT ["dotnet", "HueShift2.dll", "--config-file", "/config/hueshift2-config.json"]
