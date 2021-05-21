@@ -13,7 +13,7 @@ CMD ["dotnet", "test", "--logger:trx"]
 
 FROM build-env as unit-test
 WORKDIR /app/HueShift2Tests/
-RUN dotnet test --logger:trx
+RUN dotnet test --results-directory ./ --logger "trx;LogFileName=unit_test_report.xml"
 
 
 FROM build-env as publish
