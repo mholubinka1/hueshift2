@@ -12,8 +12,16 @@ build-master:
   script:
     - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE" .
     - docker push "$DOCKER_REGISTRY_IMAGE"
+  after-script:
     - id=`docker images --filter "label=unit-test" -q`
-    - echo $id
+    - docker cp $id:app/HueShift2Tests/unit_test_report.xml .
+  artifacts:
+    when: always
+    paths:
+      - unit_test_report.xml
+    reports:
+      junit:
+        - unit_test_report.xml
   only:
     - master
   tags:
