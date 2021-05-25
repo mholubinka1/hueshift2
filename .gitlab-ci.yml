@@ -6,7 +6,7 @@ before_script:
   
 stages:
   - build
-  - code-coverage
+  - confirmCoverage
   - cleanup
 
 build-master:
@@ -54,3 +54,16 @@ build-dev:
     - master
   tags:
     - docker
+
+check-coverage:
+  image: alpine:latest
+  stage: confirmCoverage
+  variables:
+    JOB_NAME: check-coverage
+    TARGET_BRANCH: master
+  before_script:
+    - apk add --update --no-cache curl jq
+  rules:
+    - if: $CI_COMMMIT_BRANCH != $TARGET_BRANCH
+  script:
+    - echo success
