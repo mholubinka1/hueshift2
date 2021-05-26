@@ -16,10 +16,10 @@ build-master:
     - docker push "$DOCKER_REGISTRY_IMAGE"
   after_script:
     - id=`docker images --filter "label=unit-test" -q`
-    - docker container create --name test-report $id
-    - docker cp test-report:/app/HueShift2Tests/unit_test_report.xml .
+    - docker container create --name test-reports $id
+    - docker cp test-reports:/app/HueShift2Tests/unit_test_report.xml .
     - docker cp test-reports:/app/HueShift2Tests/coverage.xml .
-    - docker rm test-report
+    - docker rm test-reports
   artifacts:
     when: always
     paths:
@@ -68,6 +68,8 @@ check-coverage:
   rules:
     - if: $CI_COMMMIT_BRANCH != $TARGET_BRANCH
   script:
+    - TARGET_PIPELINE_ID=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines?ref=${TARGET_BRANCH}&status=success" | jq ".[0].id"`
+    - echo ${TARGET_PIPELINE_ID}
     - echo success
   tags:
     - rpi
