@@ -70,3 +70,8 @@ check-coverage:
     - echo success
   tags:
     - docker
+    
+cleanup:
+  stage: cleanup
+  script:
+    - docker image prune -a -f
