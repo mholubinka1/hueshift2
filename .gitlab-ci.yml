@@ -69,9 +69,11 @@ check-coverage:
   script:
     - echo success
   tags:
-    - docker
+    - rpi
     
 cleanup:
   stage: cleanup
   script:
     - docker image prune -a -f
+  tags:
+    - docker
