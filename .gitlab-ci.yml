@@ -46,7 +46,7 @@ build-dev:
     when: always
     paths:
       - ./unit_test_report.xml
-      - ./coverage
+      - ./coverage.xml
     reports:
       junit:
         - ./unit_test_report.xml
