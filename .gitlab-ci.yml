@@ -23,6 +23,7 @@ build-master:
     when: always
     paths:
       - ./unit_test_report.xml
+      - ./coverage.xml
     reports:
       junit:
         - ./unit_test_report.xml
@@ -34,8 +35,8 @@ build-master:
 build-dev:
   stage: build
   script:
-    - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE" .
-    - docker push "$DOCKER_REGISTRY_IMAGE"
+    - docker build --rm=false --pull -t "$DOCKER_REGISTRY:dev" .
+    - docker push "$DOCKER_REGISTRY:dev"
   after_script:
     - id=`docker images --filter "label=unit-test" -q`
     - docker container create --name test-reports $id
