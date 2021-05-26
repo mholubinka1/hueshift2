@@ -67,3 +67,5 @@ check-coverage:
     - if: $CI_COMMMIT_BRANCH != $TARGET_BRANCH
   script:
     - echo success
+  tags:
+    - docker
