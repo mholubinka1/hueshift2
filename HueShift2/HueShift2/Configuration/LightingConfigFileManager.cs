@@ -15,23 +15,26 @@ using System.Threading.Tasks;
 
 namespace HueShift2.Configuration
 {
-    public class LightingConfigFileGenerator
+    public class LightingConfigFileManager
     {
         private readonly ILogger logger;
+
+        private readonly IConfigFileHelper configFileHelper;
 
         private readonly IBridgeLocator bridgeLocator;
         private readonly IGeoLocator geolocator;
 
-        public LightingConfigFileGenerator(ILogger<LightingConfigFileGenerator> logger, IConfiguration configuration)
+        public LightingConfigFileManager(ILogger<LightingConfigFileManager> logger, IConfigFileHelper configFileHelper, IConfiguration configuration)
         {
             this.logger = logger;
+            this.configFileHelper = configFileHelper;
             bridgeLocator = new HttpBridgeLocator();
             geolocator = new Geolocator(configuration.GetSection("IpStackApi"));
         }
 
         private async Task<BridgeProperties> DiscoverBridgesOnNetwork()
         {
-            logger.LogInformation($"Searching for Hue bridges on network.");
+            logger.LogInformation($"Searching for Hue bridges on network...");
             //FIXME: what if no bridges are found?
             var locatedBridges = (await bridgeLocator.LocateBridgesAsync(TimeSpan.FromSeconds(30))).ToList();
             var locatedBridge = locatedBridges[0];
@@ -61,15 +64,30 @@ namespace HueShift2.Configuration
             File.WriteAllText(configFilePath, JsonConvert.SerializeObject(hueShiftOptions, Formatting.Indented, new StringEnumConverter()));
         }
 
+        public async Task Assert(string configFilePath, string bridgeIp)
+        {
+            logger.LogInformation($"Asserting {configFilePath} Hue bridge settings...");
+            var discoveredBridge = await DiscoverBridgesOnNetwork();
+            var discoveredBridgeIp = discoveredBridge.IpAddress;
+            if (discoveredBridgeIp != bridgeIp)
+            {
+                logger.LogWarning($"Hue bridge IP mismatch. Writing updated IP address to configuration file...");
+                var key = "HueShiftOptions:BridgeProperties:IpAddress";
+                configFileHelper.AddOrUpdateSetting(configFilePath, key, discoveredBridgeIp);
+                logger.LogInformation($"Updated Hue bridge IP address.");
+            }
+            logger.LogInformation($"Settings confirmed.");
+        }
+
         public async Task Generate(string configFilePath)
         {
-            logger.LogInformation($"Generating {configFilePath} with required settings.");
+            logger.LogInformation($"Generating {configFilePath} with required settings...");
             var bridgeProperties = await DiscoverBridgesOnNetwork();
             var geolocation = await FindGeolocation();
             var hueShiftOptions = new HueShiftOptions
             {
                 BridgeProperties = bridgeProperties,
-                Geolocation = geolocation
+                Geolocation = geolocation,
             };
             hueShiftOptions.SetDefaults();
             WriteConfigToFile(configFilePath, new LightingConfiguration(hueShiftOptions));

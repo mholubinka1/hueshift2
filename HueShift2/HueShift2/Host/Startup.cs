@@ -11,44 +11,62 @@ using System.Threading.Tasks;
 
 namespace HueShift2
 {
-    public static class Startup
+    public class StartupManager
     {
-        private static IConfiguration BuildConfiguration(string[] args)
+        private readonly IConfiguration startupConfig;
+        private readonly LightingConfigFileManager lightingConfigFileManager;
+
+        public StartupManager(string[] args)
         {
-            return new ConfigurationBuilder()
+            startupConfig = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
-        }
-
-        private static async Task GenerateStartupConfigurationFile(IConfiguration config, SerilogTypedLogger<LightingConfigFileGenerator> logger)
-        {
-            var lightingConfigFilePath = config["config-file"];
-            Log.Warning($"{lightingConfigFilePath} does not exist.");
-            await new LightingConfigFileGenerator(logger, config).Generate(lightingConfigFilePath);
-            Log.Information($"{lightingConfigFilePath} successfully generated.");
-
-            
-
-
-            //need to confirm the Hue Bridge - 
-        }
-
-        public static async Task<Tuple<ILogger, string>> AssertConfiguration(string[] args)
-        {
-            var startupConfig = BuildConfiguration(args);
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(startupConfig)
                 .CreateLogger();
 
+            var fileHelperLogger = new SerilogTypedLogger<ConfigFileHelper>(Log.Logger);
+            var configFileHelper = new ConfigFileHelper(fileHelperLogger);
+            var fileManagerLogger = new SerilogTypedLogger<LightingConfigFileManager>(Log.Logger);
+            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig);
+
+
+        }
+
+        private async Task GenerateStartupConfigurationFile(IConfiguration config)
+        {
+            var lightingConfigFilePath = config["config-file"];
+            Log.Warning($"{lightingConfigFilePath} does not exist.");
+            await lightingConfigFileManager.Generate(lightingConfigFilePath);
+            Log.Information($"{lightingConfigFilePath} successfully generated.");
+        }
+
+        private async Task AssertGeneratedConfigurationFile(IConfiguration generatedConfig, string configFilePath)
+        {
+            var bridgeIp = generatedConfig["HueShiftOptions: BridgeProperties:IpAddress"];
+            await lightingConfigFileManager.Assert(configFilePath, bridgeIp);
+        }
+
+        public async Task<Tuple<ILogger, string>> AssertConfiguration()
+        {
             var lightingConfigFilePath = startupConfig["config-file"];
             if (!File.Exists(lightingConfigFilePath))
             {
-                await GenerateStartupConfigurationFile(startupConfig, new SerilogTypedLogger<LightingConfigFileGenerator>(Log.Logger));
+                await GenerateStartupConfigurationFile(startupConfig);
             }
+            else
+            {
+                var generatedConfig = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile(lightingConfigFilePath, optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+                await AssertGeneratedConfigurationFile(generatedConfig, lightingConfigFilePath);
+            }   
             return new Tuple<ILogger, string>(Log.Logger, lightingConfigFilePath);
         }
     }

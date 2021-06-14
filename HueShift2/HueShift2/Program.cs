@@ -21,9 +21,10 @@ namespace HueShift2
     {
         public static async Task Main(string[] args)
         {
-            var requiredAtStartup = await Startup.AssertConfiguration(args);
+            var requiredAtStartup = await new StartupManager(args).AssertConfiguration();
             Log.Logger = requiredAtStartup.Item1;
             var lightingConfigFilePath = requiredAtStartup.Item2;
+
             Log.Information("Starting...");
             try
             {
