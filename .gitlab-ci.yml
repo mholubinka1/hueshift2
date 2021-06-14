@@ -6,7 +6,7 @@ before_script:
   
 stages:
   - build
-  - code-coverage
+  - confirmCoverage
   - cleanup
 
 build-master:
@@ -16,13 +16,15 @@ build-master:
     - docker push "$DOCKER_REGISTRY_IMAGE"
   after_script:
     - id=`docker images --filter "label=unit-test" -q`
-    - docker container create --name test-report $id
-    - docker cp test-report:/app/HueShift2Tests/unit_test_report.xml .
-    - docker rm test-report
+    - docker container create --name test-reports $id
+    - docker cp test-reports:/app/HueShift2Tests/unit_test_report.xml .
+    - docker cp test-reports:/app/HueShift2Tests/coverage.xml .
+    - docker rm test-reports
   artifacts:
     when: always
     paths:
       - ./unit_test_report.xml
+      - ./coverage.xml
     reports:
       junit:
         - ./unit_test_report.xml
@@ -34,8 +36,8 @@ build-master:
 build-dev:
   stage: build
   script:
-    - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE" .
-    - docker push "$DOCKER_REGISTRY_IMAGE"
+    - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE:dev" .
+    - docker push "$DOCKER_REGISTRY_IMAGE:dev"
   after_script:
     - id=`docker images --filter "label=unit-test" -q`
     - docker container create --name test-reports $id
@@ -46,11 +48,37 @@ build-dev:
     when: always
     paths:
       - ./unit_test_report.xml
-      - ./coverage
+      - ./coverage.xml
     reports:
       junit:
         - ./unit_test_report.xml
   except:
     - master
+  tags:
+    - docker
+
+check-coverage:
+  image: alpine:latest
+  stage: confirmCoverage
+  variables:
+    JOB_NAME: check-coverage
+    TARGET_BRANCH: master
+  before_script:
+    - apk add --update --no-cache curl jq
+  rules:
+    - if: $CI_COMMMIT_BRANCH != $TARGET_BRANCH
+  script:
+    - TARGET_PIPELINE_ID=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines?ref=${TARGET_BRANCH}&status=success&private_token=${RUNNER_ACCESS_TOKEN}" | jq "[.[] ] | .[0]"`
+    - echo ${TARGET_PIPELINE_ID}
+    - echo success
+  tags:
+    - rpi
+    
+cleanup:
+  stage: cleanup
+  script:
+    - docker image prune -a -f
+    - docker container prune -f
+    - docker builder prune -f
   tags:
     - docker

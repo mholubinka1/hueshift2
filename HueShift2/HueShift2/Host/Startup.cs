@@ -29,6 +29,11 @@ namespace HueShift2
             Log.Warning($"{lightingConfigFilePath} does not exist.");
             await new LightingConfigFileGenerator(logger, config).Generate(lightingConfigFilePath);
             Log.Information($"{lightingConfigFilePath} successfully generated.");
+
+            
+
+
+            //need to confirm the Hue Bridge - 
         }
 
         public static async Task<Tuple<ILogger, string>> AssertConfiguration(string[] args)
