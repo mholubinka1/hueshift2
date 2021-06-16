@@ -73,9 +73,10 @@ check-coverage:
   rules:
     - if: $CI_COMMMIT_BRANCH != $TARGET_BRANCH
   script:
-    - TARGET_PIPELINE_ID=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines?ref=${TARGET_BRANCH}&status=success&private_token=${RUNNER_ACCESS_TOKEN}" | jq "[.[] ] | .[0]"`
+    - TARGET_PIPELINE_ID=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines?ref=${TARGET_BRANCH}&status=success&private_token=${RUNNER_ACCESS_TOKEN}" | jq "[.[] ] | .[0].id"`
     - echo ${TARGET_PIPELINE_ID}
-    - echo success
+    - TARGET_COVERAGE=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines/${TARGET_PIPELINE_ID}/jobs?private_token=${RUNNER_ACCESS_TOKEN}" | jq --arg JOB_NAME "$JOB_NAME" '.[] | select(.name==$JOB_NAME) | .coverage'`
+    - echo ${TARGET_COVERAGE}
   tags:
     - rpi
     
