@@ -1,6 +1,11 @@
 image: docker:latest
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+
 services:
   - docker:dind
+
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin "$DOCKER_REGISTRY"
   
