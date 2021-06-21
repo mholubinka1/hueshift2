@@ -25,9 +25,6 @@ build-master:
     - docker cp test-reports:/app/HueShift2Tests/unit_test_report.xml .
     - docker cp test-reports:/app/HueShift2Tests/coverage.xml .
     - docker rm test-reports
-    - docker image prune -a -f
-    - docker container prune -f
-    - docker builder prune -f
   artifacts:
     when: always
     paths:
