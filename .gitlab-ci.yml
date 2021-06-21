@@ -12,19 +12,22 @@ before_script:
 stages:
   - build
   - confirmCoverage
-  - cleanup
+  - push
 
 build-master:
   stage: build
+  coverage: '/Total\s*\|\s*(\d+\.?\d+)/'
   script:
     - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE" .
-    - docker push "$DOCKER_REGISTRY_IMAGE"
   after_script:
     - id=`docker images --filter "label=unit-test" -q`
     - docker container create --name test-reports $id
     - docker cp test-reports:/app/HueShift2Tests/unit_test_report.xml .
     - docker cp test-reports:/app/HueShift2Tests/coverage.xml .
     - docker rm test-reports
+    - docker image prune -a -f
+    - docker container prune -f
+    - docker builder prune -f
   artifacts:
     when: always
     paths:
@@ -40,9 +43,9 @@ build-master:
     
 build-dev:
   stage: build
+  coverage: '/Total\s*\|\s*(\d+\.?\d+)/'
   script:
     - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE:dev" .
-    - docker push "$DOCKER_REGISTRY_IMAGE:dev"
   after_script:
     - id=`docker images --filter "label=unit-test" -q`
     - docker container create --name test-reports $id
@@ -66,7 +69,7 @@ check-coverage:
   image: alpine:latest
   stage: confirmCoverage
   variables:
-    JOB_NAME: check-coverage
+    JOB_NAME: build-master
     TARGET_BRANCH: master
   before_script:
     - apk add --update --no-cache curl jq
@@ -74,17 +77,37 @@ check-coverage:
     - if: $CI_COMMMIT_BRANCH != $TARGET_BRANCH
   script:
     - TARGET_PIPELINE_ID=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines?ref=${TARGET_BRANCH}&status=success&private_token=${RUNNER_ACCESS_TOKEN}" | jq "[.[] ] | .[0].id"`
-    - echo ${TARGET_PIPELINE_ID}
     - TARGET_COVERAGE=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines/${TARGET_PIPELINE_ID}/jobs?private_token=${RUNNER_ACCESS_TOKEN}" | jq --arg JOB_NAME "$JOB_NAME" '.[] | select(.name==$JOB_NAME) | .coverage'`
-    - echo ${TARGET_COVERAGE}
+    - CURRENT_COVERAGE=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/jobs?private_token=${RUNNER_ACCESS_TOKEN}" | jq --arg JOB_NAME "$JOB_NAME" '.[] | select(.name==$JOB_NAME) | .coverage'`
+    - DIFFERENCE=$(echo "$TARGET_COVERAGE-$CURRENT_COVERAGE" |bc -l)
+    - echo "$DIFFERENCE"
+    - if (( $(echo "$DIFFERENCE > 0.0001" |bc -l) )); then echo "Coverage decreased from ${TARGET_COVERAGE} to ${CURRENT_COVERAGE}. Build Failed." && exit 1; else echo "Build Succeeded."; fi;
   tags:
     - rpi
-    
-cleanup:
-  stage: cleanup
+
+push-master:
+  stage: push
   script:
+    - docker push "$DOCKER_REGISTRY_IMAGE"
+  after_script:
     - docker image prune -a -f
     - docker container prune -f
     - docker builder prune -f
+  only:
+    - master
   tags:
     - docker
+
+push-dev:
+  stage: push
+  script:
+    - docker push "$DOCKER_REGISTRY_IMAGE:dev"
+  after_script:
+    - docker image prune -a -f
+    - docker container prune -f
+    - docker builder prune -f
+  except:
+    - master
+  tags:
+    - docker
+ 
