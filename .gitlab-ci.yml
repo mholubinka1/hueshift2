@@ -11,8 +11,9 @@ before_script:
   
 stages:
   - build
-  - confirmCoverage
+  - coverage
   - push
+  - cleanup
 
 build-master:
   stage: build
@@ -64,7 +65,7 @@ build-dev:
 
 check-coverage:
   image: alpine:latest
-  stage: confirmCoverage
+  stage: coverage
   variables:
     JOB_NAME: build-master
     TARGET_BRANCH: master
@@ -86,10 +87,6 @@ push-master:
   stage: push
   script:
     - docker push "$DOCKER_REGISTRY_IMAGE"
-  after_script:
-    - docker image prune -a -f
-    - docker container prune -f
-    - docker builder prune -f
   only:
     - master
   tags:
@@ -99,12 +96,14 @@ push-dev:
   stage: push
   script:
     - docker push "$DOCKER_REGISTRY_IMAGE:dev"
-  after_script:
-    - docker image prune -a -f
-    - docker container prune -f
-    - docker builder prune -f
   except:
     - master
   tags:
     - docker
- 
+
+cleanup:
+  stage: cleanup
+  script:
+    - docker system prune -a -f
+  tags:
+    - docker
