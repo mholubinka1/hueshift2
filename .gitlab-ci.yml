@@ -13,7 +13,6 @@ stages:
   - build
   - coverage
   - push
-  - cleanup
 
 build-master:
   stage: build
@@ -63,7 +62,7 @@ build-dev:
   tags:
     - docker
 
-check-coverage:
+coverage-master:
   image: alpine:latest
   stage: coverage
   variables:
