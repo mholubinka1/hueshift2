@@ -79,6 +79,8 @@ coverage-master:
     - DIFFERENCE=$(echo "$TARGET_COVERAGE-$CURRENT_COVERAGE" |bc -l)
     - echo "$DIFFERENCE"
     - if (( $(echo "$DIFFERENCE > 0.0001" |bc -l) )); then echo "Coverage decreased from ${TARGET_COVERAGE} to ${CURRENT_COVERAGE}. Build Failed." && exit 1; else echo "Build Succeeded."; fi;
+  only:
+    - master
   tags:
     - rpi
 
