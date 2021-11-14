@@ -4,7 +4,7 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"
 
 services:
-  - docker:19.03.8-d
+  - docker:19.03.8-dind
 
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin "$DOCKER_REGISTRY"
