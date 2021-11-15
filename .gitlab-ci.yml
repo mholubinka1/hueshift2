@@ -76,7 +76,9 @@ coverage-master:
     - echo "$CI_COMMIT_BRANCH"
     - TARGET_PIPELINE_ID=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines?ref=${TARGET_BRANCH}&status=success&private_token=${RUNNER_ACCESS_TOKEN}" | jq "[.[] ] | .[0].id"`
     - TARGET_COVERAGE=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines/${TARGET_PIPELINE_ID}/jobs?private_token=${RUNNER_ACCESS_TOKEN}" | jq --arg JOB_NAME "$JOB_NAME" '.[] | select(.name==$JOB_NAME) | .coverage'`
+    - echo "$TARGET_COVERAGE"
     - CURRENT_COVERAGE=`curl -s "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/jobs?private_token=${RUNNER_ACCESS_TOKEN}" | jq --arg JOB_NAME "$JOB_NAME" '.[] | select(.name==$JOB_NAME) | .coverage'`
+    - echo "$CURRENT_COVERAGE"
     - DIFFERENCE=$(echo "$TARGET_COVERAGE-$CURRENT_COVERAGE" |bc -l)
     - echo "$DIFFERENCE"
     - if (( $(echo "$DIFFERENCE > 0.0001" |bc -l) )); then echo "Coverage decreased from ${TARGET_COVERAGE} to ${CURRENT_COVERAGE}. Build Failed." && exit 1; else echo "Build Succeeded."; fi;
