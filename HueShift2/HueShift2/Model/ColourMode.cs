@@ -11,6 +11,7 @@ namespace HueShift2.Model
         None,
         XY,
         CT,
+        HS,
         Other
     }
 }
