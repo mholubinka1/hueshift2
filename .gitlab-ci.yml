@@ -46,6 +46,7 @@ build-dev:
     - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE:dev" .
   after_script:
     - id=`docker images --filter "label=unit-test" -q`
+    - docker rm test-reports
     - docker container create --name test-reports $id
     - docker cp test-reports:/app/HueShift2Tests/unit_test_report.xml .
     - docker cp test-reports:/app/HueShift2Tests/coverage .
