@@ -68,6 +68,8 @@ namespace HueShift2.Helpers
                     return ColourMode.XY;
                 case "ct":
                     return ColourMode.CT;
+                case "hs":
+                    return ColourMode.HS;
                 default:
                     throw new NotSupportedException();
             }
