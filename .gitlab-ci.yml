@@ -71,6 +71,7 @@ coverage-master:
   before_script:
     - apk add --update --no-cache curl jq
   rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
     - if: $CI_COMMMIT_BRANCH != $TARGET_BRANCH
   script:
     - echo "$CI_COMMIT_BRANCH"
@@ -82,8 +83,6 @@ coverage-master:
     - DIFFERENCE=$(echo "$TARGET_COVERAGE-$CURRENT_COVERAGE" |bc -l)
     - echo "$DIFFERENCE"
     - if (( $(scale = 4; echo "$DIFFERENCE > 0.0001" |bc -l) )); then echo "Coverage decreased from ${TARGET_COVERAGE} to ${CURRENT_COVERAGE}. Build Failed." && exit 1; else echo "Build Succeeded."; fi;
-  only:
-    - master
   tags:
     - rpi
 
