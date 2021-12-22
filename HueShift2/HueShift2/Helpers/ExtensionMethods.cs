@@ -91,6 +91,7 @@ namespace HueShift2.Helpers
                         Brightness = expectedLight.Brightness,
                         ColorTemperature = expectedLight.Colour.ColourTemperature,
                     };
+                case ColourMode.HS:
                 case ColourMode.Other:
                 case ColourMode.None:
                 default:

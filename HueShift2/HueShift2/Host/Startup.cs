@@ -47,7 +47,7 @@ namespace HueShift2
 
         private async Task AssertGeneratedConfigurationFile(IConfiguration generatedConfig, string configFilePath)
         {
-            var bridgeIp = generatedConfig["HueShiftOptions: BridgeProperties:IpAddress"];
+            var bridgeIp = generatedConfig["HueShiftOptions:BridgeProperties:IpAddress"];
             await lightingConfigFileManager.Assert(configFilePath, bridgeIp);
         }
 
