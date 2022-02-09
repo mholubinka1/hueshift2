@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Q42.HueApi.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HueShift2.Control
@@ -32,7 +30,8 @@ namespace HueShift2.Control
 
         public async Task<DateTime?> Execute(DateTime? lastRunTime)
         {
-            throw new NotImplementedException();
+            await Task.FromException(new NotImplementedException());
+            return new DateTime();
         }
 
         public HueShiftMode Mode()
