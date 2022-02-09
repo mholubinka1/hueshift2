@@ -42,11 +42,12 @@ build-common:
 coverage-check:
   image: alpine:latest
   stage: coverage
-  script:
+  before_script:
     - apk add --update --no-cache bash curl jq
+  script:
     - bash check_coverage.sh
   tags:
-    - docker
+    - rpi
 
 push-common:
   stage: push
