@@ -20,7 +20,7 @@ build-master:
   script:
     - docker build --rm=false --pull -t "$DOCKER_REGISTRY_IMAGE" .
   after_script:
-    - docker ps -q --filter "name=test-reports" | grep -q . && docker stop test-reports && docker rm -fv test-reports
+    - docker ps -aq --filter "name=test-reports" | grep -aq . && docker stop test-reports && docker rm -fv test-reports
     - id=`docker images --filter "label=unit-test" -q`
     - docker container create --name test-reports $id
     - docker cp test-reports:/app/HueShift2Tests/unit_test_report.xml .
