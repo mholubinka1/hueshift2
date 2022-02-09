@@ -8,6 +8,8 @@ services:
 
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin "$DOCKER_REGISTRY"
+  - if [ $CI_COMMIT_REF_NAME = "master" ]; then IMAGE_TAG = "latest"; else IMAGE_TAG = "dev"; fi;
+  - echo "$IMAGE_TAG"
   
 stages:
   - build
@@ -73,8 +75,8 @@ coverage-master:
   before_script:
     - apk add --update --no-cache curl jq
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-    - if: '$CI_COMMMIT_BRANCH != $TARGET_BRANCH'
+    - if: '$CI_COMMIT_REF_NAME = "master"'
+    - if: '$CI_COMMMIT_BRANCH -ne $TARGET_BRANCH'
   script:
     - echo "$CI_COMMIT_REF_NAME"
     - echo "$TARGET_BRANCH"
