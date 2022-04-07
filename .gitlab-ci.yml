@@ -10,7 +10,7 @@ services:
 
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin "$DOCKER_REGISTRY"
-  - IMAGE_TAG=$(if [ $CI_COMMIT_REF_NAME = "master" ]; then echo "latest"; else echo "not dev"; fi;)
+  - IMAGE_TAG=$(if [ $CI_COMMIT_REF_NAME = "master" ]; then echo "latest"; else echo "dev"; fi;)
   - echo "$IMAGE_TAG"
   
 stages:
