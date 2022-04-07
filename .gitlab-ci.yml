@@ -38,8 +38,6 @@ build-common:
 
 coverage-check:
   stage: coverage
-  before_script:
-    - apt install bash curl jq
   script:
     - bash check_coverage.sh
   tags:
