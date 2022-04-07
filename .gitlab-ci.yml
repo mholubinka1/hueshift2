@@ -1,3 +1,5 @@
+#gitlab-ci script for a gitlab-runner (armhf architecture) configured on Raspbian Buster 32-bit 
+
 image: docker:19.03.8
 
 variables:
@@ -40,10 +42,7 @@ build-common:
     - docker
 
 coverage-check:
-  image: alpine:latest
   stage: coverage
-  before_script:
-    - apk add --update --no-cache bash curl jq
   script:
     - bash check_coverage.sh
   tags:
