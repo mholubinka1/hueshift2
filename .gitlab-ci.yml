@@ -1,12 +1,7 @@
 #gitlab-ci script for a gitlab-runner (armhf architecture) configured on Raspbian Buster 32-bit 
 
-image: docker:19.03.8
-
 variables:
   DOCKER_TLS_CERTDIR: "/certs"
-
-services:
-  - docker:19.03.8-dind
 
 before_script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin "$DOCKER_REGISTRY"
