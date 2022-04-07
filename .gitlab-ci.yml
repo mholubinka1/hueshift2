@@ -39,7 +39,7 @@ build-common:
 coverage-check:
   stage: coverage
   before_script:
-    - apt install --update --no-cache bash curl jq
+    - apt install --no-cache bash curl jq
   script:
     - bash check_coverage.sh
   tags:
