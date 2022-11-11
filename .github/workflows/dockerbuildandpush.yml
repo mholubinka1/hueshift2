@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       DOCKER_REGISTRY: docker.io
-      DOCKER_IMAGE: index.docker.io/mholubinka1/hueshift2
+      DOCKER_IMAGE: mholubinka1/hueshift2
       DOCKER_TARGET_PLATFORM: linux/arm/v7
 
     steps:
