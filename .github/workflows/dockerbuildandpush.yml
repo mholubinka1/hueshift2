@@ -10,8 +10,8 @@ jobs:
     env:
       DOCKER_REGISTRY: docker.io
       DOCKER_IMAGE: index.docker.io/mholubinka1/hueshift2
-      DOCKER_USERNAME: 
-      DOCKER_PASSWORD:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       DOCKER_TARGET_PLATFORM: linux/arm/v7
 
     steps:
