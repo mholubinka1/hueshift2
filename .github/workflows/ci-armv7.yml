@@ -10,7 +10,7 @@ on:
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ARMv7
     env:
       DOCKER_REGISTRY: docker.io
       DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/hueshift2
@@ -49,14 +49,12 @@ jobs:
           if [ $branchName != 'master' ]; then image_tag='staging'; else image_tag='latest'; fi
           echo "tag=$(echo $image_tag)" >> $GITHUB_OUTPUT
 
-      - name: Run Buildx - Push Image
-        if: success()
-        run: |
-          docker buildx build \
-          --platform ${{ steps.prepare.outputs.docker_platform }} \
-          --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag}} \
-          --file ./Dockerfile \
-          --output type=image,push=true .
+      - name: Docker Build And Push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag }}
+
 
 
 
