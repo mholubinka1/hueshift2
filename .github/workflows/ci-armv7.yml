@@ -49,11 +49,17 @@ jobs:
           if [ $branchName != 'master' ]; then image_tag='staging'; else image_tag='latest'; fi
           echo "tag=$(echo $image_tag)" >> $GITHUB_OUTPUT
 
-      - name: Docker Build and Push
-        if: success()
-        run: |
-          docker build --rm=false --no-cache --pull -t "${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag }}" .
-          docker push "${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag }}"
+      #- name: Docker Build and Push
+      #  if: success()
+      #  run: |
+      #    docker build --rm=false --no-cache --pull -t "${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag }}" .
+      #    docker push "${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag }}"
+
+      - name: Docker Build and Push    
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag }}
 
 
 
