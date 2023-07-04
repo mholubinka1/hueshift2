@@ -9,8 +9,8 @@ on:
       - 'master'
 
 jobs:
-  docker:
-    runs-on: ARMv7
+  ARMv7_Image_Build_and_Push:
+    runs-on: [ ARMv7 ]
     env:
       DOCKER_REGISTRY: docker.io
       DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/hueshift2
