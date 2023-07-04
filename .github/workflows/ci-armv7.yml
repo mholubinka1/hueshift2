@@ -29,9 +29,9 @@ jobs:
         if: success()
         id: prepare
         run: | 
-          echo "{docker_platform}=${DOCKER_TARGET_PLATFORM}" >> $GITHUB_OUTPUT
-          echo "{docker_image}=${DOCKER_REGISTRY}/${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
-          echo "{version}=${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+          echo "{docker_platform}={${DOCKER_TARGET_PLATFORM}}" >> $GITHUB_OUTPUT
+          echo "{docker_image}={${DOCKER_REGISTRY}/${DOCKER_IMAGE}}" >> $GITHUB_OUTPUT
+          echo "{version}={${GITHUB_RUN_NUMBER}}" >> $GITHUB_OUTPUT
 
       - name: Docker Login
         if: success()
@@ -40,12 +40,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Get Docker Image Tag
+        if: success()
+        id: extract_branch
+        shell: bash
+        run: |
+          branchName=${GITHUB_REF#refs/heads/}
+          if [ $branchName != 'master' ]; then image_tag='staging'; else image_tag='latest'; fi
+          echo "{tag}={$(echo $image_tag)}" >> $GITHUB_OUPUT
+
       #- name: Run Buildx - Push Image
       #  if: success()
       #  run: |
       #    docker buildx build \
       #    --platform ${{ steps.prepare.outputs.docker_platform }} \
-      #    --tag ${{ steps.prepare.outputs.docker_image }}:latest \
+      #    --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.extract_branch.outputs.tag}} \
       #    --file ./Dockerfile \
       #    --output type=image,push=true .
 
