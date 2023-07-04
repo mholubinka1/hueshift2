@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           branchName=${{ github.ref_name }}
-          if [ $branchName != 'master' ]; then image_tag='staging'; else image_tag='latest'; fi
+          if [ $branchName != 'master' ]; then image_tag='dev'; else image_tag='latest'; fi
           echo "tag=$(echo $image_tag)" >> $GITHUB_OUTPUT
 
       #- name: Docker Build and Push
