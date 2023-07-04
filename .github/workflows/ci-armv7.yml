@@ -2,8 +2,8 @@ name: Docker Build/Publish Image - ARMv7
 
 on:
   push:
-    branches:
-      - '!master'
+    branches-ignore:
+      - 'master'
   pull_request:
     branches:
       - 'master'
