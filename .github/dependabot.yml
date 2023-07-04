@@ -5,7 +5,3 @@ updates:
     directory: "/HueShift2/HueShift2"
     schedule:
       interval: "daily"
-  - package-ecosystem: "nuget"
-    directory: "/HueShift2/HueShift2Tests"
-    schedule:
-      interval: "daily"
