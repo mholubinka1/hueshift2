@@ -42,19 +42,19 @@ jobs:
 
       - name: Get Docker Image Tag
         if: success()
-        id: extract_branch
+        id: tag
         shell: bash
         run: |
           branchName=${{ github.ref_name }}
           if [ $branchName != 'master' ]; then image_tag='staging'; else image_tag='latest'; fi
-          echo "{tag}={$(echo $image_tag)}" >> $GITHUB_OUTPUT
+          echo "tag=$(echo $image_tag)" >> $GITHUB_OUTPUT
 
       - name: Run Buildx - Push Image
         if: success()
         run: |
           docker buildx build \
           --platform ${{ steps.prepare.outputs.docker_platform }} \
-          --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.extract_branch.outputs.tag}} \
+          --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag}} \
           --file ./Dockerfile \
           --output type=image,push=true .
 
