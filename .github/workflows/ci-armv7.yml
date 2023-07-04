@@ -13,17 +13,11 @@ jobs:
     runs-on: [ ARMv7 ]
     env:
       DOCKER_REGISTRY: docker.io
-      DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/hueshift2
+      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/hueshift2
       DOCKER_TARGET_PLATFORM: linux/arm/v7
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      #- name: Set Up QEMU Dependency
-      #  uses: docker/setup-qemu-action@v1
-
-      - name: Set Up Docker Buildx
-        uses: docker/setup-buildx-action@v1
 
       - name: Prepare
         if: success()
@@ -35,10 +29,10 @@ jobs:
 
       - name: Docker Login
         if: success()
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with: 
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Get Docker Image Tag
         if: success()
