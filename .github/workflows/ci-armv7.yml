@@ -19,8 +19,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set Up QEMU Dependency
-        uses: docker/setup-qemu-action@v1
+      #- name: Set Up QEMU Dependency
+      #  uses: docker/setup-qemu-action@v1
 
       - name: Set Up Docker Buildx
         uses: docker/setup-buildx-action@v1
