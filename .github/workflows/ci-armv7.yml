@@ -47,7 +47,7 @@ jobs:
         run: |
           branchName=${{ github.ref_name }}
           if [ $branchName != 'master' ]; then image_tag='staging'; else image_tag='latest'; fi
-          echo "{tag}={$(echo $image_tag)}" >> $GITHUB_OUPUT
+          echo "{tag}={$(echo $image_tag)}" >> $GITHUB_OUTPUT
 
       #- name: Run Buildx - Push Image
       #  if: success()
