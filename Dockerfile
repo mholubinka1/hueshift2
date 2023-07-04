@@ -2,7 +2,6 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim-arm32v7 AS build-env
 WORKDIR /app
 COPY HueShift2/*.sln ./
 COPY HueShift2/HueShift2/*.csproj ./HueShift2/
-COPY HueShift2/HueShift2Tests/*.csproj ./HueShift2Tests/
 RUN dotnet restore
 COPY HueShift2 ./
 RUN dotnet build
