@@ -1,4 +1,4 @@
-name: Docker Build/Publish Image - ARMv7
+name: Docker Build/Publish Image - ARM64
 
 on:
   push:
@@ -10,11 +10,11 @@ on:
 
 jobs:
   ARMv7_Image_Build_and_Push:
-    runs-on: [ ARMv7 ]
+    runs-on: [ ARM64 ]
     env:
       DOCKER_REGISTRY: docker.io
       DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/hueshift2
-      DOCKER_TARGET_PLATFORM: linux/arm/v7
+      DOCKER_TARGET_PLATFORM: linux/arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v2
