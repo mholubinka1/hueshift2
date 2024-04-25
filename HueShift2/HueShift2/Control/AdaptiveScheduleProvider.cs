@@ -98,7 +98,7 @@ namespace HueShift2.Control
             return false;
         }
 
-        public TransitionType TransitionRequired(DateTime currentTime, DateTime? lastRunTime)
+        public TransitionType TransitionRequired(DateTime currentTime, DateTime? lastRunTime, DateTime? lastTransitionTime)
         {
             if (RefreshRequired(currentTime, lastRunTime)) RefreshSolarEvents(currentTime);
             
@@ -119,7 +119,8 @@ namespace HueShift2.Control
                 return TransitionType.Solar;
             }
             var transitionInterval = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.TransitionInterval);
-            if (currentTime - lastRunTime >= transitionInterval)
+            if (lastTransitionTime == null) return TransitionType.Null;
+            if (currentTime - lastTransitionTime >= transitionInterval)
             {
                 logger.LogInformation("Performing adaptive transition.");
                 return TransitionType.Adaptive;
