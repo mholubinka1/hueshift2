@@ -10,7 +10,6 @@ namespace HueShift2.Configuration
     [JsonConverter(typeof(StringEnumConverter))] 
     public enum HueShiftMode
     {
-        Auto = 0,
-        Custom = 1
+        Adaptive = 0,
     }
 }

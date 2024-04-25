@@ -7,6 +7,6 @@ namespace HueShift2.Interfaces
     public interface ILightScheduler
     {
         public HueShiftMode Mode();
-        public Task<DateTime?> Execute(DateTime? lastRunTime);
+        public Task<(bool, DateTime?)> Execute(DateTime? lastRunTime, DateTime? lastTransitionTime);
     }
 }

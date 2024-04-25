@@ -8,13 +8,9 @@ namespace HueShift2.Configuration.Model
     {
         public readonly HueShiftOptions HueShiftOptions;
 
-        public readonly CustomScheduleOptions CustomScheduleOptions; 
-
         public LightingConfiguration(HueShiftOptions hueShiftOptions)
         {
             HueShiftOptions = hueShiftOptions;
-            CustomScheduleOptions = new CustomScheduleOptions();
-            CustomScheduleOptions.SetDefaults();
         }
     }
 }

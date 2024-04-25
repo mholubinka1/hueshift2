@@ -21,6 +21,7 @@ namespace HueShift2.Host
         private readonly IEnumerable<ILightScheduler> lightSchedulers;
 
         private DateTime? lastRunTime;
+        private DateTime? lastTransitionTime;
 
         public LightScheduleWorker(ILogger<LightScheduleWorker> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate,
             IEnumerable<ILightScheduler> lightSchedulers)
@@ -39,8 +40,9 @@ namespace HueShift2.Host
         public async Task RunAsync()
         {
             var scheduler = ResolveScheduler();
-            var currentTime = await scheduler.Execute(lastRunTime);
+            (bool transitionOccurred, DateTime? currentTime) = await scheduler.Execute(lastRunTime, lastTransitionTime);
             lastRunTime = currentTime;
+            if (transitionOccurred) lastTransitionTime = currentTime;
         }
     }
 }
