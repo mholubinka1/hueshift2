@@ -52,12 +52,12 @@ namespace HueShift2.Control
             {
                 if (currentTime < events.SolarNoon)
                 {
-                    var scalingFactor = Math.Pow(((currentTime.TimeOfDay - events.SolarNoon.TimeOfDay) / (events.SolarNoon.TimeOfDay - events.Sunrise.TimeOfDay)), 2.0);
+                    var scalingFactor = 1.0 - Math.Pow(((currentTime.TimeOfDay - events.SolarNoon.TimeOfDay) / (events.SolarNoon.TimeOfDay - events.Sunrise.TimeOfDay)), 2.0);
                     return 1.0 * scalingFactor;
 ;                }
                 if (currentTime > events.SolarNoon)
                 {
-                    var scalingFactor = Math.Pow(((currentTime.TimeOfDay - events.SolarNoon.TimeOfDay) / (events.SolarNoon.TimeOfDay - events.Sunset.TimeOfDay)), 2.0);
+                    var scalingFactor = 1.0 - Math.Pow(((currentTime.TimeOfDay - events.SolarNoon.TimeOfDay) / (events.SolarNoon.TimeOfDay - events.Sunset.TimeOfDay)), 2.0);
                     return 1.0 * scalingFactor;
                 }
             }
@@ -69,7 +69,8 @@ namespace HueShift2.Control
         {
             AdaptiveCalculationParameters adaptiveParameters = (AdaptiveCalculationParameters)lightCalculationParameters;
             var brightness = CalculateBrightnessPct(isSleep);
-            var colourTemperature = CalculateKelvinColourTemperature(CalculateSunPosition(adaptiveParameters.SolarEvents, currentTime));
+            var sunPosition = CalculateSunPosition(adaptiveParameters.SolarEvents, currentTime);
+            var colourTemperature = CalculateKelvinColourTemperature(sunPosition);
             return new AppLightState(brightness, colourTemperature);
         }
     }

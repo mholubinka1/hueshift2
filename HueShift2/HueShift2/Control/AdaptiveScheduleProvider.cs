@@ -101,8 +101,12 @@ namespace HueShift2.Control
         public TransitionType TransitionRequired(DateTime currentTime, DateTime? lastRunTime, DateTime? lastTransitionTime)
         {
             if (RefreshRequired(currentTime, lastRunTime)) RefreshSolarEvents(currentTime);
-            
-            if (lastRunTime == null) return TransitionType.FirstRun;
+
+            if (lastRunTime == null)
+            {
+                logger.LogInformation("Performing first run transition. Taking control of all non-excluded lights.");
+                return TransitionType.FirstRun;
+            }
             if (lastRunTime < solarEvents.Sunrise && currentTime >= solarEvents.Sunrise)
             {
                 logger.LogInformation("Performing sunrise transition.");

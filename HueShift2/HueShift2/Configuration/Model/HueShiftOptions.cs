@@ -44,7 +44,7 @@ namespace HueShift2.Configuration.Model
                 SunsetUpper = new TimeSpan(20, 0, 0),
             };
             Sleep = new TimeSpan(23, 0, 0);
-            PollingFrequency = 10;
+            PollingFrequency = 2;
             TransitionInterval = 600;
             LightsToExclude = Array.Empty<string>();
             ColourTemperature = new ColourTemperature
