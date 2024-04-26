@@ -26,8 +26,10 @@ namespace HueShift2.Control
         private byte? CalculateBrightnessPct(bool isSleep)
         {
             if (isSleep) {
-                var percentage = appOptionsDelegate.CurrentValue.NightBrightnessPercentage;
-                return (byte)(percentage / 100 * Byte.MaxValue);
+                var percentage = (double)appOptionsDelegate.CurrentValue.NightBrightnessPercentage;
+                var binaryPercentage = (percentage / 100.0) * (double)Byte.MaxValue;
+                var bytePercentage = (byte)binaryPercentage;
+                return bytePercentage;
             }
             return Byte.MaxValue;
         }
