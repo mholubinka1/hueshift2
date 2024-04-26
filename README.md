@@ -48,7 +48,7 @@ When the program starts for the first time a configuration file is automatically
 }
 ```
 
-This configuration once generated can be modified and reloaded dynamically. The file can be located anywhere on your device, just mount the folder of your choice to the appropriate folder in the `docker-compose.yml`:
+This configuration once generated can be modified and will be reloaded dynamically, without the need to restart the software. The file can be located anywhere on your device, just mount the folder of your choice to the appropriate folder in the `docker-compose.yml`:
 
 ```
 volumes:
@@ -60,7 +60,7 @@ volumes:
 
 The latest image can be found on [DockerHub](https://hub.docker.com/repository/docker/mholubinka1/hueshift2/general) and a sample `docker-compose.yml` is included for deployment.
 
-To deploy, navigate to the folder contained the `docker-compose.yml` file:
+To deploy, navigate to the folder containing the `docker-compose.yml` file:
 
 ```
 docker compose up -d
