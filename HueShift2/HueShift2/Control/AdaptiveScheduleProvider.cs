@@ -159,7 +159,10 @@ namespace HueShift2.Control
         {
             var midnight = solarEvents.Sunrise.Date;
             var sleepDateTime = midnight + appOptionsDelegate.CurrentValue.Sleep;
-            return currentTime >= sleepDateTime;
+            var sunrise = solarEvents.Sunrise
+            if (currentTime >= sleepDateTime) return true;
+            if (currentTime <= solarEvents.Sunrise) return true;
+            return false;
         }
 
         public AppLightState TargetLightState(DateTime currentTime)
