@@ -33,7 +33,7 @@ namespace HueShift2.Configuration.Model
         public void SetDefaults()
         {
             Mode = HueShiftMode.Adaptive;
-            BasicTransitionDuration = 5;
+            BasicTransitionDuration = 2;
             AdaptiveTransitionDuration = 30;
             SolarTransitionDuration = 120;
             SolarTransitionTimeLimits = new SolarTransitionTimeLimits
