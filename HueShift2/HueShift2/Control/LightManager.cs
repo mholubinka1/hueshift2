@@ -52,7 +52,7 @@ namespace HueShift2.Control
             }
         }
 
-        private async Task Synchronise(IDictionary<string, LightCommand> syncCommandsPairs, DateTime currentTime)
+        private async Task Synchronise(IDictionary<string, LightCommand> syncCommandsPairs)
         {
             foreach (var pair in syncCommandsPairs)
             {
@@ -95,17 +95,17 @@ namespace HueShift2.Control
                     logger.LogRefresh(staleLight, light);
                     if (this.lights[id].RequiresSync(out LightCommand syncCommand))
                     {
-                        syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.StandardTransitionTime);
+                        syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.BasicTransitionDuration);
                         syncCommands.Add(id, syncCommand);
                     }
                 }
             }
-            if (syncCommands.Any()) await Synchronise(syncCommands, currentTime);
+            if (syncCommands.Any()) await Synchronise(syncCommands);
             foreach(var idLightPair in lights)
             {
                 if(idLightPair.Key != idLightPair.Value.Properties.Id)
                 {
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException("Lights must be accessible via the Light ID.");
                 }
             }
             return;

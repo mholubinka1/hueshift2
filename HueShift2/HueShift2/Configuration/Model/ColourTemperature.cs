@@ -6,8 +6,8 @@ namespace HueShift2.Configuration.Model
 {
     public class ColourTemperature
     {
-        public int Day { get; set; } = 250;
-        public int Night { get; set; } = 454;
+        public int Coolest { get; set; } = 250;
+        public int Warmest { get; set; } = 454;
 
         public ColourTemperature()
         {

@@ -45,15 +45,13 @@ namespace HueShift2
                     {                   
                         services.AddOptions();
                         services.Configure<HueShiftOptions>(hostContext.Configuration.GetSection("HueShiftOptions"));
-                        services.Configure<CustomScheduleOptions>(hostContext.Configuration.GetSection("CustomScheduleOptions"));
                         services.AddSingleton<ILocalHueClient>(client => new LocalHueClient(hostContext.Configuration["HueShiftOptions:BridgeProperties:IpAddress"]));
                         services.AddSingleton<IConfigFileHelper, ConfigFileHelper>();
                         services.AddSingleton<IHueClientManager, LocalHueClientManager>();
                         services.AddSingleton<ILightManager, LightManager>();
-                        services.AddScoped<IScheduleProvider, AutoScheduleProvider>();
-                        services.AddScoped<IScheduleProvider, CustomScheduleProvider>();
-                        services.AddSingleton<ILightScheduler, AutoLightScheduler>();
-                        services.AddSingleton<ILightScheduler, CustomLightScheduler>();
+                        services.AddScoped<ILightColourCalculator, AdaptiveLightColourCalculator>();
+                        services.AddScoped<IScheduleProvider, AdaptiveScheduleProvider>();
+                        services.AddSingleton<ILightScheduler, AdaptiveLightScheduler>();
                         services.AddSingleton<ILightScheduleWorker, LightScheduleWorker>();
                         services.AddHostedService<LightScheduleService>();
                     });

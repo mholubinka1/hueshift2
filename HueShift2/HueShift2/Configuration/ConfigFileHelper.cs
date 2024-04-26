@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
     public class ConfigFileHelper : IConfigFileHelper
     {
-        private ILogger logger;
+        private readonly ILogger<ConfigFileHelper> logger;
 
         public ConfigFileHelper(ILogger<ConfigFileHelper> logger)
         {

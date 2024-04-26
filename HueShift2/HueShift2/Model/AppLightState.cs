@@ -28,6 +28,12 @@ namespace HueShift2.Model
             this.Colour = colour.DeepClone();
         }
 
+        public AppLightState(byte? brightness, int colourTemperature)
+        {
+            this.Brightness = brightness;
+            this.Colour = new Colour(colourTemperature);
+        }
+
         public AppLightState DeepClone()
         {
             return new AppLightState
