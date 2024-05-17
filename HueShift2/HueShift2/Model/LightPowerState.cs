@@ -8,15 +8,8 @@ namespace HueShift2.Model
     {
         On,
         Off,
-        Transitioning,
         Syncing,
-    }
-
-    public static class HelperMethods
-    {
-        public static LightPowerState ToPowerState(this bool on)
-        {
-            return on ? LightPowerState.On : LightPowerState.Off;
-        }
+        Transitioning,
+        Unreachable,
     }
 }

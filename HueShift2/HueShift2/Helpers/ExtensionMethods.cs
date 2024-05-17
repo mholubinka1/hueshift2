@@ -60,60 +60,60 @@ namespace HueShift2.Helpers
             return filtered.ToArray();
         }
 
+        public static LightPowerState DeterminePowerState(this State networkLight)
+        {
+            if (networkLight.IsReachable is null)
+            {
+                return LightPowerState.Off;
+            }
+            if ((bool)networkLight.IsReachable)
+            {
+                return networkLight.On ? LightPowerState.On : LightPowerState.Off;
+            }
+            return LightPowerState.Off;
+        }
+
         public static ColourMode ToColourMode(this string mode)
         {
-            switch (mode)
+            return mode switch
             {
-                case "xy":
-                    return ColourMode.XY;
-                case "ct":
-                    return ColourMode.CT;
-                case "hs":
-                    return ColourMode.HS;
-                default:
-                    throw new NotSupportedException();
-            }
+                "xy" => ColourMode.XY,
+                "ct" => ColourMode.CT,
+                "hs" => ColourMode.HS,
+                _ => throw new NotSupportedException(),
+            };
         }
 
         public static LightCommand ToCommand(this AppLightState expectedLight)
         {
-            switch (expectedLight.Colour.Mode)
+            return expectedLight.Colour.Mode switch
             {
-                case ColourMode.XY:
-                    return new LightCommand
-                    {
-                        Brightness = expectedLight.Brightness,
-                        ColorCoordinates = expectedLight.Colour.ColourCoordinates,
-                    };
-                case ColourMode.CT:
-                    return new LightCommand
-                    {
-                        Brightness = expectedLight.Brightness,
-                        ColorTemperature = expectedLight.Colour.ColourTemperature,
-                    };
-                case ColourMode.HS:
-                case ColourMode.Other:
-                case ColourMode.None:
-                default:
-                    throw new NotImplementedException();
-            }
+                ColourMode.XY => new LightCommand
+                {
+                    Brightness = expectedLight.Brightness,
+                    ColorCoordinates = expectedLight.Colour.ColourCoordinates,
+                },
+                ColourMode.CT => new LightCommand
+                {
+                    Brightness = expectedLight.Brightness,
+                    ColorTemperature = expectedLight.Colour.ColourTemperature,
+                },
+                _ => throw new NotImplementedException(),
+            };
         }
 
         #region Light Equality
 
-        public static bool ColourEquals(this State @this, AppLightState expectedLight)
+        public static bool Equals(this State @this, AppLightState expectedLight)
         {
             if (expectedLight.Colour.Mode != @this.ColorMode.ToColourMode()) return false;
-            switch (expectedLight.Colour.Mode)
+            if (expectedLight.Brightness != @this.Brightness) return false;
+            return expectedLight.Colour.Mode switch
             {
-                case ColourMode.XY:
-                    return ExtensionMethods.ArrayEquals(expectedLight.Colour.ColourCoordinates, @this.ColorCoordinates);
-                case ColourMode.CT:
-                    return expectedLight.Colour.ColourTemperature == @this.ColorTemperature;
-                default:
-                    //return this.Hue == lightState.Hue && this.Saturation == lightState.Saturation;
-                    throw new NotImplementedException();
-            }
+                ColourMode.XY => ExtensionMethods.ArrayEquals(expectedLight.Colour.ColourCoordinates, @this.ColorCoordinates),
+                ColourMode.CT => expectedLight.Colour.ColourTemperature == @this.ColorTemperature,
+                _ => throw new NotImplementedException(),//return this.Hue == lightState.Hue && this.Saturation == lightState.Saturation;
+            };
         }
 
         public static bool ArrayEquals(double[] @this, double[] other)
