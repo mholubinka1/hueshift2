@@ -23,7 +23,7 @@ namespace HueShift2.Control
         public LightControlPair(Light networkLight)
         {
             this.Properties = new LightProperties(networkLight);
-            this.PowerState = networkLight.State.On ? LightPowerState.On : LightPowerState.Off;
+            this.PowerState = networkLight.State.DeterminePowerState();
             this.AppControlState = LightControlState.HueShift;
             this.NetworkLight = networkLight.State;
             this.ExpectedLight = new AppLightState(this.NetworkLight);
@@ -59,17 +59,17 @@ namespace HueShift2.Control
         {
             this.NetworkLight = networkLight;
             this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
-            var isOn = NetworkLight.On;
+            var isOn = networkLight.DeterminePowerState() == LightPowerState.On;
             if (isOn)
             {
                 switch (this.AppControlState)
                 {
                     case LightControlState.HueShift:
-                        if (!this.NetworkLight.ColourEquals(this.ExpectedLight) && this.PowerState == LightPowerState.On)
+                        if (!this.NetworkLight.Equals(this.ExpectedLight) && this.PowerState == LightPowerState.On)
                         {
                             this.AppControlState = LightControlState.Manual;
                         }
-                        if (this.NetworkLight.ColourEquals(this.ExpectedLight) && this.PowerState == LightPowerState.Syncing)
+                        if (this.NetworkLight.Equals(this.ExpectedLight) && this.PowerState == LightPowerState.Syncing)
                         {
                             this.PowerState = LightPowerState.On;
                         }
@@ -94,7 +94,7 @@ namespace HueShift2.Control
             {
                 return false;
             }
-            if (this.NetworkLight.ColourEquals(this.ExpectedLight))
+            if (this.NetworkLight.Equals(this.ExpectedLight))
             {
                 if (this.ResetOccurred)
                 {
@@ -187,21 +187,6 @@ namespace HueShift2.Control
         public void ExecuteSync()
         {
             this.PowerState = LightPowerState.Syncing;
-        }
-
-        public void Exclude(bool isExcluded)
-        {
-            if (isExcluded)
-            {
-                AppControlState = LightControlState.Excluded;
-            }
-            else
-            {
-                if (this.AppControlState == LightControlState.Excluded)
-                {
-                    this.AppControlState = LightControlState.HueShift;
-                }
-            }
         }
 
         public override string ToString()

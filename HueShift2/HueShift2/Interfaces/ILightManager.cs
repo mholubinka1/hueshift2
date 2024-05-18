@@ -14,7 +14,5 @@ namespace HueShift2.Interfaces
         public void PrintAll();
         public void PrintScheduled();
         public void PrintManual();
-        public void PrintExcluded();
-
     }
 }

@@ -18,7 +18,6 @@ namespace HueShift2.Configuration.Model
         public int SolarTransitionDuration { get; set; }
         public SolarTransitionTimeLimits SolarTransitionTimeLimits { get; set; }
         public TimeSpan Sleep { get; set; }
-        public string[] LightsToExclude { get; set; } = Array.Empty<string>();
         public BridgeProperties BridgeProperties { get; set; }
         public Geolocation Geolocation { get; set; }
         public ColourTemperature ColourTemperature { get; set; }
@@ -46,7 +45,6 @@ namespace HueShift2.Configuration.Model
             Sleep = new TimeSpan(23, 0, 0);
             PollingFrequency = 2;
             TransitionInterval = 600;
-            LightsToExclude = Array.Empty<string>();
             ColourTemperature = new ColourTemperature
             {
                 Coolest = 250,
