@@ -50,6 +50,8 @@ namespace HueShift2.Model
 
         public Colour(Colour other)
         {
+            this.Mode = other.Mode;
+            this.ColourCoordinates = other.ColourCoordinates.DeepClone();
             this.ColourTemperature = other.ColourTemperature;
             this.Hue = other.Hue;
             this.Saturation = other.Saturation;

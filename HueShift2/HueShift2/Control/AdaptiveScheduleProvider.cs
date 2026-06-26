@@ -137,6 +137,7 @@ namespace HueShift2.Control
             var options = appOptionsDelegate.CurrentValue;
             var transitionDurationSeconds = transitionType switch
             {
+                TransitionType.Sync => options.BasicTransitionDuration,
                 TransitionType.FirstRun => options.BasicTransitionDuration,
                 TransitionType.Adaptive => options.AdaptiveTransitionDuration,
                 TransitionType.Solar => options.SolarTransitionDuration,
@@ -150,7 +151,7 @@ namespace HueShift2.Control
             return transitionType switch
             {
                 TransitionType.FirstRun or TransitionType.Solar => true,
-                TransitionType.Adaptive => false,
+                TransitionType.Sync or TransitionType.Adaptive => false,
                 _ => throw new NotImplementedException($"Invalid transition type: {transitionType}"),
             };
         }

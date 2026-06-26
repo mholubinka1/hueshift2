@@ -15,23 +15,26 @@ namespace HueShift2.Logging
     {
         #region LightManager
 
-        public static void LogCommand<T>(this ILogger<T> logger, IEnumerable<LightControlPair> commandLights, AppLightState target)
+        public static void LogSync<T>(this ILogger<T> logger, IEnumerable<string> lightNames, AppLightState target)
         {
-            if (commandLights.Any())
-            {
-                logger.LogInformation($"Sending command to lights:");
-                foreach (var light in commandLights)
-                {
-                    logger.LogInformation($"ID: {light.Properties.Id} Name: {light.Properties.Name} | from: {light.ExpectedLight} | to: {target}");
-                }
-            }
+            var names = lightNames.ToArray();
+            if (!names.Any()) return;
+            logger.LogInformation($"[Sync] {names.Length} light(s) → {target} | {string.Join(", ", names)}");
+        }
+
+        public static void LogAdaptive<T>(this ILogger<T> logger, IEnumerable<LightControlPair> commandLights, AppLightState target)
+        {
+            var lights = commandLights.ToArray();
+            if (!lights.Any()) return;
+            var names = string.Join(", ", lights.Select(l => l.Properties.Name));
+            logger.LogInformation($"[Adaptive] {lights.Length} light(s) → {target} | {names}");
         }
 
         public static void LogLightProperties<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)
         {
             foreach (var light in lights)
             {
-                logger.LogInformation($"ID: {light.Properties.Id,-4} Name: {light.Properties.Name,-20} ModelID: {light.Properties.ModelId,-10} ProductID: {light.Properties.ProductId,-10}");
+                logger.LogDebug($"ID: {light.Properties.Id,-4} Name: {light.Properties.Name,-20} ModelID: {light.Properties.ModelId,-10} ProductID: {light.Properties.ProductId,-10}");
             }
         }
 
@@ -79,9 +82,9 @@ namespace HueShift2.Logging
             {
                 refreshMessage += $" | Control state changed from {stale.AppControlState} to {refreshed.AppControlState}";
             }
-            if (refreshed.ResetOccurred != refreshed.ResetOccurred)
+            if (stale.ResetOccurred != refreshed.ResetOccurred)
             {
-                refreshMessage += refreshed.ResetOccurred ? $" | Light reset." : $" | Reset scheduled.";
+                refreshMessage += refreshed.ResetOccurred ? " | Reset scheduled." : " | Light reset.";
             }
             logger.LogDebug(stale.ToString());
             logger.LogDebug(refreshed.ToString());
@@ -90,10 +93,10 @@ namespace HueShift2.Logging
 
         public static void LogUpdate<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)
         {
-            logger.LogInformation($"New light states in memory:");
+            logger.LogDebug("New light states in memory:");
             foreach (var light in lights)
             {
-                logger.LogInformation($"ID: {light.Properties.Id} Name: {light.Properties.Name} | {light.ExpectedLight}");
+                logger.LogDebug($"ID: {light.Properties.Id} Name: {light.Properties.Name} | {light.ExpectedLight}");
             }
         }
 

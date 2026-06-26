@@ -11,25 +11,28 @@ namespace HueShift2.Model
     {
         public readonly DateTime StartedTime;
         public readonly TimeSpan Duration;
+        public readonly TransitionType Kind;
         public double SecondsRemaining { get; private set; }
 
-        public Transition(DateTime currentTime, TimeSpan duration)
+        public Transition(DateTime currentTime, TimeSpan duration, TransitionType kind)
         {
             StartedTime = currentTime;
             Duration = duration;
+            Kind = kind;
             SecondsRemaining = duration.TotalSeconds;
         }
 
-        public Transition(DateTime startedTime, TimeSpan duration, double secondsRemaining)
+        public Transition(DateTime startedTime, TimeSpan duration, double secondsRemaining, TransitionType kind)
         {
             StartedTime = startedTime;
             Duration = duration;
+            Kind = kind;
             SecondsRemaining = secondsRemaining;
         }
 
         public Transition DeepClone()
         {
-            return new Transition(this.StartedTime, this.Duration, this.SecondsRemaining);
+            return new Transition(this.StartedTime, this.Duration, this.SecondsRemaining, this.Kind);
         }
 
         public bool IsExpired(DateTime currentTime)

@@ -1,0 +1,6 @@
+#!/bin/sh
+# Verify code formatting before every push.
+set -e
+echo "[pre-push] Checking formatting..."
+dotnet format HueShift2/HueShift2.sln --verify-no-changes -v d
+echo "[pre-push] Format check passed."

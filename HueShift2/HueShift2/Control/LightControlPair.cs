@@ -19,6 +19,7 @@ namespace HueShift2.Control
         public AppLightState ExpectedLight { get; private set; }
         public Transition Transition { get; private set; }
         public bool ResetOccurred { get; private set; }
+        public bool SyncRequired { get; private set; }
 
         public LightControlPair(Light networkLight)
         {
@@ -28,13 +29,14 @@ namespace HueShift2.Control
             this.NetworkLight = networkLight.State;
             this.ExpectedLight = new AppLightState(this.NetworkLight);
             this.ResetOccurred = false;
+            this.SyncRequired = false;
         }
 
         public void RefreshTransition(bool isOn, DateTime currentTime)
         {
             if (isOn)
             {
-                if (this.PowerState == LightPowerState.Transitioning)
+                if (this.PowerState == LightPowerState.Transitioning || this.PowerState == LightPowerState.Syncing)
                 {
                     if (this.Transition == null) throw new NullReferenceException();
                     if (this.Transition.IsExpired(currentTime))
@@ -60,6 +62,7 @@ namespace HueShift2.Control
             this.NetworkLight = networkLight;
             this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
             var isOn = networkLight.DeterminePowerState() == LightPowerState.On;
+            var wasOff = this.PowerState == LightPowerState.Off;
             if (isOn)
             {
                 switch (this.AppControlState)
@@ -85,39 +88,46 @@ namespace HueShift2.Control
                 }
             }
             RefreshTransition(isOn, currentTime);
+            if (isOn && wasOff && this.PowerState == LightPowerState.On && this.AppControlState == LightControlState.HueShift)
+            {
+                this.SyncRequired = true;
+            }
         }
 
         public bool RequiresSync(out LightCommand syncCommand)
         {
             syncCommand = null;
             if (this.PowerState != LightPowerState.On || this.AppControlState != LightControlState.HueShift)
-            {
                 return false;
-            }
-            if (this.NetworkLight.Equals(this.ExpectedLight))
+
+            if (this.SyncRequired)
             {
-                if (this.ResetOccurred)
+                this.SyncRequired = false;
+                syncCommand = this.ExpectedLight.ToCommand();
+                return true;
+            }
+
+            if (this.ResetOccurred)
+            {
+                var brightness = (byte)254;
+                this.ResetOccurred = false;
+                if (this.NetworkLight.Brightness != brightness)
                 {
-                    var brightness = (byte)254;
-                    this.ResetOccurred = false;
-                    if (this.NetworkLight.Brightness != brightness)
-                    {
-                        syncCommand = this.ExpectedLight.ToCommand();
-                        syncCommand.Brightness = brightness;
-                        return true;
-                    }
+                    syncCommand = this.ExpectedLight.ToCommand();
+                    syncCommand.Brightness = brightness;
+                    return true;
                 }
-                return false;
             }
-            syncCommand = this.ExpectedLight.ToCommand();
-            return true;
+
+            return false;
         }
 
         public void Reset()
         {
-            if(this.AppControlState == LightControlState.Manual)
+            if (this.AppControlState == LightControlState.Manual)
             {
                 this.AppControlState = LightControlState.HueShift;
+                this.SyncRequired = true;
             }
             this.ResetOccurred = true;
         }
@@ -156,13 +166,13 @@ namespace HueShift2.Control
             throw new InvalidOperationException();
         }
 
-        public void ExecuteCommand(LightCommand command, DateTime currentTime)
+        public void ExecuteCommand(LightCommand command, DateTime currentTime, TransitionType transitionType)
         {
             if (this.AppControlState != LightControlState.HueShift) throw new InvalidOperationException();
             if (command.TransitionTime != null)
             {
                 this.PowerState = LightPowerState.Transitioning;
-                this.Transition = new Transition(currentTime, ((TimeSpan)command.TransitionTime));
+                this.Transition = new Transition(currentTime, (TimeSpan)command.TransitionTime, transitionType);
             }
             else
             {
@@ -184,15 +194,16 @@ namespace HueShift2.Control
             ChangeColour(command);
         }
 
-        public void ExecuteSync()
+        public void ExecuteSync(TimeSpan duration, DateTime currentTime)
         {
             this.PowerState = LightPowerState.Syncing;
+            this.Transition = new Transition(currentTime, duration, TransitionType.Sync);
         }
 
         public override string ToString()
         {
             var @base = $"Control Pair | Id: {this.Properties.Id} Name: {this.Properties.Name} | {this.PowerState} - Control: {this.AppControlState}";
-            if (this.PowerState == LightPowerState.Transitioning)
+            if (this.PowerState == LightPowerState.Transitioning || this.PowerState == LightPowerState.Syncing)
             {;
                 @base += $" | Transition Time Remaining: {this.Transition.SecondsRemaining}s";
             }

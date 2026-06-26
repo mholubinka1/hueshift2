@@ -44,18 +44,20 @@ namespace HueShift2.Control
             return discoveredLights;
         }
 
-        private async Task Synchronise(IDictionary<string, LightCommand> syncCommandsPairs)
+        private async Task Synchronise(IDictionary<string, LightCommand> syncCommandsPairs, DateTime currentTime)
         {
+            var duration = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.BasicTransitionDuration);
+            var lightNames = syncCommandsPairs.Keys.Select(id => lights[id].Properties.Name);
+            var target = lights[syncCommandsPairs.Keys.First()].ExpectedLight;
+            logger.LogSync(lightNames, target);
             foreach (var pair in syncCommandsPairs)
             {
                 var id = pair.Key;
                 var syncCommand = pair.Value;
                 var light = lights[id];
+                syncCommand.TransitionTime = duration;
                 light.ExecuteInstantaneousCommand(syncCommand);
-                logger.LogInformation($"Syncing light | Id: {light.Properties.Id} Name: {light.Properties.Name} | " +
-                    $"from: {new AppLightState(light.NetworkLight)} | " +
-                    $"to: {light.ExpectedLight}");
-                light.ExecuteSync();
+                light.ExecuteSync(duration, currentTime);
                 await client.SendCommandAsync(syncCommand, new[] { id });
             }
         }
@@ -86,14 +88,14 @@ namespace HueShift2.Control
                     var staleLight = new CachedControlPair(light);
                     light.Refresh(discoveredLight.State, currentTime);
                     logger.LogRefresh(staleLight, light);
-                    if (lights[id].RequiresSync(out LightCommand syncCommand))
+                    if (light.PowerState != LightPowerState.Syncing && light.PowerState != LightPowerState.Transitioning)
                     {
-                        syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.BasicTransitionDuration);
-                        syncCommands.Add(id, syncCommand);
+                        if (light.RequiresSync(out LightCommand syncCommand))
+                            syncCommands.Add(id, syncCommand);
                     }
                 }
             }
-            if (syncCommands.Any()) await Synchronise(syncCommands);
+            if (syncCommands.Any()) await Synchronise(syncCommands, currentTime);
             foreach(var idLightPair in lights)
             {
                 if(idLightPair.Key != idLightPair.Value.Properties.Id)
@@ -104,7 +106,7 @@ namespace HueShift2.Control
             return;
         }
 
-        public async Task Transition(AppLightState target, LightCommand command, DateTime currentTime, bool reset)
+        public async Task Transition(AppLightState target, LightCommand command, DateTime currentTime, bool reset, TransitionType transitionType)
         {
             if (reset)
             {
@@ -114,13 +116,13 @@ namespace HueShift2.Control
             PrintScheduled();
             var commandLights = lights.SelectLightsToControl();
             commandLights = commandLights.Filter(target);
-            logger.LogCommand(commandLights, target);
+            logger.LogAdaptive(commandLights, target);
             var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             foreach (var light in lights.Values)
             {
                 if(commandIds.Any(i => i == light.Properties.Id))
                 {
-                    light.ExecuteCommand(command, currentTime);
+                    light.ExecuteCommand(command, currentTime, transitionType);
                 }
                 else
                 {
@@ -150,7 +152,7 @@ namespace HueShift2.Control
             }
             else
             {
-                logger.LogInformation("Lights under app control:");
+                logger.LogDebug("Lights under app control:");
                 logger.LogLightProperties(controlledLights);
             }
         }
@@ -160,11 +162,11 @@ namespace HueShift2.Control
             var manualLights = lights.Values.Where(x => x.AppControlState == LightControlState.Manual).ToArray();
             if (manualLights.Length == 0)
             {
-                logger.LogInformation("Manually controlled lights: none");
+                logger.LogDebug("Manually controlled lights: none");
             }
             else
             {
-                logger.LogInformation("Manually controlled lights:");
+                logger.LogDebug("Manually controlled lights:");
                 logger.LogLightProperties(manualLights);
             }
         }

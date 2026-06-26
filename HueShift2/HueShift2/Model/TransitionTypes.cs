@@ -9,6 +9,7 @@ namespace HueShift2.Model
     public enum TransitionType
     {
         Null,
+        Sync,
         FirstRun,
         Adaptive,
         Solar,
