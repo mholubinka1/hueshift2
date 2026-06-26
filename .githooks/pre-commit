@@ -1,6 +1,14 @@
 #!/bin/sh
-# Verify the solution builds before every commit.
 set -e
 echo "[pre-commit] Building solution..."
 dotnet build HueShift2/HueShift2.sln --no-restore -v q
 echo "[pre-commit] Build passed."
+echo "[pre-commit] Formatting code..."
+dotnet format HueShift2/HueShift2.sln
+CHANGED=$(git diff --name-only)
+if [ -n "$CHANGED" ]; then
+    echo "[pre-commit] Format modified files — stage them and re-commit:"
+    echo "$CHANGED" | sed 's/^/  /'
+    exit 1
+fi
+echo "[pre-commit] Format clean."

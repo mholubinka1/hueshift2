@@ -38,7 +38,7 @@ namespace HueShift2.Logging
             }
         }
 
-        public static void LogDiscovery<T>(this ILogger<T> logger, 
+        public static void LogDiscovery<T>(this ILogger<T> logger,
             IEnumerable<Light> discoveredLights, IEnumerable<LightControlPair> previousLights)
         {
             var numDiscoveredLights = discoveredLights.Count();

@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace HueShift2.Configuration
 {
-    [JsonConverter(typeof(StringEnumConverter))] 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum HueShiftMode
     {
         Adaptive = 0,

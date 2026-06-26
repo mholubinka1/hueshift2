@@ -42,7 +42,7 @@ namespace HueShift2
                         config.AddCommandLine(args);
                     })
                     .ConfigureServices((hostContext, services) =>
-                    {                   
+                    {
                         services.AddOptions();
                         services.Configure<HueShiftOptions>(hostContext.Configuration.GetSection("HueShiftOptions"));
                         services.AddSingleton<ILocalHueClient>(client => new LocalHueClient(hostContext.Configuration["HueShiftOptions:BridgeProperties:IpAddress"]));
@@ -58,7 +58,7 @@ namespace HueShift2
                 Log.Information("Host created successfully.");
                 await host.Build().RunAsync();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Log.Fatal(e, "Host builder failed.");
                 throw;

@@ -6,8 +6,8 @@ using System;
 
 namespace HueShift2.Configuration
 {
-using System.IO;
-using System.Collections.Generic;
+    using System.IO;
+    using System.Collections.Generic;
     using Newtonsoft.Json.Converters;
 
     public class ConfigFileHelper : IConfigFileHelper
@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
         public ConfigFileHelper(ILogger<ConfigFileHelper> logger)
         {
-            this.logger = logger;;
+            this.logger = logger; ;
         }
 
         private void SetValue<T>(dynamic json, string key, T value)

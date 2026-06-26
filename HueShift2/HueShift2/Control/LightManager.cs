@@ -79,7 +79,7 @@ namespace HueShift2.Control
                     {
                         var syncCommand = cachedLightCommand;
                         syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.BasicTransitionDuration);
-                        syncCommands.Add(id, syncCommand);  
+                        syncCommands.Add(id, syncCommand);
                     }
                 }
                 else
@@ -96,9 +96,9 @@ namespace HueShift2.Control
                 }
             }
             if (syncCommands.Any()) await Synchronise(syncCommands, currentTime);
-            foreach(var idLightPair in lights)
+            foreach (var idLightPair in lights)
             {
-                if(idLightPair.Key != idLightPair.Value.Properties.Id)
+                if (idLightPair.Key != idLightPair.Value.Properties.Id)
                 {
                     throw new InvalidOperationException("Lights must be accessible via the Light ID.");
                 }
@@ -120,7 +120,7 @@ namespace HueShift2.Control
             var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             foreach (var light in lights.Values)
             {
-                if(commandIds.Any(i => i == light.Properties.Id))
+                if (commandIds.Any(i => i == light.Properties.Id))
                 {
                     light.ExecuteCommand(command, currentTime, transitionType);
                 }

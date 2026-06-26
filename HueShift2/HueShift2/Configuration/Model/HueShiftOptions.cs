@@ -22,7 +22,7 @@ namespace HueShift2.Configuration.Model
         public Geolocation Geolocation { get; set; }
         public ColourTemperature ColourTemperature { get; set; }
 
-        public int NightBrightnessPercentage {get; set; }
+        public int NightBrightnessPercentage { get; set; }
 
         public HueShiftOptions()
         {

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class AppLightState : IDeepCloneable<AppLightState> , IEquatable<AppLightState> 
+    public class AppLightState : IDeepCloneable<AppLightState>, IEquatable<AppLightState>
     {
         public byte? Brightness { get; set; }
         public Colour Colour { get; set; }

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class Transition: IDeepCloneable<Transition>
+    public class Transition : IDeepCloneable<Transition>
     {
         public readonly DateTime StartedTime;
         public readonly TimeSpan Duration;

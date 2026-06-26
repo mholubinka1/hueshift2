@@ -13,7 +13,7 @@ namespace HueShift2.Helpers
     public static class ExtensionMethods
     {
         public static DateTime Clamp(this DateTime dt, DateTime min, DateTime max)
-        { 
+        {
             if (dt <= min) return min;
             if (dt >= max) return max;
             return dt;

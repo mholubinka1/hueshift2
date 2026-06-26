@@ -19,7 +19,7 @@ namespace HueShift2.Control
     {
         private readonly HueShiftMode mode;
         private readonly ILogger<AdaptiveScheduleProvider> logger;
-        private readonly IConfiguration configuration; 
+        private readonly IConfiguration configuration;
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
         private readonly ILightColourCalculator lightColourCalculator;
 
@@ -73,14 +73,14 @@ namespace HueShift2.Control
             var sunrise = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise.ToUniversalTime(), tz);
             var sunset = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset.ToUniversalTime(), tz);
             var solar_noon = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.SolarNoon.ToUniversalTime(), tz);
-            
+
             var midnight = sunrise.Date;
             var adaptiveTransitionTimeLimits = appOptionsDelegate.CurrentValue.SolarTransitionTimeLimits;
             this.solarEvents = new AdaptiveSolarEvents(
                 sunrise.Clamp(midnight + adaptiveTransitionTimeLimits.SunriseLower, midnight + adaptiveTransitionTimeLimits.SunriseUpper),
                 solar_noon,
                 sunset.Clamp(midnight + adaptiveTransitionTimeLimits.SunsetLower, midnight + adaptiveTransitionTimeLimits.SunsetUpper)
-            ); 
+            );
             if (solarEvents.Sunrise.Date != solarEvents.Sunset.Date) throw new InvalidOperationException();
             logger.LogInformation($"Solar transition times refreshed | Day: {solarEvents.Sunrise.ToString(CultureInfo.InvariantCulture)} | Night: {solarEvents.Sunset.ToString(CultureInfo.InvariantCulture)}");
         }

@@ -14,7 +14,7 @@ namespace HueShift2.Model
 
     public class AdaptiveCalculationParameters : LightCalculationParameters
     {
-        public AdaptiveSolarEvents SolarEvents {get; private set; }
+        public AdaptiveSolarEvents SolarEvents { get; private set; }
 
         public AdaptiveCalculationParameters(AdaptiveSolarEvents solarEvents, ColourTemperature colourTemperature)
         {
