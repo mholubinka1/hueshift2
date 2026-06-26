@@ -71,6 +71,7 @@ namespace HueShift2.Model
 
         public bool Equals(Colour other)
         {
+            if (other == null) return false;
             if (this.Mode == other.Mode)
             {
                 switch (this.Mode)

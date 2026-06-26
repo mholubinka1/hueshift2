@@ -27,7 +27,7 @@ namespace HueShift2.Control
         {
             if (isSleep)
             {
-                var percentage = (double)appOptionsDelegate.CurrentValue.NightBrightnessPercentage;
+                var percentage = Math.Clamp((double)appOptionsDelegate.CurrentValue.NightBrightnessPercentage, 0.0, 100.0);
                 var binaryPercentage = (percentage / 100.0) * 254.0;
                 return (byte)binaryPercentage;
             }
