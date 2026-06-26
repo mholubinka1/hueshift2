@@ -19,7 +19,7 @@ namespace HueShift2.Control
         private readonly ILocalHueClient client;
         private readonly IConfigFileHelper configHelper;
 
-        public LocalHueClientManager(ILogger<LocalHueClientManager> logger, IConfiguration configuration, IOptionsMonitor<HueShiftOptions> optionsDelegate, 
+        public LocalHueClientManager(ILogger<LocalHueClientManager> logger, IConfiguration configuration, IOptionsMonitor<HueShiftOptions> optionsDelegate,
             ILocalHueClient client, IConfigFileHelper configHelper)
         {
             this.logger = logger;
@@ -34,7 +34,8 @@ namespace HueShift2.Control
             logger.LogInformation("Registering application with Hue bridge...");
             var registered = false;
             string apiKey = "";
-            while (!registered) {
+            while (!registered)
+            {
                 token.ThrowIfCancellationRequested();
                 try
                 {
@@ -56,7 +57,8 @@ namespace HueShift2.Control
 
         public async Task AssertConnected()
         {
-            if (!await client.CheckConnection()){
+            if (!await client.CheckConnection())
+            {
                 if (string.IsNullOrEmpty(optionsDelegate.CurrentValue.BridgeProperties.ApiKey))
                 {
                     var cts = new CancellationTokenSource();

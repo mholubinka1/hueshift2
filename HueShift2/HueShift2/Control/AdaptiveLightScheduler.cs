@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace HueShift2.Control
 {
-    public class AdaptiveLightScheduler: ILightScheduler
+    public class AdaptiveLightScheduler : ILightScheduler
     {
         private readonly HueShiftMode mode;
         private readonly ILogger<AdaptiveLightScheduler> logger;
@@ -20,7 +20,7 @@ namespace HueShift2.Control
 
         private IScheduleProvider scheduleProvider;
         private ILightManager lightManager;
-   
+
         public AdaptiveLightScheduler(ILogger<AdaptiveLightScheduler> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate,
             ILightManager lightManager, IEnumerable<IScheduleProvider> scheduleProviders)
         {
@@ -48,12 +48,12 @@ namespace HueShift2.Control
         }
 
         private async Task ExecuteTransition(DateTime currentTime, DateTime? lastRunTime, TransitionType transitionType)
-        { 
+        {
             var transitionDuration = scheduleProvider.GetTransitionDuration(transitionType);
             var reset = scheduleProvider.IsReset(transitionType);
             var targetLightState = scheduleProvider.TargetLightState(currentTime);
             var command = CreateCommand(targetLightState, transitionDuration);
-            await lightManager.Transition(targetLightState, command, currentTime, reset);
+            await lightManager.Transition(targetLightState, command, currentTime, reset, transitionType);
         }
 
         public async Task<(bool, DateTime?)> Execute(DateTime? lastRunTime, DateTime? lastTransitionTime)

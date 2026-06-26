@@ -25,20 +25,21 @@ namespace HueShift2.Control
 
         private byte? CalculateBrightnessPct(bool isSleep)
         {
-            if (isSleep) {
-                var percentage = (double)appOptionsDelegate.CurrentValue.NightBrightnessPercentage;
-                var binaryPercentage = (percentage / 100.0) * (double)Byte.MaxValue;
-                var bytePercentage = (byte)binaryPercentage;
-                return bytePercentage;
+            if (isSleep)
+            {
+                var percentage = Math.Clamp((double)appOptionsDelegate.CurrentValue.NightBrightnessPercentage, 0.0, 100.0);
+                var binaryPercentage = (percentage / 100.0) * 254.0;
+                return (byte)binaryPercentage;
             }
-            return Byte.MaxValue;
+            return 254;
         }
 
         private int CalculateKelvinColourTemperature(double sunPosition)
         {
             var warmest = appOptionsDelegate.CurrentValue.ColourTemperature.Warmest;
             var coolest = appOptionsDelegate.CurrentValue.ColourTemperature.Coolest;
-            if (sunPosition > 0) {
+            if (sunPosition > 0)
+            {
                 var range = warmest - coolest;
                 var colourTemperature = (int)(warmest - (range * sunPosition));
                 if (colourTemperature > warmest) return warmest;
@@ -56,7 +57,7 @@ namespace HueShift2.Control
                 {
                     var scalingFactor = 1.0 - Math.Pow(((currentTime.TimeOfDay - events.SolarNoon.TimeOfDay) / (events.SolarNoon.TimeOfDay - events.Sunrise.TimeOfDay)), 2.0);
                     return 1.0 * scalingFactor;
-;                }
+                }
                 if (currentTime > events.SolarNoon)
                 {
                     var scalingFactor = 1.0 - Math.Pow(((currentTime.TimeOfDay - events.SolarNoon.TimeOfDay) / (events.SolarNoon.TimeOfDay - events.Sunset.TimeOfDay)), 2.0);

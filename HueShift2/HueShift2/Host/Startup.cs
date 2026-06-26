@@ -66,7 +66,7 @@ namespace HueShift2
                 .AddEnvironmentVariables()
                 .Build();
                 await AssertGeneratedConfigurationFile(generatedConfig, lightingConfigFilePath);
-            }   
+            }
             return new Tuple<ILogger, string>(Log.Logger, lightingConfigFilePath);
         }
     }

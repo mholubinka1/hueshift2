@@ -14,7 +14,7 @@ namespace HueShift2.Model
             this.Sunrise = sunrise;
             this.SolarNoon = solarNoon;
             this.Sunset = sunset;
-            if (!ValidateOrder()) 
+            if (!ValidateOrder())
             {
                 throw new InvalidOperationException($"Solar Event times in the wrong order | Sunrise: {Sunrise.ToString(CultureInfo.InvariantCulture)} | Solar Noon: {SolarNoon.ToString(CultureInfo.InvariantCulture)} | Sunset: {Sunset.ToString(CultureInfo.InvariantCulture)}");
             }

@@ -5,6 +5,6 @@ namespace HueShift2.Configuration
 {
     public interface IGeoLocator
     {
-        public Task<Geolocation> Get(); 
+        public Task<Geolocation> Get();
     }
 }

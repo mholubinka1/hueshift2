@@ -16,6 +16,7 @@ namespace HueShift2.Model
         public readonly AppLightState ExpectedLight;
         public readonly Transition Transition;
         public readonly bool ResetOccurred;
+        public readonly bool SyncRequired;
 
         public CachedControlPair(LightControlPair light)
         {
@@ -29,13 +30,14 @@ namespace HueShift2.Model
                 this.Transition = light.Transition.DeepClone();
             }
             this.ResetOccurred = light.ResetOccurred;
+            this.SyncRequired = light.SyncRequired;
         }
 
         public override string ToString()
         {
             var @base = $"Cached Pair | Id: {this.Properties.Id} Name: {this.Properties.Name} | {this.PowerState} - Control: {this.AppControlState}";
-            if (this.PowerState == LightPowerState.Transitioning)
-            {;
+            if (this.PowerState == LightPowerState.Transitioning || this.PowerState == LightPowerState.Syncing)
+            {
                 @base += $" | Transition Time Remaining: {this.Transition.SecondsRemaining}s";
             }
             else

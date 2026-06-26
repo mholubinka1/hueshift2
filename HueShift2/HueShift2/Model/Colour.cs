@@ -7,7 +7,7 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class Colour : IDeepCloneable<Colour> , IEquatable<Colour>
+    public class Colour : IDeepCloneable<Colour>, IEquatable<Colour>
     {
         public ColourMode Mode { get; set; }
         public double[] ColourCoordinates { get; set; }
@@ -50,6 +50,8 @@ namespace HueShift2.Model
 
         public Colour(Colour other)
         {
+            this.Mode = other.Mode;
+            this.ColourCoordinates = other.ColourCoordinates.DeepClone();
             this.ColourTemperature = other.ColourTemperature;
             this.Hue = other.Hue;
             this.Saturation = other.Saturation;
@@ -69,6 +71,7 @@ namespace HueShift2.Model
 
         public bool Equals(Colour other)
         {
+            if (other == null) return false;
             if (this.Mode == other.Mode)
             {
                 switch (this.Mode)
@@ -84,7 +87,7 @@ namespace HueShift2.Model
             }
             else
             {
-                if(ExtensionMethods.ArrayEquals(this.ColourCoordinates, other.ColourCoordinates))
+                if (ExtensionMethods.ArrayEquals(this.ColourCoordinates, other.ColourCoordinates))
                 {
                     return true;
                 }

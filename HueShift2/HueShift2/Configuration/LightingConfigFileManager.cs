@@ -42,10 +42,10 @@ namespace HueShift2.Configuration
             {
                 logger.LogWarning($"App does not support more than one bridge.");
             }
-            logger.LogInformation($"Hue BridgeID: { locatedBridge.BridgeId,-10} IP: {locatedBridge.IpAddress} found.");
-            return new BridgeProperties 
-            { 
-                IpAddress = locatedBridge.IpAddress 
+            logger.LogInformation($"Hue BridgeID: {locatedBridge.BridgeId,-10} IP: {locatedBridge.IpAddress} found.");
+            return new BridgeProperties
+            {
+                IpAddress = locatedBridge.IpAddress
             };
         }
 

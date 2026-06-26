@@ -66,3 +66,22 @@ To deploy, navigate to the folder containing the `docker-compose.yml` file:
 docker compose up -d
 ```
 
+## Development
+
+### Prerequisites
+
+- .NET 7 SDK
+
+### Git hooks
+
+Pre-commit and pre-push hooks live in [.githooks/](.githooks/). Activate them once per clone:
+
+```
+git config core.hooksPath .githooks
+```
+
+| Hook | Runs on | Check |
+|------|---------|-------|
+| `pre-commit` | every commit | `dotnet build` — solution must compile; `dotnet format` — auto-applies fixes and aborts if files were changed |
+| `pre-push` | every push | `dotnet format --verify-no-changes` — code must be formatted |
+
