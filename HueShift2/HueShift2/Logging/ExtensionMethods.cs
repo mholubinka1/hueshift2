@@ -22,12 +22,12 @@ namespace HueShift2.Logging
             logger.LogInformation($"[Sync] {names.Length} light(s) → {target} | {string.Join(", ", names)}");
         }
 
-        public static void LogAdaptive<T>(this ILogger<T> logger, IEnumerable<LightControlPair> commandLights, AppLightState target)
+        public static void LogTransition<T>(this ILogger<T> logger, IEnumerable<LightControlPair> commandLights, AppLightState target, TransitionType transitionType)
         {
             var lights = commandLights.ToArray();
             if (!lights.Any()) return;
             var names = string.Join(", ", lights.Select(l => l.Properties.Name));
-            logger.LogInformation($"[Adaptive] {lights.Length} light(s) → {target} | {names}");
+            logger.LogInformation($"[{transitionType}] {lights.Length} light(s) → {target} | {names}");
         }
 
         public static void LogLightProperties<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)

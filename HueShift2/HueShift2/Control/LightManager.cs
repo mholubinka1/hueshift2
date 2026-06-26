@@ -120,7 +120,7 @@ namespace HueShift2.Control
             PrintScheduled();
             var commandLights = lights.SelectLightsToControl();
             commandLights = commandLights.Filter(target);
-            logger.LogAdaptive(commandLights, target);
+            logger.LogTransition(commandLights, target, transitionType);
             var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
             foreach (var light in lights.Values)
             {
