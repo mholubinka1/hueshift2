@@ -57,7 +57,6 @@ namespace HueShift2.Control
                 {
                     var scalingFactor = 1.0 - Math.Pow(((currentTime.TimeOfDay - events.SolarNoon.TimeOfDay) / (events.SolarNoon.TimeOfDay - events.Sunrise.TimeOfDay)), 2.0);
                     return 1.0 * scalingFactor;
-                    ;
                 }
                 if (currentTime > events.SolarNoon)
                 {

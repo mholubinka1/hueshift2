@@ -16,7 +16,7 @@ namespace HueShift2.Configuration
 
         public ConfigFileHelper(ILogger<ConfigFileHelper> logger)
         {
-            this.logger = logger; ;
+            this.logger = logger;
         }
 
         private void SetValue<T>(dynamic json, string key, T value)

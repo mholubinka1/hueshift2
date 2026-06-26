@@ -82,6 +82,6 @@ git config core.hooksPath .githooks
 
 | Hook | Runs on | Check |
 |------|---------|-------|
-| `pre-commit` | every commit | `dotnet build` — solution must compile |
+| `pre-commit` | every commit | `dotnet build` — solution must compile; `dotnet format` — auto-applies fixes and aborts if files were changed |
 | `pre-push` | every push | `dotnet format --verify-no-changes` — code must be formatted |
 
