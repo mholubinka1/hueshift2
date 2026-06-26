@@ -48,8 +48,6 @@ namespace HueShift2.Control
         {
             var duration = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.BasicTransitionDuration);
             var lightNames = syncCommandsPairs.Keys.Select(id => lights[id].Properties.Name);
-            var target = lights[syncCommandsPairs.Keys.First()].ExpectedLight;
-            logger.LogSync(lightNames, target);
             foreach (var pair in syncCommandsPairs)
             {
                 var id = pair.Key;
@@ -60,6 +58,7 @@ namespace HueShift2.Control
                 light.ExecuteSync(duration, currentTime);
                 await client.SendCommandAsync(syncCommand, new[] { id });
             }
+            logger.LogSync(lightNames, lights[syncCommandsPairs.Keys.First()].ExpectedLight);
         }
 
         public async Task Refresh(DateTime currentTime)
