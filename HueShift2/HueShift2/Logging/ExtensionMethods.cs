@@ -68,8 +68,7 @@ namespace HueShift2.Logging
         public static void LogRefresh<T>(this ILogger<T> logger, CachedControlPair stale, LightControlPair refreshed)
         {
             if (stale.PowerState == refreshed.PowerState &&
-                stale.AppControlState == refreshed.AppControlState &&
-                stale.ResetOccurred == refreshed.ResetOccurred)
+                stale.AppControlState == refreshed.AppControlState)
             {
                 return;
             }
@@ -81,10 +80,6 @@ namespace HueShift2.Logging
             if (stale.AppControlState != refreshed.AppControlState)
             {
                 refreshMessage += $" | Control state changed from {stale.AppControlState} to {refreshed.AppControlState}";
-            }
-            if (stale.ResetOccurred != refreshed.ResetOccurred)
-            {
-                refreshMessage += refreshed.ResetOccurred ? " | Reset scheduled." : " | Light reset.";
             }
             logger.LogDebug(stale.ToString());
             logger.LogDebug(refreshed.ToString());

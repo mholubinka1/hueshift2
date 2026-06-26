@@ -89,8 +89,13 @@ namespace HueShift2.Control
                     logger.LogRefresh(staleLight, light);
                     if (light.PowerState != LightPowerState.Syncing && light.PowerState != LightPowerState.Transitioning)
                     {
+                        var preResetOccurred = light.ResetOccurred;
                         if (light.RequiresSync(out LightCommand syncCommand))
+                        {
+                            if (preResetOccurred && !light.ResetOccurred)
+                                logger.LogInformation($"Brightness reset applied | ID: {light.Properties.Id} Name: {light.Properties.Name}");
                             syncCommands.Add(id, syncCommand);
+                        }
                     }
                 }
             }
