@@ -4,8 +4,8 @@ echo "[pre-commit] Building solution..."
 dotnet build HueShift2/HueShift2.sln --no-restore -v q
 echo "[pre-commit] Build passed."
 echo "[pre-commit] Formatting code..."
-dotnet format HueShift2/HueShift2.sln
-CHANGED=$(git diff --name-only)
+FORMAT_OUTPUT=$(dotnet format HueShift2/HueShift2.sln 2>&1)
+CHANGED=$(echo "$FORMAT_OUTPUT" | grep "Formatted code file" | sed "s/.*Formatted code file '//;s/'\..*//")
 if [ -n "$CHANGED" ]; then
     echo "[pre-commit] Format modified files — stage them and re-commit:"
     echo "$CHANGED" | sed 's/^/  /'
