@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64 mcr.microsoft.com/dotnet/sdk:10.0.301-bookworm-slim AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0.301-resolute-arm64v8 AS build-env
 WORKDIR /app
 COPY HueShift2/*.sln ./
 COPY HueShift2/HueShift2/*.csproj ./HueShift2/
@@ -10,7 +10,7 @@ FROM build-env AS publish
 WORKDIR /app/HueShift2/
 RUN dotnet publish -c Release -o out
 
-FROM --platform=linux/arm64 mcr.microsoft.com/dotnet/runtime:10.0.9-bookworm-slim AS runtime
+FROM mcr.microsoft.com/dotnet/runtime:10.0.9-resolute-arm64v8 AS runtime
 WORKDIR /app
 RUN mkdir -p config
 VOLUME /config
