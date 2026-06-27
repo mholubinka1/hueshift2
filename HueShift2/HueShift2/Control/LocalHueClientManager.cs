@@ -82,7 +82,7 @@ namespace HueShift2.Control
                 }
                 catch (Exception e)
                 {
-                    logger.LogError($"Failed to initialise Hue client", e);
+                    logger.LogError(e, "Failed to initialise Hue client");
                     throw;
                 }
             }
