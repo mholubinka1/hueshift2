@@ -70,7 +70,7 @@ docker compose up -d
 
 ### Prerequisites
 
-- .NET 7 SDK
+- .NET 10 SDK
 
 ### Git hooks
 
