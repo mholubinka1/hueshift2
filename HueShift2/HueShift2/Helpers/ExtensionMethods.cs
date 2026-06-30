@@ -80,8 +80,7 @@ namespace HueShift2.Helpers
             {
                 "xy" => ColourMode.XY,
                 "ct" => ColourMode.CT,
-                "hs" => ColourMode.HS,
-                _ => throw new NotSupportedException(),
+                _ => ColourMode.None,
             };
         }
 

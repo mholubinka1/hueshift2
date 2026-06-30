@@ -33,13 +33,17 @@ namespace HueShift2.Host
 
         private ILightScheduler ResolveScheduler()
         {
-            var controller = lightSchedulers.First(x => x.Mode() == appOptionsDelegate.CurrentValue.Mode);
-            return controller;
+            return lightSchedulers.FirstOrDefault(x => x.Mode() == appOptionsDelegate.CurrentValue.Mode);
         }
 
         public async Task RunAsync()
         {
             var scheduler = ResolveScheduler();
+            if (scheduler == null)
+            {
+                logger.LogError("No scheduler registered for mode '{Mode}'. Check HueShiftOptions.Mode in config.", appOptionsDelegate.CurrentValue.Mode);
+                return;
+            }
             (bool transitionOccurred, DateTime? currentTime) = await scheduler.Execute(lastRunTime, lastTransitionTime);
             lastRunTime = currentTime;
             if (transitionOccurred) lastTransitionTime = currentTime;

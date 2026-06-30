@@ -155,20 +155,13 @@ namespace HueShift2.Control
                 this.ExpectedLight.Colour.ColourCoordinates = command.ColorCoordinates;
                 return;
             }
-            else if (command.ColorTemperature != null)
+            if (command.ColorTemperature != null)
             {
                 this.ExpectedLight.Colour.Mode = ColourMode.CT;
                 this.ExpectedLight.Colour.ColourTemperature = command.ColorTemperature;
                 return;
             }
-            else if (command.Hue != null && command.Saturation != null)
-            {
-                this.ExpectedLight.Colour.Mode = ColourMode.Other;
-                this.ExpectedLight.Colour.Hue = command.Hue;
-                this.ExpectedLight.Colour.Saturation = command.Saturation;
-            }
-            this.ExpectedLight.Colour.Mode = ColourMode.None;
-            throw new InvalidOperationException();
+            // HS or unknown: ClearColourState already set Mode = None; nothing further needed
         }
 
         public void ExecuteCommand(LightCommand command, DateTime currentTime, TransitionType transitionType)

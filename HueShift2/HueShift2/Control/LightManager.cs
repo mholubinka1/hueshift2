@@ -72,6 +72,8 @@ namespace HueShift2.Control
             foreach (var discoveredLight in discoveredLights)
             {
                 var id = discoveredLight.Id;
+                if (discoveredLight.State.ColorMode == "hs")
+                    logger.LogWarning("[Refresh] Light {Id} ({Name}) reports HS colour mode — not supported, treating as None.", id, discoveredLight.Name);
                 if (!lights.ContainsKey(id))
                 {
                     var light = new LightControlPair(discoveredLight);
