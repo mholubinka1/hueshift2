@@ -88,7 +88,7 @@ namespace HueShift2.Control
                             }
                             else if (this.Transition.IsExpired(currentTime))
                             {
-                                var withinGrace = this.syncIssuedAt.HasValue && (currentTime - this.syncIssuedAt.Value) < syncGracePeriod;
+                                var withinGrace = this.syncIssuedAt.HasValue && (currentTime - this.syncIssuedAt.Value) <= syncGracePeriod;
                                 if (withinGrace)
                                 {
                                     this.SyncRequired = true;

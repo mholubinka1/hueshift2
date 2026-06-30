@@ -70,6 +70,8 @@ namespace HueShift2.Control
             var syncCommands = new Dictionary<string, LightCommand>();
             var retrySyncCommands = new Dictionary<string, LightCommand>();
             var refreshLog = new List<(CachedControlPair stale, LightControlPair current)>();
+            var options = appOptionsDelegate.CurrentValue;
+            var syncGracePeriod = TimeSpan.FromSeconds(options.SyncGracePeriod);
             foreach (var discoveredLight in discoveredLights)
             {
                 var id = discoveredLight.Id;
@@ -80,7 +82,7 @@ namespace HueShift2.Control
                     if (cachedLightCommand is not null)
                     {
                         var syncCommand = cachedLightCommand;
-                        syncCommand.TransitionTime = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.BasicTransitionDuration);
+                        syncCommand.TransitionTime = TimeSpan.FromSeconds(options.BasicTransitionDuration);
                         syncCommands.Add(id, syncCommand);
                     }
                 }
@@ -88,7 +90,6 @@ namespace HueShift2.Control
                 {
                     var light = lights[id];
                     var staleLight = new CachedControlPair(light);
-                    var syncGracePeriod = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.SyncGracePeriod);
                     light.Refresh(discoveredLight.State, currentTime, ct.Coolest, ct.Warmest, syncGracePeriod);
                     refreshLog.Add((staleLight, light));
                     if (light.RequiresRetrySync(out LightCommand retrySyncCommand))

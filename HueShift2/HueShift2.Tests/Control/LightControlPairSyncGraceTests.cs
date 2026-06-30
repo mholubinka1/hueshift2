@@ -156,6 +156,24 @@ namespace HueShift2.Tests.Control
         }
 
         [Fact]
+        public void BridgeUnconfirmedAtExactGraceBoundary_StillSyncingAndRequestsRetry()
+        {
+            var pair = CreateLightOn(colourTemperature: 339);
+            var syncIssuedAt = DateTime.UtcNow;
+            pair.ExecuteSync(SyncDuration, syncIssuedAt);
+
+            // Exactly at syncIssuedAt + SyncGracePeriod: the boundary must be inclusive,
+            // so this must be a retry rather than a failure.
+            pair.Refresh(BridgeState(454), syncIssuedAt.Add(SyncGracePeriod), Coolest, Warmest, SyncGracePeriod);
+
+            Assert.Equal(LightPowerState.Syncing, pair.PowerState);
+            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.True(pair.SyncRequired);
+            Assert.False(pair.SyncConfirmed);
+            Assert.False(pair.SyncFailed);
+        }
+
+        [Fact]
         public void GraceExpiresAfterRetryWasPending_RetryClearedAndSyncFailed()
         {
             var pair = CreateLightOn(colourTemperature: 339);
