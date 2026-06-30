@@ -116,6 +116,10 @@ namespace HueShift2.Control
             var hueShiftOnLights = lights.SelectLightsToControl();
             var commandLights = hueShiftOnLights.Filter(target);
             var commandIds = new HashSet<string>(commandLights.Select(x => x.Properties.Id));
+            if (commandIds.Any())
+                logger.LogTransition(commandLights, target, transitionType);
+            else if (transitionType == TransitionType.Adaptive)
+                logger.LogDebug("[Adaptive] Checked — no lights require a colour update.");
             foreach (var light in lights.Values)
             {
                 if (commandIds.Contains(light.Properties.Id))
@@ -124,14 +128,7 @@ namespace HueShift2.Control
                     light.ExecuteInstantaneousCommand(command);
             }
             if (commandIds.Any())
-            {
-                logger.LogTransition(commandLights, target, transitionType);
                 await client.SendCommandAsync(command, commandIds.ToArray());
-            }
-            else if (transitionType == TransitionType.Adaptive)
-            {
-                logger.LogDebug("[Adaptive] Checked — no lights require a colour update.");
-            }
             cachedLightCommand = command;
             logger.LogUpdate(lights.Values);
         }
