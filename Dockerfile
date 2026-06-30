@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0.301-resolute-arm64v8 AS build-env
 WORKDIR /app
 COPY HueShift2/*.sln ./
 COPY HueShift2/HueShift2/*.csproj ./HueShift2/
+COPY HueShift2/HueShift2.Tests/*.csproj ./HueShift2.Tests/
 RUN dotnet restore
 COPY HueShift2 ./
 RUN dotnet build

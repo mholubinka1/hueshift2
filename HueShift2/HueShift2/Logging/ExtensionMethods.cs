@@ -107,6 +107,38 @@ namespace HueShift2.Logging
             }
         }
 
+        public static void LogSyncConfirmed<T>(this ILogger<T> logger, IEnumerable<(CachedControlPair stale, LightControlPair current)> pairs)
+        {
+            var entries = pairs.ToList();
+            if (!entries.Any()) return;
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                foreach (var p in entries)
+                {
+                    logger.LogDebug(p.stale.ToString());
+                    logger.LogDebug(p.current.ToString());
+                }
+            }
+            var names = string.Join(", ", entries.Select(p => p.current.Properties.Name));
+            logger.LogInformation($"[Sync] confirmed | {entries.Count} light(s) | {names}");
+        }
+
+        public static void LogSyncFailed<T>(this ILogger<T> logger, IEnumerable<(CachedControlPair stale, LightControlPair current)> pairs)
+        {
+            var entries = pairs.ToList();
+            if (!entries.Any()) return;
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                foreach (var p in entries)
+                {
+                    logger.LogDebug(p.stale.ToString());
+                    logger.LogDebug(p.current.ToString());
+                }
+            }
+            var names = string.Join(", ", entries.Select(p => p.current.Properties.Name));
+            logger.LogWarning($"[Sync] failed → Manual | {entries.Count} light(s) | {names}");
+        }
+
         public static void LogUpdate<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)
         {
             logger.LogDebug("New light states in memory:");

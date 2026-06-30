@@ -14,6 +14,7 @@ namespace HueShift2.Configuration.Model
         public int PollingFrequency { get; set; }
         public int TransitionInterval { get; set; }
         public int BasicTransitionDuration { get; set; }
+        public int SyncGracePeriod { get; set; } = 10;
         public int AdaptiveTransitionDuration { get; set; }
         public int SolarTransitionDuration { get; set; }
         public SolarTransitionTimeLimits SolarTransitionTimeLimits { get; set; }
@@ -33,6 +34,7 @@ namespace HueShift2.Configuration.Model
         {
             Mode = HueShiftMode.Adaptive;
             BasicTransitionDuration = 2;
+            SyncGracePeriod = 10;
             AdaptiveTransitionDuration = 30;
             SolarTransitionDuration = 120;
             SolarTransitionTimeLimits = new SolarTransitionTimeLimits

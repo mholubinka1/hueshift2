@@ -20,6 +20,10 @@ namespace HueShift2.Control
         public Transition Transition { get; private set; }
         public bool ResetOccurred { get; private set; }
         public bool SyncRequired { get; private set; }
+        public bool SyncConfirmed { get; private set; }
+        public bool SyncFailed { get; private set; }
+
+        private DateTime? syncIssuedAt;
 
         public LightControlPair(Light networkLight)
         {
@@ -36,7 +40,7 @@ namespace HueShift2.Control
         {
             if (isOn)
             {
-                if (this.PowerState == LightPowerState.Transitioning || this.PowerState == LightPowerState.Syncing)
+                if (this.PowerState == LightPowerState.Transitioning)
                 {
                     if (this.Transition == null) throw new NullReferenceException();
                     if (this.Transition.IsExpired(currentTime))
@@ -45,7 +49,7 @@ namespace HueShift2.Control
                         this.Transition = null;
                     }
                 }
-                else
+                else if (this.PowerState != LightPowerState.Syncing)
                 {
                     this.PowerState = LightPowerState.On;
                 }
@@ -54,13 +58,17 @@ namespace HueShift2.Control
             {
                 this.PowerState = LightPowerState.Off;
                 this.Transition = null;
+                this.syncIssuedAt = null;
+                this.SyncRequired = false;
             }
         }
 
-        public void Refresh(State networkLight, DateTime currentTime, int minCt, int maxCt)
+        public void Refresh(State networkLight, DateTime currentTime, int minCt, int maxCt, TimeSpan syncGracePeriod)
         {
             this.NetworkLight = networkLight;
             this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
+            this.SyncConfirmed = false;
+            this.SyncFailed = false;
             var isOn = networkLight.DeterminePowerState() == LightPowerState.On;
             var wasOff = this.PowerState == LightPowerState.Off;
             if (isOn)
@@ -68,13 +76,37 @@ namespace HueShift2.Control
                 switch (this.AppControlState)
                 {
                     case LightControlState.HueShift:
-                        if (!this.NetworkLight.Equals(this.ExpectedLight, minCt, maxCt) && this.PowerState == LightPowerState.On)
+                        if (this.PowerState == LightPowerState.Syncing)
+                        {
+                            if (this.NetworkLight.Equals(this.ExpectedLight, minCt, maxCt))
+                            {
+                                this.PowerState = LightPowerState.On;
+                                this.Transition = null;
+                                this.syncIssuedAt = null;
+                                this.SyncRequired = false;
+                                this.SyncConfirmed = true;
+                            }
+                            else if (this.Transition.IsExpired(currentTime))
+                            {
+                                var withinGrace = this.syncIssuedAt.HasValue && (currentTime - this.syncIssuedAt.Value) <= syncGracePeriod;
+                                if (withinGrace)
+                                {
+                                    this.SyncRequired = true;
+                                }
+                                else
+                                {
+                                    this.PowerState = LightPowerState.On;
+                                    this.Transition = null;
+                                    this.syncIssuedAt = null;
+                                    this.SyncRequired = false;
+                                    this.AppControlState = LightControlState.Manual;
+                                    this.SyncFailed = true;
+                                }
+                            }
+                        }
+                        else if (!this.NetworkLight.Equals(this.ExpectedLight, minCt, maxCt) && this.PowerState == LightPowerState.On)
                         {
                             this.AppControlState = LightControlState.Manual;
-                        }
-                        if (this.NetworkLight.Equals(this.ExpectedLight, minCt, maxCt) && this.PowerState == LightPowerState.Syncing)
-                        {
-                            this.PowerState = LightPowerState.On;
                         }
                         break;
                     case LightControlState.Manual:
@@ -125,6 +157,16 @@ namespace HueShift2.Control
             }
 
             return false;
+        }
+
+        public bool RequiresRetrySync(out LightCommand syncCommand)
+        {
+            syncCommand = null;
+            if (this.PowerState != LightPowerState.Syncing || !this.SyncRequired)
+                return false;
+            this.SyncRequired = false;
+            syncCommand = this.ExpectedLight.ToCommand();
+            return true;
         }
 
         public void Reset()
@@ -196,6 +238,7 @@ namespace HueShift2.Control
         {
             this.PowerState = LightPowerState.Syncing;
             this.Transition = new Transition(currentTime, duration, TransitionType.Sync);
+            this.syncIssuedAt ??= currentTime;
         }
 
         public override string ToString()
