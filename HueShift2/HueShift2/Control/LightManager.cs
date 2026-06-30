@@ -65,13 +65,13 @@ namespace HueShift2.Control
         {
             await clientManager.AssertConnected();
             var discoveredLights = await Discover();
-            var ct = appOptionsDelegate.CurrentValue.ColourTemperature;
+            var options = appOptionsDelegate.CurrentValue;
+            var ct = options.ColourTemperature;
+            var syncGracePeriod = TimeSpan.FromSeconds(options.SyncGracePeriod);
 
             var syncCommands = new Dictionary<string, LightCommand>();
             var retrySyncCommands = new Dictionary<string, LightCommand>();
             var refreshLog = new List<(CachedControlPair stale, LightControlPair current)>();
-            var options = appOptionsDelegate.CurrentValue;
-            var syncGracePeriod = TimeSpan.FromSeconds(options.SyncGracePeriod);
             foreach (var discoveredLight in discoveredLights)
             {
                 var id = discoveredLight.Id;
