@@ -27,7 +27,16 @@ namespace HueShift2.Logging
             var lights = commandLights.ToArray();
             if (!lights.Any()) return;
             var names = string.Join(", ", lights.Select(l => l.Properties.Name));
-            logger.LogInformation($"[{transitionType}] {lights.Length} light(s) → {target} | {names}");
+            if (transitionType == TransitionType.Adaptive)
+            {
+                var fromCt = lights.First().ExpectedLight.Colour.ColourTemperature;
+                var toCt = target.Colour.ColourTemperature;
+                logger.LogInformation($"[Adaptive] CT {fromCt} → {toCt} | {lights.Length} light(s) | {names}");
+            }
+            else
+            {
+                logger.LogInformation($"[{transitionType}] {lights.Length} light(s) → {target} | {names}");
+            }
         }
 
         public static void LogLightProperties<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)
@@ -65,25 +74,37 @@ namespace HueShift2.Logging
             return;
         }
 
-        public static void LogRefresh<T>(this ILogger<T> logger, CachedControlPair stale, LightControlPair refreshed)
+        public static void LogRefresh<T>(this ILogger<T> logger, IEnumerable<(CachedControlPair stale, LightControlPair current)> pairs)
         {
-            if (stale.PowerState == refreshed.PowerState &&
-                stale.AppControlState == refreshed.AppControlState)
+            var changed = pairs
+                .Where(p => p.stale.PowerState != p.current.PowerState || p.stale.AppControlState != p.current.AppControlState)
+                .ToList();
+            if (!changed.Any()) return;
+
+            var groups = changed.GroupBy(p =>
             {
-                return;
-            }
-            var refreshMessage = $"Refreshed light | ID: {refreshed.Properties.Id} Name: {refreshed.Properties.Name}";
-            if (stale.PowerState != refreshed.PowerState)
+                var parts = new List<string>();
+                if (p.stale.PowerState != p.current.PowerState)
+                    parts.Add($"Power state changed from {p.stale.PowerState} to {p.current.PowerState}");
+                if (p.stale.AppControlState != p.current.AppControlState)
+                    parts.Add($"Control state changed from {p.stale.AppControlState} to {p.current.AppControlState}");
+                return string.Join(" | ", parts);
+            });
+
+            foreach (var group in groups)
             {
-                refreshMessage += $" | Power state changed from {stale.PowerState} to {refreshed.PowerState}";
+                var entries = group.ToList();
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    foreach (var p in entries)
+                    {
+                        logger.LogDebug(p.stale.ToString());
+                        logger.LogDebug(p.current.ToString());
+                    }
+                }
+                var names = string.Join(", ", entries.Select(p => p.current.Properties.Name));
+                logger.LogInformation($"[Refresh] {entries.Count} light(s): {group.Key} | {names}");
             }
-            if (stale.AppControlState != refreshed.AppControlState)
-            {
-                refreshMessage += $" | Control state changed from {stale.AppControlState} to {refreshed.AppControlState}";
-            }
-            logger.LogDebug(stale.ToString());
-            logger.LogDebug(refreshed.ToString());
-            logger.LogInformation(refreshMessage);
         }
 
         public static void LogUpdate<T>(this ILogger<T> logger, IEnumerable<LightControlPair> lights)

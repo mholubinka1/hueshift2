@@ -57,7 +57,7 @@ namespace HueShift2.Control
             }
         }
 
-        public void Refresh(State networkLight, DateTime currentTime)
+        public void Refresh(State networkLight, DateTime currentTime, int minCt, int maxCt)
         {
             this.NetworkLight = networkLight;
             this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
@@ -68,11 +68,11 @@ namespace HueShift2.Control
                 switch (this.AppControlState)
                 {
                     case LightControlState.HueShift:
-                        if (!this.NetworkLight.Equals(this.ExpectedLight) && this.PowerState == LightPowerState.On)
+                        if (!this.NetworkLight.Equals(this.ExpectedLight, minCt, maxCt) && this.PowerState == LightPowerState.On)
                         {
                             this.AppControlState = LightControlState.Manual;
                         }
-                        if (this.NetworkLight.Equals(this.ExpectedLight) && this.PowerState == LightPowerState.Syncing)
+                        if (this.NetworkLight.Equals(this.ExpectedLight, minCt, maxCt) && this.PowerState == LightPowerState.Syncing)
                         {
                             this.PowerState = LightPowerState.On;
                         }
@@ -104,6 +104,11 @@ namespace HueShift2.Control
             {
                 this.SyncRequired = false;
                 syncCommand = this.ExpectedLight.ToCommand();
+                if (this.ResetOccurred)
+                {
+                    this.ResetOccurred = false;
+                    syncCommand.Brightness = 254;
+                }
                 return true;
             }
 

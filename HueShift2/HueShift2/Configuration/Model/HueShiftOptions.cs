@@ -44,7 +44,7 @@ namespace HueShift2.Configuration.Model
             };
             Sleep = new TimeSpan(23, 0, 0);
             PollingFrequency = 2;
-            TransitionInterval = 600;
+            TransitionInterval = 60;
             ColourTemperature = new ColourTemperature
             {
                 Coolest = 250,
