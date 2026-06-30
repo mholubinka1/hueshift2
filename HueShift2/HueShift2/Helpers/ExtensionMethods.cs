@@ -98,7 +98,7 @@ namespace HueShift2.Helpers
                     Brightness = expectedLight.Brightness,
                     ColorTemperature = expectedLight.Colour.ColourTemperature,
                 },
-                _ => throw new NotImplementedException(),
+                _ => new LightCommand { Brightness = expectedLight.Brightness },
             };
         }
 
