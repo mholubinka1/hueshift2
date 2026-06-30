@@ -128,7 +128,9 @@ namespace HueShift2.Helpers
                 if (@this.ColorCoordinates != null)
                 {
                     if (!TryXyToCt(@this.ColorCoordinates, out var convertedCt)) return false;
-                    if (convertedCt < minCt - 50 || convertedCt > maxCt + 50) return false;
+                    var low = Math.Min(minCt, maxCt);
+                    var high = Math.Max(minCt, maxCt);
+                    if (convertedCt < low - 50 || convertedCt > high + 50) return false;
                     return Math.Abs(convertedCt - expectedCt) <= 50;
                 }
                 return false;

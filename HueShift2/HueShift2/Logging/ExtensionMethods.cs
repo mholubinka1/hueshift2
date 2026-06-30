@@ -94,10 +94,13 @@ namespace HueShift2.Logging
             foreach (var group in groups)
             {
                 var entries = group.ToList();
-                foreach (var p in entries)
+                if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    logger.LogDebug(p.stale.ToString());
-                    logger.LogDebug(p.current.ToString());
+                    foreach (var p in entries)
+                    {
+                        logger.LogDebug(p.stale.ToString());
+                        logger.LogDebug(p.current.ToString());
+                    }
                 }
                 var names = string.Join(", ", entries.Select(p => p.current.Properties.Name));
                 logger.LogInformation($"[Refresh] {entries.Count} light(s): {group.Key} | {names}");
