@@ -59,6 +59,7 @@ namespace HueShift2.Control
                 this.PowerState = LightPowerState.Off;
                 this.Transition = null;
                 this.syncIssuedAt = null;
+                this.SyncRequired = false;
             }
         }
 
@@ -82,6 +83,7 @@ namespace HueShift2.Control
                                 this.PowerState = LightPowerState.On;
                                 this.Transition = null;
                                 this.syncIssuedAt = null;
+                                this.SyncRequired = false;
                                 this.SyncConfirmed = true;
                             }
                             else if (this.Transition.IsExpired(currentTime))
@@ -96,6 +98,7 @@ namespace HueShift2.Control
                                     this.PowerState = LightPowerState.On;
                                     this.Transition = null;
                                     this.syncIssuedAt = null;
+                                    this.SyncRequired = false;
                                     this.AppControlState = LightControlState.Manual;
                                     this.SyncFailed = true;
                                 }

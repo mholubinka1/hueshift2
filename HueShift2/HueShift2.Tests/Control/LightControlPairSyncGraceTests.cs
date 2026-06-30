@@ -120,6 +120,7 @@ namespace HueShift2.Tests.Control
             // Still mid-grace, bridge unconfirmed, then the light is switched off.
             pair.Refresh(BridgeState(454), syncIssuedAt.AddSeconds(3), Coolest, Warmest, SyncGracePeriod);
             pair.Refresh(BridgeState(454, on: false), syncIssuedAt.AddSeconds(4), Coolest, Warmest, SyncGracePeriod);
+            Assert.False(pair.SyncRequired);
 
             // Powers back on and a new sync is issued, 11s after the *original* sync — which
             // would already be outside the old 10s grace window if it weren't reset. The bridge
@@ -152,6 +153,48 @@ namespace HueShift2.Tests.Control
             Assert.False(pair.SyncRequired);
             Assert.False(pair.SyncConfirmed);
             Assert.True(pair.SyncFailed);
+        }
+
+        [Fact]
+        public void GraceExpiresAfterRetryWasPending_RetryClearedAndSyncFailed()
+        {
+            var pair = CreateLightOn(colourTemperature: 339);
+            var syncIssuedAt = DateTime.UtcNow;
+            pair.ExecuteSync(SyncDuration, syncIssuedAt);
+
+            // First poll: transition expired, bridge unconfirmed, within grace → SyncRequired = true.
+            pair.Refresh(BridgeState(454), syncIssuedAt.AddSeconds(3), Coolest, Warmest, SyncGracePeriod);
+            Assert.True(pair.SyncRequired);
+
+            // Second poll: grace period has now elapsed, bridge still unconfirmed → sync failed.
+            pair.Refresh(BridgeState(454), syncIssuedAt.AddSeconds(11), Coolest, Warmest, SyncGracePeriod);
+
+            Assert.Equal(LightPowerState.On, pair.PowerState);
+            Assert.Equal(LightControlState.Manual, pair.AppControlState);
+            Assert.True(pair.SyncFailed);
+            Assert.False(pair.SyncRequired);
+            Assert.False(pair.SyncConfirmed);
+        }
+
+        [Fact]
+        public void BridgeConfirmsSyncAfterRetryWasPending_RetryClearedAndSyncConfirmed()
+        {
+            var pair = CreateLightOn(colourTemperature: 339);
+            var syncIssuedAt = DateTime.UtcNow;
+            pair.ExecuteSync(SyncDuration, syncIssuedAt);
+
+            // First poll: transition expired, bridge unconfirmed, within grace → SyncRequired = true.
+            pair.Refresh(BridgeState(454), syncIssuedAt.AddSeconds(3), Coolest, Warmest, SyncGracePeriod);
+            Assert.True(pair.SyncRequired);
+
+            // Second poll: bridge now reports the commanded CT → sync confirmed.
+            pair.Refresh(BridgeState(339), syncIssuedAt.AddSeconds(4), Coolest, Warmest, SyncGracePeriod);
+
+            Assert.Equal(LightPowerState.On, pair.PowerState);
+            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.True(pair.SyncConfirmed);
+            Assert.False(pair.SyncRequired);
+            Assert.False(pair.SyncFailed);
         }
 
         [Fact]

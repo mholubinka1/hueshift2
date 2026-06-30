@@ -104,7 +104,7 @@ namespace HueShift2.Control
             }
             var syncConfirmedPairs = refreshLog.Where(p => p.current.SyncConfirmed).ToList();
             var syncFailedPairs = refreshLog.Where(p => p.current.SyncFailed).ToList();
-            var regularRefreshLog = refreshLog.Except(syncConfirmedPairs).Except(syncFailedPairs);
+            var regularRefreshLog = refreshLog.Where(p => !p.current.SyncConfirmed && !p.current.SyncFailed);
             logger.LogRefresh(regularRefreshLog);
             logger.LogSyncConfirmed(syncConfirmedPairs);
             logger.LogSyncFailed(syncFailedPairs);
