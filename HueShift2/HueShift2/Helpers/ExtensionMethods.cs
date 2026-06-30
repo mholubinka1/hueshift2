@@ -80,8 +80,7 @@ namespace HueShift2.Helpers
             {
                 "xy" => ColourMode.XY,
                 "ct" => ColourMode.CT,
-                "hs" => ColourMode.HS,
-                _ => throw new NotSupportedException(),
+                _ => ColourMode.None,
             };
         }
 
@@ -99,7 +98,7 @@ namespace HueShift2.Helpers
                     Brightness = expectedLight.Brightness,
                     ColorTemperature = expectedLight.Colour.ColourTemperature,
                 },
-                _ => throw new NotImplementedException(),
+                _ => new LightCommand { Brightness = expectedLight.Brightness },
             };
         }
 

@@ -14,10 +14,10 @@ namespace HueShift2.Control
 {
     public class AdaptiveLightColourCalculator : ILightColourCalculator
     {
-        private ILogger<LightManager> logger;
+        private ILogger<AdaptiveLightColourCalculator> logger;
         private IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
-        public AdaptiveLightColourCalculator(ILogger<LightManager> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate)
+        public AdaptiveLightColourCalculator(ILogger<AdaptiveLightColourCalculator> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate)
         {
             this.logger = logger;
             this.appOptionsDelegate = appOptionsDelegate;
@@ -63,9 +63,10 @@ namespace HueShift2.Control
                     var scalingFactor = 1.0 - Math.Pow(((currentTime.TimeOfDay - events.SolarNoon.TimeOfDay) / (events.SolarNoon.TimeOfDay - events.Sunset.TimeOfDay)), 2.0);
                     return 1.0 * scalingFactor;
                 }
+                return 1.0;
             }
-            if ((currentTime < events.Sunrise && currentTime > currentTime.Date) || currentTime > events.Sunset) return -1.0;
-            throw new InvalidOperationException();
+            if (currentTime < events.Sunrise || currentTime > events.Sunset) return -1.0;
+            return 0.0;
         }
 
         public AppLightState SetBrightnessAndColour(LightCalculationParameters lightCalculationParameters, DateTime currentTime, bool isSleep)
