@@ -114,19 +114,18 @@ namespace HueShift2.Control
             await Refresh(currentTime);
             PrintScheduled();
             var hueShiftOnLights = lights.SelectLightsToControl();
-            var hueShiftOnIds = new HashSet<string>(hueShiftOnLights.Select(x => x.Properties.Id));
             var commandLights = hueShiftOnLights.Filter(target);
             var commandIds = new HashSet<string>(commandLights.Select(x => x.Properties.Id));
+            foreach (var light in lights.Values)
+            {
+                if (commandIds.Contains(light.Properties.Id))
+                    light.ExecuteCommand(command, currentTime, transitionType);
+                else
+                    light.ExecuteInstantaneousCommand(command);
+            }
             if (commandIds.Any())
             {
                 logger.LogTransition(commandLights, target, transitionType);
-                foreach (var light in lights.Values)
-                {
-                    if (commandIds.Contains(light.Properties.Id))
-                        light.ExecuteCommand(command, currentTime, transitionType);
-                    else if (!hueShiftOnIds.Contains(light.Properties.Id))
-                        light.ExecuteInstantaneousCommand(command);
-                }
                 await client.SendCommandAsync(command, commandIds.ToArray());
             }
             else if (transitionType == TransitionType.Adaptive)

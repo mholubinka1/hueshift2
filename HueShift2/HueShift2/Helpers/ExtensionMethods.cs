@@ -52,8 +52,12 @@ namespace HueShift2.Helpers
             var targetCt = targetState.Colour.ColourTemperature;
             return commandLights.Where(l =>
             {
-                var expectedCt = l.ExpectedLight.Colour.ColourTemperature;
-                return expectedCt == null || targetCt == null || Math.Abs(expectedCt.Value - targetCt.Value) > 10;
+                if (targetCt == null) return true;
+                if (l.NetworkLight.ColorTemperature != null)
+                    return Math.Abs(l.NetworkLight.ColorTemperature.Value - targetCt.Value) > 10;
+                if (l.NetworkLight.ColorCoordinates != null && TryXyToCt(l.NetworkLight.ColorCoordinates, out var networkCt))
+                    return Math.Abs(networkCt - targetCt.Value) > 10;
+                return true;
             }).ToArray();
         }
 
