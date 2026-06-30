@@ -44,7 +44,7 @@ namespace HueShift2.Control
             return discoveredLights;
         }
 
-        private async Task Synchronise(IDictionary<string, LightCommand> syncCommandsPairs, DateTime currentTime)
+        private async Task Synchronise(IDictionary<string, LightCommand> syncCommandsPairs, DateTime currentTime, bool logSync = true)
         {
             var duration = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.BasicTransitionDuration);
             var lightNames = syncCommandsPairs.Keys.Select(id => lights[id].Properties.Name);
@@ -58,7 +58,7 @@ namespace HueShift2.Control
                 light.ExecuteSync(duration, currentTime);
                 await client.SendCommandAsync(syncCommand, new[] { id });
             }
-            logger.LogSync(lightNames, lights[syncCommandsPairs.Keys.First()].ExpectedLight);
+            if (logSync) logger.LogSync(lightNames, lights[syncCommandsPairs.Keys.First()].ExpectedLight);
         }
 
         public async Task Refresh(DateTime currentTime)
@@ -68,6 +68,7 @@ namespace HueShift2.Control
             var ct = appOptionsDelegate.CurrentValue.ColourTemperature;
 
             var syncCommands = new Dictionary<string, LightCommand>();
+            var retrySyncCommands = new Dictionary<string, LightCommand>();
             var refreshLog = new List<(CachedControlPair stale, LightControlPair current)>();
             foreach (var discoveredLight in discoveredLights)
             {
@@ -87,17 +88,28 @@ namespace HueShift2.Control
                 {
                     var light = lights[id];
                     var staleLight = new CachedControlPair(light);
-                    light.Refresh(discoveredLight.State, currentTime, ct.Coolest, ct.Warmest);
+                    var syncGracePeriod = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.SyncGracePeriod);
+                    light.Refresh(discoveredLight.State, currentTime, ct.Coolest, ct.Warmest, syncGracePeriod);
                     refreshLog.Add((staleLight, light));
-                    if (light.PowerState != LightPowerState.Syncing && light.PowerState != LightPowerState.Transitioning)
+                    if (light.RequiresRetrySync(out LightCommand retrySyncCommand))
+                    {
+                        retrySyncCommands.Add(id, retrySyncCommand);
+                    }
+                    else if (light.PowerState != LightPowerState.Syncing && light.PowerState != LightPowerState.Transitioning)
                     {
                         if (light.RequiresSync(out LightCommand syncCommand))
                             syncCommands.Add(id, syncCommand);
                     }
                 }
             }
-            logger.LogRefresh(refreshLog);
+            var syncConfirmedPairs = refreshLog.Where(p => p.current.SyncConfirmed).ToList();
+            var syncFailedPairs = refreshLog.Where(p => p.current.SyncFailed).ToList();
+            var regularRefreshLog = refreshLog.Except(syncConfirmedPairs).Except(syncFailedPairs);
+            logger.LogRefresh(regularRefreshLog);
+            logger.LogSyncConfirmed(syncConfirmedPairs);
+            logger.LogSyncFailed(syncFailedPairs);
             if (syncCommands.Any()) await Synchronise(syncCommands, currentTime);
+            if (retrySyncCommands.Any()) await Synchronise(retrySyncCommands, currentTime, logSync: false);
             foreach (var idLightPair in lights)
             {
                 if (idLightPair.Key != idLightPair.Value.Properties.Id)

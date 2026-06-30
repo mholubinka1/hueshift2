@@ -3,3 +3,6 @@ set -e
 echo "[pre-push] Checking formatting..."
 dotnet format HueShift2/HueShift2.sln --verify-no-changes -v q
 echo "[pre-push] Format check passed."
+echo "[pre-push] Running tests..."
+dotnet test HueShift2/HueShift2.sln -v q
+echo "[pre-push] Tests passed."
