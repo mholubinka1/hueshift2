@@ -21,8 +21,7 @@ namespace HueShift2
     {
         public static async Task Main(string[] args)
         {
-            var stdout = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-            Console.SetOut(stdout);
+            Console.SetOut(TextWriter.Synchronized(new StreamWriter(Console.OpenStandardOutput(), Console.OutputEncoding) { AutoFlush = true }));
             var requiredAtStartup = await new StartupManager(args).AssertConfiguration();
             Log.Logger = requiredAtStartup.Item1;
             var lightingConfigFilePath = requiredAtStartup.Item2;

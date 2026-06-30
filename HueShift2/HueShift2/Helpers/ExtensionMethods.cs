@@ -101,14 +101,17 @@ namespace HueShift2.Helpers
 
         #region Light Equality
 
-        public static int XyToCt(double[] xy)
+        public static bool TryXyToCt(double[] xy, out int ct)
         {
+            ct = 0;
+            if (xy == null || xy.Length < 2) return false;
             var denominator = 0.1858 - xy[1];
-            if (Math.Abs(denominator) < 1e-10) return int.MaxValue;
+            if (Math.Abs(denominator) < 1e-10) return false;
             var n = (xy[0] - 0.3320) / denominator;
             var kelvin = 449 * Math.Pow(n, 3) + 3525 * Math.Pow(n, 2) + 6823.3 * n + 5520.33;
-            if (kelvin <= 0 || double.IsNaN(kelvin) || double.IsInfinity(kelvin)) return int.MaxValue;
-            return (int)(1_000_000 / kelvin);
+            if (kelvin <= 0 || double.IsNaN(kelvin) || double.IsInfinity(kelvin)) return false;
+            ct = (int)(1_000_000 / kelvin);
+            return true;
         }
 
         public static bool Equals(this State @this, AppLightState expectedLight, int minCt, int maxCt)
@@ -120,7 +123,7 @@ namespace HueShift2.Helpers
                     return Math.Abs(@this.ColorTemperature.Value - expectedCt) <= 50;
                 if (@this.ColorCoordinates != null)
                 {
-                    var convertedCt = XyToCt(@this.ColorCoordinates);
+                    if (!TryXyToCt(@this.ColorCoordinates, out var convertedCt)) return false;
                     if (convertedCt < minCt - 50 || convertedCt > maxCt + 50) return false;
                     return Math.Abs(convertedCt - expectedCt) <= 50;
                 }
