@@ -49,15 +49,12 @@ namespace HueShift2.Helpers
 
         public static LightControlPair[] Filter(this LightControlPair[] commandLights, AppLightState targetState)
         {
-            var filtered = new List<LightControlPair>();
-            foreach (var light in commandLights)
+            var targetCt = targetState.Colour.ColourTemperature;
+            return commandLights.Where(l =>
             {
-                if (!light.ExpectedLight.Equals(targetState))
-                {
-                    filtered.Add(light);
-                }
-            }
-            return filtered.ToArray();
+                var expectedCt = l.ExpectedLight.Colour.ColourTemperature;
+                return expectedCt == null || targetCt == null || Math.Abs(expectedCt.Value - targetCt.Value) > 10;
+            }).ToArray();
         }
 
         public static LightPowerState DeterminePowerState(this State networkLight)
@@ -104,16 +101,34 @@ namespace HueShift2.Helpers
 
         #region Light Equality
 
-        public static bool Equals(this State @this, AppLightState expectedLight)
+        public static int XyToCt(double[] xy)
         {
-            if (expectedLight.Colour.Mode != @this.ColorMode.ToColourMode()) return false;
-            if (expectedLight.Brightness != @this.Brightness) return false;
-            return expectedLight.Colour.Mode switch
+            var denominator = 0.1858 - xy[1];
+            if (Math.Abs(denominator) < 1e-10) return int.MaxValue;
+            var n = (xy[0] - 0.3320) / denominator;
+            var kelvin = 449 * Math.Pow(n, 3) + 3525 * Math.Pow(n, 2) + 6823.3 * n + 5520.33;
+            if (kelvin <= 0 || double.IsNaN(kelvin) || double.IsInfinity(kelvin)) return int.MaxValue;
+            return (int)(1_000_000 / kelvin);
+        }
+
+        public static bool Equals(this State @this, AppLightState expectedLight, int minCt, int maxCt)
+        {
+            if (expectedLight.Colour.ColourTemperature != null)
             {
-                ColourMode.XY => ExtensionMethods.ArrayEquals(expectedLight.Colour.ColourCoordinates, @this.ColorCoordinates),
-                ColourMode.CT => expectedLight.Colour.ColourTemperature == @this.ColorTemperature,
-                _ => throw new NotImplementedException(),//return this.Hue == lightState.Hue && this.Saturation == lightState.Saturation;
-            };
+                var expectedCt = expectedLight.Colour.ColourTemperature.Value;
+                if (@this.ColorTemperature != null)
+                    return Math.Abs(@this.ColorTemperature.Value - expectedCt) <= 50;
+                if (@this.ColorCoordinates != null)
+                {
+                    var convertedCt = XyToCt(@this.ColorCoordinates);
+                    if (convertedCt < minCt - 50 || convertedCt > maxCt + 50) return false;
+                    return Math.Abs(convertedCt - expectedCt) <= 50;
+                }
+                return false;
+            }
+            if (expectedLight.Colour.ColourCoordinates != null && @this.ColorCoordinates != null)
+                return ArrayEquals(expectedLight.Colour.ColourCoordinates, @this.ColorCoordinates);
+            return false;
         }
 
         public static bool ArrayEquals(double[] @this, double[] other)

@@ -65,8 +65,10 @@ namespace HueShift2.Control
         {
             await clientManager.AssertConnected();
             var discoveredLights = await Discover();
+            var ct = appOptionsDelegate.CurrentValue.ColourTemperature;
 
             var syncCommands = new Dictionary<string, LightCommand>();
+            var refreshLog = new List<(CachedControlPair stale, LightControlPair current)>();
             foreach (var discoveredLight in discoveredLights)
             {
                 var id = discoveredLight.Id;
@@ -85,20 +87,16 @@ namespace HueShift2.Control
                 {
                     var light = lights[id];
                     var staleLight = new CachedControlPair(light);
-                    light.Refresh(discoveredLight.State, currentTime);
-                    logger.LogRefresh(staleLight, light);
+                    light.Refresh(discoveredLight.State, currentTime, ct.Coolest, ct.Warmest);
+                    refreshLog.Add((staleLight, light));
                     if (light.PowerState != LightPowerState.Syncing && light.PowerState != LightPowerState.Transitioning)
                     {
-                        var preResetOccurred = light.ResetOccurred;
                         if (light.RequiresSync(out LightCommand syncCommand))
-                        {
-                            if (preResetOccurred && !light.ResetOccurred)
-                                logger.LogInformation($"Brightness reset applied | ID: {light.Properties.Id} Name: {light.Properties.Name}");
                             syncCommands.Add(id, syncCommand);
-                        }
                     }
                 }
             }
+            logger.LogRefresh(refreshLog);
             if (syncCommands.Any()) await Synchronise(syncCommands, currentTime);
             foreach (var idLightPair in lights)
             {
@@ -112,31 +110,31 @@ namespace HueShift2.Control
 
         public async Task Transition(AppLightState target, LightCommand command, DateTime currentTime, bool reset, TransitionType transitionType)
         {
-            if (reset)
-            {
-                lights.Reset();
-            }
+            if (reset) lights.Reset();
             await Refresh(currentTime);
             PrintScheduled();
-            var commandLights = lights.SelectLightsToControl();
-            commandLights = commandLights.Filter(target);
-            logger.LogTransition(commandLights, target, transitionType);
-            var commandIds = commandLights.Select(x => x.Properties.Id).ToArray();
-            foreach (var light in lights.Values)
+            var hueShiftOnLights = lights.SelectLightsToControl();
+            var hueShiftOnIds = new HashSet<string>(hueShiftOnLights.Select(x => x.Properties.Id));
+            var commandLights = hueShiftOnLights.Filter(target);
+            var commandIds = new HashSet<string>(commandLights.Select(x => x.Properties.Id));
+            if (commandIds.Any())
             {
-                if (commandIds.Any(i => i == light.Properties.Id))
+                logger.LogTransition(commandLights, target, transitionType);
+                foreach (var light in lights.Values)
                 {
-                    light.ExecuteCommand(command, currentTime, transitionType);
+                    if (commandIds.Contains(light.Properties.Id))
+                        light.ExecuteCommand(command, currentTime, transitionType);
+                    else if (!hueShiftOnIds.Contains(light.Properties.Id))
+                        light.ExecuteInstantaneousCommand(command);
                 }
-                else
-                {
-                    light.ExecuteInstantaneousCommand(command);
-                }
+                await client.SendCommandAsync(command, commandIds.ToArray());
             }
-            if (commandIds.Length > 0) await client.SendCommandAsync(command, commandIds);
+            else if (transitionType == TransitionType.Adaptive)
+            {
+                logger.LogDebug("[Adaptive] Checked — no lights require a colour update.");
+            }
             cachedLightCommand = command;
             logger.LogUpdate(lights.Values);
-            return;
         }
 
         #region Output

@@ -117,16 +117,10 @@ namespace HueShift2.Control
                 logger.LogInformation("Performing sunset transition.");
                 return TransitionType.Solar;
             }
-            if (lastRunTime < solarEvents.Sunset && currentTime >= solarEvents.Sunset)
-            {
-                logger.LogInformation("Performing sunset transition.");
-                return TransitionType.Solar;
-            }
             var transitionInterval = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.TransitionInterval);
             if (lastTransitionTime == null) return TransitionType.Null;
             if (currentTime - lastTransitionTime >= transitionInterval)
             {
-                logger.LogInformation("Performing adaptive transition.");
                 return TransitionType.Adaptive;
             }
             return TransitionType.Null;
