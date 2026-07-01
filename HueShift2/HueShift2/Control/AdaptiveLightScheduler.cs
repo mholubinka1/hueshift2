@@ -19,10 +19,10 @@ namespace HueShift2.Control
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
         private IScheduleProvider scheduleProvider;
-        private ILightManager lightManager;
+        private ILightController lightManager;
 
         public AdaptiveLightScheduler(ILogger<AdaptiveLightScheduler> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate,
-            ILightManager lightManager, IEnumerable<IScheduleProvider> scheduleProviders)
+            ILightController lightManager, IEnumerable<IScheduleProvider> scheduleProviders)
         {
             this.mode = HueShiftMode.Adaptive;
             this.logger = logger;

@@ -14,10 +14,10 @@ namespace HueShift2
         private readonly ILogger<LightScheduleService> logger;
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
-        private readonly ILightManager lightManager;
+        private readonly ILightController lightManager;
         private readonly ILightScheduleWorker lightScheduler;
 
-        public LightScheduleService(ILogger<LightScheduleService> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, ILightManager lightManager, ILightScheduleWorker lightScheduler)
+        public LightScheduleService(ILogger<LightScheduleService> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, ILightController lightManager, ILightScheduleWorker lightScheduler)
         {
             this.logger = logger;
             this.appOptionsDelegate = appOptionsDelegate;
