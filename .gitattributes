@@ -1,0 +1,9 @@
+# Normalize all text files to LF in the repo, CRLF in the working tree
+* text=auto eol=crlf
+
+# Explicitly mark binary files to prevent line-ending conversion
+*.png binary
+*.jpg binary
+*.ico binary
+*.dll binary
+*.exe binary
