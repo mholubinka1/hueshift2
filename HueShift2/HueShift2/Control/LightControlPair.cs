@@ -179,6 +179,11 @@ namespace HueShift2.Control
             this.ResetOccurred = true;
         }
 
+        internal void MarkForSync()
+        {
+            this.SyncRequired = true;
+        }
+
         private void ClearColourState()
         {
             this.ExpectedLight.Colour.Mode = ColourMode.None;
