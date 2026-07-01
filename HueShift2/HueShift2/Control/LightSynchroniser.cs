@@ -40,18 +40,18 @@ namespace HueShift2.Control
                 }
             }
 
-            if (syncCommands.Any()) await Dispatch(syncCommands, lights, duration);
+            if (syncCommands.Any()) await Dispatch(syncCommands, lights, duration, currentTime);
         }
 
-        private async Task Dispatch(IDictionary<string, LightCommand> commands, IReadOnlyDictionary<string, LightControlPair> lights, TimeSpan duration)
+        private async Task Dispatch(IDictionary<string, LightCommand> commands, IReadOnlyDictionary<string, LightControlPair> lights, TimeSpan duration, DateTime currentTime)
         {
-            var lightNames = commands.Keys.Select(id => lights[id].Properties.Name);
             foreach (var (id, command) in commands)
             {
                 command.TransitionTime = duration;
-                lights[id].ExecuteInstantaneousCommand(command);
+                lights[id].ExecuteCommand(command, currentTime, TransitionType.Adaptive);
                 await client.SendCommandAsync(command, new[] { id });
             }
+            var lightNames = commands.Keys.Select(id => lights[id].Properties.Name);
             logger.LogSync(lightNames, lights[commands.Keys.First()].ExpectedLight);
         }
     }
