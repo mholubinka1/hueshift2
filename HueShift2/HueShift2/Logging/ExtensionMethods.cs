@@ -53,27 +53,25 @@ namespace HueShift2.Logging
         {
             var discoveredList = discoveredLights.ToList();
             var previousList = previousLights.ToList();
-            var numDiscoveredLights = discoveredList.Count;
-            var numPreviousLights = previousList.Count;
-            if (numDiscoveredLights - numPreviousLights >= 0)
+            var previousIds = new HashSet<string>(previousList.Select(y => y.Properties.Id));
+            var discoveredIds = new HashSet<string>(discoveredList.Select(y => y.Id));
+
+            var newLights = discoveredList.Where(x => !previousIds.Contains(x.Id)).ToList();
+            var lostLights = previousList.Where(x => !discoveredIds.Contains(x.Properties.Id)).ToList();
+
+            if (!newLights.Any() && !lostLights.Any())
             {
-                if (numDiscoveredLights - numPreviousLights == 0)
-                {
-                    logger.LogDebug($"Discovery: no change to lights on the network.");
-                }
-                else
-                {
-                    logger.LogInformation($"Discovery: {numDiscoveredLights - numPreviousLights} discovered new lights on the network.");
-                    var previousIds = new HashSet<string>(previousList.Select(y => y.Properties.Id));
-                    var newLights = discoveredList.Where(x => !previousIds.Contains(x.Id));
-                    logger.LogLightProperties(newLights.Select(x => new LightControlPair(x)));
-                }
+                logger.LogDebug("Discovery: no change to lights on the network.");
+                return;
             }
-            else
+            if (newLights.Any())
             {
-                logger.LogInformation($"Discovery: {numPreviousLights - numDiscoveredLights} lights are no longer connected to the network.");
-                var discoveredIds = new HashSet<string>(discoveredList.Select(y => y.Id));
-                var lostLights = previousList.Where(x => !discoveredIds.Contains(x.Properties.Id));
+                logger.LogInformation($"Discovery: {newLights.Count} new light(s) discovered on the network.");
+                logger.LogLightProperties(newLights.Select(x => new LightControlPair(x)));
+            }
+            if (lostLights.Any())
+            {
+                logger.LogInformation($"Discovery: {lostLights.Count} light(s) are no longer connected to the network.");
                 logger.LogLightProperties(lostLights);
             }
         }
