@@ -12,6 +12,7 @@ namespace HueShift2.Control
 {
     public class LightControlPair
     {
+        private const int TransitionSettlingPeriodSeconds = 10;
         public LightProperties Properties { get; private set; }
         public LightPowerState PowerState { get; private set; }
         public LightControlState AppControlState { get; private set; }
@@ -179,7 +180,8 @@ namespace HueShift2.Control
             if (command.TransitionTime != null)
             {
                 this.PowerState = LightPowerState.Transitioning;
-                this.Transition = new Transition(currentTime, (TimeSpan)command.TransitionTime, transitionType);
+                var internalDuration = (TimeSpan)command.TransitionTime + TimeSpan.FromSeconds(TransitionSettlingPeriodSeconds);
+                this.Transition = new Transition(currentTime, internalDuration, transitionType);
             }
             else
             {
