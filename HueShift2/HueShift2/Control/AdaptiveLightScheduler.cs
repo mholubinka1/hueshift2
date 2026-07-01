@@ -19,16 +19,16 @@ namespace HueShift2.Control
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
         private IScheduleProvider scheduleProvider;
-        private ILightController lightManager;
+        private ILightController lightController;
 
         public AdaptiveLightScheduler(ILogger<AdaptiveLightScheduler> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate,
-            ILightController lightManager, IEnumerable<IScheduleProvider> scheduleProviders)
+            ILightController lightController, IEnumerable<IScheduleProvider> scheduleProviders)
         {
             this.mode = HueShiftMode.Adaptive;
             this.logger = logger;
             this.appOptionsDelegate = appOptionsDelegate;
             this.scheduleProvider = scheduleProviders.First(x => x.Mode() == this.mode);
-            this.lightManager = lightManager;
+            this.lightController = lightController;
         }
 
         public HueShiftMode Mode()
@@ -53,7 +53,7 @@ namespace HueShift2.Control
             var reset = scheduleProvider.IsReset(transitionType);
             var targetLightState = scheduleProvider.TargetLightState(currentTime);
             var command = CreateCommand(targetLightState, transitionDuration);
-            await lightManager.Transition(targetLightState, command, currentTime, reset, transitionType);
+            await lightController.Transition(targetLightState, command, currentTime, reset, transitionType);
         }
 
         public async Task<(bool, DateTime?)> Execute(DateTime? lastRunTime, DateTime? lastTransitionTime)
@@ -64,7 +64,7 @@ namespace HueShift2.Control
             if (transition == TransitionType.Null)
             {
                 logger.LogDebug("No transition to perform.");
-                await lightManager.Refresh(currentTime);
+                await lightController.Refresh(currentTime);
                 return (false, currentTime);
             }
             await ExecuteTransition(currentTime, lastRunTime, transition);

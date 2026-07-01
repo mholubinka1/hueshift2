@@ -14,22 +14,22 @@ namespace HueShift2
         private readonly ILogger<LightScheduleService> logger;
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
-        private readonly ILightController lightManager;
+        private readonly ILightController lightController;
         private readonly ILightScheduleWorker lightScheduler;
 
-        public LightScheduleService(ILogger<LightScheduleService> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, ILightController lightManager, ILightScheduleWorker lightScheduler)
+        public LightScheduleService(ILogger<LightScheduleService> logger, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, ILightController lightController, ILightScheduleWorker lightScheduler)
         {
             this.logger = logger;
             this.appOptionsDelegate = appOptionsDelegate;
-            this.lightManager = lightManager;
+            this.lightController = lightController;
             this.lightScheduler = lightScheduler;
         }
 
         protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             var pollingFrequency = Math.Max(appOptionsDelegate.CurrentValue.PollingFrequency, appOptionsDelegate.CurrentValue.BasicTransitionDuration) * 1000;
-            await lightManager.Refresh(DateTime.Now);
-            lightManager.PrintAll();
+            await lightController.Refresh(DateTime.Now);
+            lightController.PrintAll();
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
