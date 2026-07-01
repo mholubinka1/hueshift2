@@ -51,8 +51,10 @@ namespace HueShift2.Logging
         public static void LogDiscovery<T>(this ILogger<T> logger,
             IEnumerable<Light> discoveredLights, IEnumerable<LightControlPair> previousLights)
         {
-            var numDiscoveredLights = discoveredLights.Count();
-            var numPreviousLights = previousLights.Count();
+            var discoveredList = discoveredLights.ToList();
+            var previousList = previousLights.ToList();
+            var numDiscoveredLights = discoveredList.Count;
+            var numPreviousLights = previousList.Count;
             if (numDiscoveredLights - numPreviousLights >= 0)
             {
                 if (numDiscoveredLights - numPreviousLights == 0)
@@ -62,17 +64,18 @@ namespace HueShift2.Logging
                 else
                 {
                     logger.LogInformation($"Discovery: {numDiscoveredLights - numPreviousLights} discovered new lights on the network.");
-                    var newLights = discoveredLights.Where(x => !previousLights.Select(y => y.Properties.Id).Contains(x.Id));
+                    var previousIds = new HashSet<string>(previousList.Select(y => y.Properties.Id));
+                    var newLights = discoveredList.Where(x => !previousIds.Contains(x.Id));
                     logger.LogLightProperties(newLights.Select(x => new LightControlPair(x)));
                 }
             }
             else
             {
                 logger.LogInformation($"Discovery: {numPreviousLights - numDiscoveredLights} lights are no longer connected to the network.");
-                var lostLights = previousLights.Where(x => !discoveredLights.Select(y => y.Id).Contains(x.Properties.Id));
+                var discoveredIds = new HashSet<string>(discoveredList.Select(y => y.Id));
+                var lostLights = previousList.Where(x => !discoveredIds.Contains(x.Properties.Id));
                 logger.LogLightProperties(lostLights);
             }
-            return;
         }
 
         public static void LogRefresh<T>(this ILogger<T> logger, IEnumerable<(CachedControlPair stale, LightControlPair current)> pairs)
