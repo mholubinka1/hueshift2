@@ -102,6 +102,38 @@ namespace HueShift2.Helpers
             };
         }
 
+        #region Manual Override and Drift Detection
+
+        public static bool IsManualOverride(this State @this, int minCt, int maxCt)
+        {
+            var low = Math.Min(minCt, maxCt);
+            var high = Math.Max(minCt, maxCt);
+            if (@this.ColorTemperature != null)
+                return @this.ColorTemperature.Value < low || @this.ColorTemperature.Value > high;
+            if (@this.ColorCoordinates != null)
+            {
+                if (!TryXyToCt(@this.ColorCoordinates, out var convertedCt)) return true;
+                return convertedCt < low || convertedCt > high;
+            }
+            return true;
+        }
+
+        public static bool HasDrifted(this State @this, AppLightState expectedLight)
+        {
+            if (expectedLight.Colour.ColourTemperature == null) return false;
+            var expectedCt = expectedLight.Colour.ColourTemperature.Value;
+            if (@this.ColorTemperature != null)
+                return Math.Abs(@this.ColorTemperature.Value - expectedCt) > 10;
+            if (@this.ColorCoordinates != null)
+            {
+                if (!TryXyToCt(@this.ColorCoordinates, out var convertedCt)) return false;
+                return Math.Abs(convertedCt - expectedCt) > 10;
+            }
+            return false;
+        }
+
+        #endregion
+
         #region Light Equality
 
         public static bool TryXyToCt(double[] xy, out int ct)

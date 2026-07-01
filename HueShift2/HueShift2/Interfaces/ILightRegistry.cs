@@ -9,7 +9,7 @@ namespace HueShift2.Interfaces
 {
     public interface ILightRegistry
     {
-        Task Discover(LightCommand cachedCommand, DateTime currentTime, ColourTemperature ct, TimeSpan syncGracePeriod);
+        Task Discover(LightCommand cachedCommand, DateTime currentTime, ColourTemperature ct);
         IReadOnlyDictionary<string, LightControlPair> GetAll();
         void Reset();
     }

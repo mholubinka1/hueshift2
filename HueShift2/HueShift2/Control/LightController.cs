@@ -46,8 +46,7 @@ namespace HueShift2.Control
             await clientManager.AssertConnected();
             var options = appOptionsDelegate.CurrentValue;
             var ct = options.ColourTemperature;
-            var syncGracePeriod = TimeSpan.FromSeconds(options.SyncGracePeriod);
-            await registry.Discover(cachedLightCommand, currentTime, ct, syncGracePeriod);
+            await registry.Discover(cachedLightCommand, currentTime, ct);
             await synchroniser.Synchronise(registry.GetAll(), currentTime);
         }
 

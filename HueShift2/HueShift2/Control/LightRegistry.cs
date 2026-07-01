@@ -29,7 +29,7 @@ namespace HueShift2.Control
             readOnlyView = new ReadOnlyDictionary<string, LightControlPair>(lights);
         }
 
-        public async Task Discover(LightCommand cachedCommand, DateTime currentTime, ColourTemperature ct, TimeSpan syncGracePeriod)
+        public async Task Discover(LightCommand cachedCommand, DateTime currentTime, ColourTemperature ct)
         {
             var discoveredLights = (await client.GetLightsAsync()).ToList();
             logger.LogDiscovery(discoveredLights, lights.Values);
@@ -53,16 +53,12 @@ namespace HueShift2.Control
                 {
                     var light = lights[id];
                     var stale = new CachedControlPair(light);
-                    light.Refresh(discoveredLight.State, currentTime, ct.Coolest, ct.Warmest, syncGracePeriod);
+                    light.Refresh(discoveredLight.State, currentTime, ct.Coolest, ct.Warmest);
                     refreshLog.Add((stale, light));
                 }
             }
 
-            var syncConfirmed = refreshLog.Where(p => p.current.SyncConfirmed).ToList();
-            var syncFailed = refreshLog.Where(p => p.current.SyncFailed).ToList();
-            logger.LogRefresh(refreshLog.Where(p => !p.current.SyncConfirmed && !p.current.SyncFailed));
-            logger.LogSyncConfirmed(syncConfirmed);
-            logger.LogSyncFailed(syncFailed);
+            logger.LogRefresh(refreshLog);
 
             foreach (var pair in lights)
             {

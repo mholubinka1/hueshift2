@@ -31,38 +31,28 @@ namespace HueShift2.Control
             var duration = TimeSpan.FromSeconds(appOptionsDelegate.CurrentValue.BasicTransitionDuration);
 
             var syncCommands = new Dictionary<string, LightCommand>();
-            var retrySyncCommands = new Dictionary<string, LightCommand>();
             foreach (var (id, light) in lights)
             {
-                if (light.RequiresRetrySync(out var retryCommand))
-                    retrySyncCommands.Add(id, retryCommand);
-                else if (light.PowerState != LightPowerState.Syncing && light.PowerState != LightPowerState.Transitioning)
+                if (light.PowerState != LightPowerState.Transitioning)
                 {
                     if (light.RequiresSync(out var syncCommand))
                         syncCommands.Add(id, syncCommand);
                 }
             }
 
-            if (syncCommands.Any()) await Dispatch(syncCommands, lights, duration, currentTime, logSync: true);
-            if (retrySyncCommands.Any()) await Dispatch(retrySyncCommands, lights, duration, currentTime, logSync: false);
+            if (syncCommands.Any()) await Dispatch(syncCommands, lights, duration);
         }
 
-        private async Task Dispatch(IDictionary<string, LightCommand> commands, IReadOnlyDictionary<string, LightControlPair> lights, TimeSpan duration, DateTime currentTime, bool logSync)
+        private async Task Dispatch(IDictionary<string, LightCommand> commands, IReadOnlyDictionary<string, LightControlPair> lights, TimeSpan duration)
         {
             var lightNames = commands.Keys.Select(id => lights[id].Properties.Name);
             foreach (var (id, command) in commands)
             {
                 command.TransitionTime = duration;
                 lights[id].ExecuteInstantaneousCommand(command);
-                lights[id].ExecuteSync(duration, currentTime);
                 await client.SendCommandAsync(command, new[] { id });
             }
-            if (logSync)
-            {
-                var targetKeys = commands.Keys.Select(id => lights[id].ExpectedLight.ToString()).Distinct().ToList();
-                var commonTarget = targetKeys.Count == 1 ? lights[commands.Keys.First()].ExpectedLight : null;
-                logger.LogSync(lightNames, commonTarget);
-            }
+            logger.LogSync(lightNames, lights[commands.Keys.First()].ExpectedLight);
         }
     }
 }

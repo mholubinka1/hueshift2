@@ -20,7 +20,6 @@ namespace HueShift2.Tests.Control
         {
             ColourTemperature = new ColourTemperature { Coolest = 250, Warmest = 454 },
             BasicTransitionDuration = 2,
-            SyncGracePeriod = 10,
         };
 
         private static Light MakeLight(string id, string name, int ct = 339, bool on = true) => new Light
@@ -131,7 +130,7 @@ namespace HueShift2.Tests.Control
         {
             // Given: one light on, under HueShift control, at a different CT to the target
             var (controller, hueClient) = BuildController();
-            var light = MakeLight("1", "Kitchen", ct: 500);
+            var light = MakeLight("1", "Kitchen", ct: 400);
             var now = DateTime.UtcNow;
 
             // GetLightsAsync called twice: once in explicit Refresh, once inside Transition's Refresh
