@@ -49,8 +49,9 @@ namespace HueShift2.Tests.Control
             // When: bridge reports CT 454 (TRADFRI power-on default — within [250, 454])
             pair.Refresh(BridgeCt(454), Now, Coolest, Warmest);
 
-            // Then: light stays HueShift-controlled
+            // Then: light stays HueShift-controlled and a re-sync is queued
             Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.True(pair.SyncRequired);
         }
 
         [Fact]
