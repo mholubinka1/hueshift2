@@ -8,6 +8,7 @@ using Q42.HueApi;
 using Q42.HueApi.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,11 +20,13 @@ namespace HueShift2.Control
         private readonly ILocalHueClient client;
 
         private readonly Dictionary<string, LightControlPair> lights = new();
+        private readonly ReadOnlyDictionary<string, LightControlPair> readOnlyView;
 
         public LightRegistry(ILogger<LightRegistry> logger, ILocalHueClient client)
         {
             this.logger = logger;
             this.client = client;
+            readOnlyView = new ReadOnlyDictionary<string, LightControlPair>(lights);
         }
 
         public async Task Discover(LightCommand cachedCommand, DateTime currentTime, ColourTemperature ct, TimeSpan syncGracePeriod)
@@ -67,7 +70,7 @@ namespace HueShift2.Control
             }
         }
 
-        public IReadOnlyDictionary<string, LightControlPair> GetAll() => lights;
+        public IReadOnlyDictionary<string, LightControlPair> GetAll() => readOnlyView;
 
         public void Reset() => lights.Reset();
     }
