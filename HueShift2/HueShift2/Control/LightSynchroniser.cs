@@ -48,11 +48,13 @@ namespace HueShift2.Control
             foreach (var (id, command) in commands)
             {
                 command.TransitionTime = duration;
-                lights[id].ExecuteCommand(command, currentTime, TransitionType.Adaptive);
+                lights[id].ExecuteCommand(command, currentTime, TransitionType.Sync);
                 await client.SendCommandAsync(command, new[] { id });
             }
             var lightNames = commands.Keys.Select(id => lights[id].Properties.Name);
-            logger.LogSync(lightNames, lights[commands.Keys.First()].ExpectedLight);
+            var distinctTargets = commands.Values.Select(c => c.ColorTemperature).Distinct().ToList();
+            var logTarget = distinctTargets.Count == 1 ? lights[commands.Keys.First()].ExpectedLight : null;
+            logger.LogSync(lightNames, logTarget);
         }
     }
 }
