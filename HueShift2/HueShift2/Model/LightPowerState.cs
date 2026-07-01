@@ -8,7 +8,6 @@ namespace HueShift2.Model
     {
         On,
         Off,
-        Syncing,
         Transitioning,
         Unreachable,
     }

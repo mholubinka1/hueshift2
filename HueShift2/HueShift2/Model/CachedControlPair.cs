@@ -36,7 +36,7 @@ namespace HueShift2.Model
         public override string ToString()
         {
             var @base = $"Cached Pair | Id: {this.Properties.Id} Name: {this.Properties.Name} | {this.PowerState} - Control: {this.AppControlState}";
-            if (this.PowerState == LightPowerState.Transitioning || this.PowerState == LightPowerState.Syncing)
+            if (this.PowerState == LightPowerState.Transitioning)
             {
                 @base += $" | Transition Time Remaining: {this.Transition.SecondsRemaining}s";
             }
