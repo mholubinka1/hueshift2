@@ -1,5 +1,4 @@
 using HueShift2.Configuration.Model;
-using HueShift2.Helpers;
 using HueShift2.Interfaces;
 using HueShift2.Logging;
 using HueShift2.Model;

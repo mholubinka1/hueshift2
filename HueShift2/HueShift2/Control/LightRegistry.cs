@@ -42,10 +42,11 @@ namespace HueShift2.Control
                 {
                     var light = new LightControlPair(discoveredLight);
                     lights.Add(id, light);
-                    if (cachedCommand is not null && light.PowerState == LightPowerState.On)
+                    if (cachedCommand is not null)
                     {
                         light.ExecuteInstantaneousCommand(cachedCommand);
-                        light.MarkForSync();
+                        if (light.PowerState == LightPowerState.On)
+                            light.MarkForSync();
                     }
                 }
                 else
