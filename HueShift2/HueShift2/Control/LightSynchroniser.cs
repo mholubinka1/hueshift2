@@ -58,7 +58,12 @@ namespace HueShift2.Control
                 lights[id].ExecuteSync(duration, currentTime);
                 await client.SendCommandAsync(command, new[] { id });
             }
-            if (logSync) logger.LogSync(lightNames, lights[commands.Keys.First()].ExpectedLight);
+            if (logSync)
+            {
+                var distinctTargets = commands.Keys.Select(id => lights[id].ExpectedLight).Distinct().ToList();
+                var commonTarget = distinctTargets.Count == 1 ? distinctTargets[0] : null;
+                logger.LogSync(lightNames, commonTarget);
+            }
         }
     }
 }

@@ -19,7 +19,8 @@ namespace HueShift2.Logging
         {
             var names = lightNames.ToArray();
             if (!names.Any()) return;
-            logger.LogInformation($"[Sync] {names.Length} light(s) → {target} | {string.Join(", ", names)}");
+            var targetStr = target != null ? $" → {target}" : string.Empty;
+            logger.LogInformation($"[Sync] {names.Length} light(s){targetStr} | {string.Join(", ", names)}");
         }
 
         public static void LogTransition<T>(this ILogger<T> logger, IEnumerable<LightControlPair> commandLights, AppLightState target, TransitionType transitionType)
@@ -61,14 +62,14 @@ namespace HueShift2.Logging
                 else
                 {
                     logger.LogInformation($"Discovery: {numDiscoveredLights - numPreviousLights} discovered new lights on the network.");
-                    var newLights = discoveredLights.Where(x => previousLights.Select(y => y.Properties.Id).Contains(x.Id));
+                    var newLights = discoveredLights.Where(x => !previousLights.Select(y => y.Properties.Id).Contains(x.Id));
                     logger.LogLightProperties(newLights.Select(x => new LightControlPair(x)));
                 }
             }
             else
             {
                 logger.LogInformation($"Discovery: {numPreviousLights - numDiscoveredLights} lights are no longer connected to the network.");
-                var lostLights = previousLights.Where(x => discoveredLights.Select(y => y.Id).Contains(x.Properties.Id));
+                var lostLights = previousLights.Where(x => !discoveredLights.Select(y => y.Id).Contains(x.Properties.Id));
                 logger.LogLightProperties(lostLights);
             }
             return;
