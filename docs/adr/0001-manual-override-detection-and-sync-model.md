@@ -9,9 +9,10 @@ to recover, even though the user had not touched them.
 
 We redefined Manual Override as: a light whose CT mode value falls outside the configured
 operating range [Coolest, Warmest] (strict, no tolerance), or whose XY mode state either
-cannot be converted to a CT value or converts to one outside that range. CT values within the
-range — including a TRADFRI reverting to its 454 mired default — are treated as Drift, not
-Manual Override.
+cannot be converted to a CT value or converts to one outside that range. A light reporting
+neither CT nor XY (e.g. HS or an unknown colour mode) is also treated as Manual Override, as
+there is no CT value to reason about. CT values within the range — including a TRADFRI
+reverting to its 454 mired default — are treated as Drift, not Manual Override.
 
 We also removed the Sync Grace Period and the `Syncing` power state. The previous model held
 lights in `Syncing` between command dispatch and Bridge confirmation, retried periodically, and

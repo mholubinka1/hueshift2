@@ -52,7 +52,7 @@ namespace HueShift2.Control
                 await client.SendCommandAsync(command, new[] { id });
             }
             var lightNames = commands.Keys.Select(id => lights[id].Properties.Name);
-            var distinctTargets = commands.Values.Select(c => c.ColorTemperature).Distinct().ToList();
+            var distinctTargets = commands.Keys.Select(id => lights[id].ExpectedLight.ToString()).Distinct().ToList();
             var logTarget = distinctTargets.Count == 1 ? lights[commands.Keys.First()].ExpectedLight : null;
             logger.LogSync(lightNames, logTarget);
         }
