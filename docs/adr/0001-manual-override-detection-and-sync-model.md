@@ -23,6 +23,12 @@ Light by more than 10 mired while in-range and `PowerState == On`) is detected o
 and triggers an immediate re-Sync — making correction self-healing without any grace period or
 explicit confirmation step.
 
+To prevent a cascade of re-Sync commands immediately after a transition (while the Bridge is
+still applying the command and state has not yet settled), every commanded transition sets
+`PowerState` to `Transitioning` for `TransitionTime + 10 s` internally (the Transition
+Settling Period). Drift and Manual Override checks are suppressed during this window. The 10 s
+is a fixed constant; the commanded `TransitionTime` sent to the Bridge is unchanged.
+
 ## Considered Options
 
 **Grace-period extension after confirmation.** We considered adding a post-sync grace period —
