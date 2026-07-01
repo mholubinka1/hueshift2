@@ -59,8 +59,8 @@ namespace HueShift2.Control
             }
             if (logSync)
             {
-                var distinctTargets = commands.Keys.Select(id => lights[id].ExpectedLight).Distinct().ToList();
-                var commonTarget = distinctTargets.Count == 1 ? distinctTargets[0] : null;
+                var targetKeys = commands.Keys.Select(id => lights[id].ExpectedLight.ToString()).Distinct().ToList();
+                var commonTarget = targetKeys.Count == 1 ? lights[commands.Keys.First()].ExpectedLight : null;
                 logger.LogSync(lightNames, commonTarget);
             }
         }
