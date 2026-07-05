@@ -170,7 +170,7 @@ namespace HueShift2.Tests.Control
         [Fact]
         public void DriftCheckDoesNotFireDuringAdaptiveTransition()
         {
-            // Given: a HueShift light mid-Adaptive Transition (PowerState = Transitioning)
+            // Given: a HueShiftControlled light mid-Adaptive Transition (IsTransitioning() == true)
             var pair = LightOnAt(309);
             var transitionDuration = TimeSpan.FromSeconds(30);
             pair.ExecuteCommand(
@@ -240,7 +240,7 @@ namespace HueShift2.Tests.Control
             // When: Reset is called (Solar or FirstRun transition)
             pair.Reset();
 
-            // Then: control returns to HueShift and sync is flagged
+            // Then: control returns to HueShiftControlled and sync is flagged
             Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
             Assert.True(pair.SyncRequired);
         }
