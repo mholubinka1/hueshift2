@@ -22,7 +22,7 @@ namespace HueShift2.Control
         public LightControlState AppControlState { get; private set; }
         public State NetworkLight { get; private set; }
         public AppLightState ExpectedLight { get; private set; }
-        public Transition Transition { get; private set; }
+        private Transition Transition { get; set; }
         public bool ResetOccurred { get; private set; }
         public bool SyncRequired { get; private set; }
 

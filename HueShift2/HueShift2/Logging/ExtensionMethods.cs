@@ -93,7 +93,7 @@ namespace HueShift2.Logging
                 if (p.stale.AppControlState != p.current.AppControlState)
                     parts.Add($"Control state changed from {p.stale.AppControlState} to {p.current.AppControlState}");
                 if (!p.stale.SyncRequired && p.current.SyncRequired)
-                    parts.Add("Drift detected — sync queued");
+                    parts.Add("Sync queued");
                 return string.Join(" | ", parts);
             });
 
