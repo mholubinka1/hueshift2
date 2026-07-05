@@ -56,9 +56,7 @@ namespace HueShift2.Control
             await Refresh(currentTime);
             PrintScheduled();
             var lights = registry.GetAll();
-            var hueShiftOnLights = lights.Values
-                .Where(l => l.AppControlState == LightControlState.HueShift && l.PowerState == LightPowerState.On)
-                .ToArray();
+            var hueShiftOnLights = lights.Values.Where(l => l.CanReceiveCommand()).ToArray();
             var commandLights = hueShiftOnLights.Filter(target);
             var commandIds = new HashSet<string>(commandLights.Select(x => x.Properties.Id));
             if (commandIds.Any())
@@ -70,7 +68,7 @@ namespace HueShift2.Control
                 if (commandIds.Contains(light.Properties.Id))
                     light.ExecuteCommand(command, currentTime, transitionType);
                 else
-                    light.ExecuteInstantaneousCommand(command);
+                    light.UpdateExpectedState(command);
             }
             if (commandIds.Any())
                 await client.SendCommandAsync(command, commandIds.ToArray());
@@ -86,7 +84,7 @@ namespace HueShift2.Control
 
         public void PrintScheduled()
         {
-            var controlled = registry.GetAll().Values.Where(x => x.AppControlState == LightControlState.HueShift).ToArray();
+            var controlled = registry.GetAll().Values.Where(x => x.AppControlState == LightControlState.HueShiftControlled).ToArray();
             if (controlled.Length == 0)
                 logger.LogWarning("Lights under app control: none");
             else

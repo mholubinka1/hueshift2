@@ -44,8 +44,8 @@ namespace HueShift2.Control
                     lights.Add(id, light);
                     if (cachedCommand is not null)
                     {
-                        light.ExecuteInstantaneousCommand(cachedCommand);
-                        if (light.PowerState == LightPowerState.On)
+                        light.UpdateExpectedState(cachedCommand);
+                        if (light.IsOn())
                             light.MarkForSync();
                     }
                 }

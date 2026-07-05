@@ -6,7 +6,7 @@ namespace HueShift2.Model
 {
     public enum LightControlState
     {
-        HueShift,
+        HueShiftControlled,
         Manual,
         Excluded,
     }

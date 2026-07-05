@@ -50,7 +50,7 @@ namespace HueShift2.Tests.Control
             pair.Refresh(BridgeCt(454), Now, Coolest, Warmest);
 
             // Then: light stays HueShift-controlled and a re-sync is queued
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
             Assert.True(pair.SyncRequired);
         }
 
@@ -85,7 +85,7 @@ namespace HueShift2.Tests.Control
         {
             var pair = LightOnAt(309);
             pair.Refresh(BridgeCt(Warmest), Now, Coolest, Warmest);
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace HueShift2.Tests.Control
         {
             var pair = LightOnAt(309);
             pair.Refresh(BridgeCt(Coolest), Now, Coolest, Warmest);
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace HueShift2.Tests.Control
 
             // Then: SyncRequired is set, control stays HueShift
             Assert.True(pair.SyncRequired);
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace HueShift2.Tests.Control
 
             // Then: no sync triggered
             Assert.False(pair.SyncRequired);
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace HueShift2.Tests.Control
             pair.Refresh(BridgeXy(0.4448, 0.4066), Now, Coolest, Warmest);
 
             // Then: not Manual, but drift sync triggered
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
             Assert.True(pair.SyncRequired);
         }
 
@@ -170,7 +170,7 @@ namespace HueShift2.Tests.Control
         [Fact]
         public void DriftCheckDoesNotFireDuringAdaptiveTransition()
         {
-            // Given: a HueShift light mid-Adaptive Transition (PowerState = Transitioning)
+            // Given: a HueShiftControlled light mid-Adaptive Transition (IsTransitioning() == true)
             var pair = LightOnAt(309);
             var transitionDuration = TimeSpan.FromSeconds(30);
             pair.ExecuteCommand(
@@ -182,7 +182,7 @@ namespace HueShift2.Tests.Control
             pair.Refresh(BridgeCt(455), Now.AddSeconds(5), Coolest, Warmest);
 
             // Then: no Manual Override — checks are suppressed while Transitioning
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
             Assert.False(pair.SyncRequired);
         }
 
@@ -202,7 +202,31 @@ namespace HueShift2.Tests.Control
 
             // Then: SyncRequired is set
             Assert.True(pair.SyncRequired);
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
+        }
+
+        [Fact]
+        public void ManualLightOffForMultiplePollsThenOnReturnToControl()
+        {
+            // Given: a light in Manual Override
+            var pair = LightOnAt(309);
+            pair.Refresh(BridgeCt(455), Now, Coolest, Warmest); // CT=455 > Warmest=454
+            Assert.Equal(LightControlState.Manual, pair.AppControlState);
+
+            // And: light turns off — first off-poll
+            pair.Refresh(BridgeCt(309, on: false), Now.AddSeconds(5), Coolest, Warmest);
+            Assert.Equal(LightControlState.Manual, pair.AppControlState);
+
+            // And: still off — second off-poll
+            pair.Refresh(BridgeCt(309, on: false), Now.AddSeconds(10), Coolest, Warmest);
+            Assert.Equal(LightControlState.Manual, pair.AppControlState);
+
+            // When: light turns back on
+            pair.Refresh(BridgeCt(309), Now.AddSeconds(15), Coolest, Warmest);
+
+            // Then: ReturnToControl fired and sync is queued — exactly once
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
+            Assert.True(pair.SyncRequired);
         }
 
         [Fact]
@@ -216,8 +240,8 @@ namespace HueShift2.Tests.Control
             // When: Reset is called (Solar or FirstRun transition)
             pair.Reset();
 
-            // Then: control returns to HueShift and sync is flagged
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            // Then: control returns to HueShiftControlled and sync is flagged
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
             Assert.True(pair.SyncRequired);
         }
     }

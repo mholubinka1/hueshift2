@@ -33,7 +33,7 @@ namespace HueShift2.Control
             var syncCommands = new Dictionary<string, LightCommand>();
             foreach (var (id, light) in lights)
             {
-                if (light.PowerState != LightPowerState.Transitioning)
+                if (!light.IsTransitioning())
                 {
                     if (light.RequiresSync(out var syncCommand))
                         syncCommands.Add(id, syncCommand);

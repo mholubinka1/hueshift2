@@ -40,13 +40,6 @@ namespace HueShift2.Helpers
             }
         }
 
-        public static LightControlPair[] SelectLightsToControl(this IDictionary<string, LightControlPair> controlPairs)
-        {
-            var commandLights = controlPairs.Where(x => x.Value.AppControlState == LightControlState.HueShift && x.Value.PowerState == LightPowerState.On)
-                .Select(x => x.Value).ToArray();
-            return commandLights;
-        }
-
         public static LightControlPair[] Filter(this LightControlPair[] commandLights, AppLightState targetState)
         {
             var targetCt = targetState.Colour.ColourTemperature;
@@ -59,19 +52,6 @@ namespace HueShift2.Helpers
                     return Math.Abs(networkCt - targetCt.Value) > 10;
                 return true;
             }).ToArray();
-        }
-
-        public static LightPowerState DeterminePowerState(this State networkLight)
-        {
-            if (networkLight.IsReachable is null)
-            {
-                return LightPowerState.Off;
-            }
-            if ((bool)networkLight.IsReachable)
-            {
-                return networkLight.On ? LightPowerState.On : LightPowerState.Off;
-            }
-            return LightPowerState.Off;
         }
 
         public static ColourMode ToColourMode(this string mode)
