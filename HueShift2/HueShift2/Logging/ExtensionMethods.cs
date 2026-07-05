@@ -89,7 +89,7 @@ namespace HueShift2.Logging
                 if (p.stale.IsReachable != p.current.IsReachable())
                     parts.Add($"Reachability changed from {p.stale.IsReachable} to {p.current.IsReachable()}");
                 if (p.stale.IsOn != p.current.IsOn() || p.stale.IsTransitioning != p.current.IsTransitioning())
-                    parts.Add($"Power state changed: on={p.current.IsOn()} transitioning={p.current.IsTransitioning()}");
+                    parts.Add($"Power state changed: on={p.stale.IsOn}→{p.current.IsOn()} transitioning={p.stale.IsTransitioning}→{p.current.IsTransitioning()}");
                 if (p.stale.AppControlState != p.current.AppControlState)
                     parts.Add($"Control state changed from {p.stale.AppControlState} to {p.current.AppControlState}");
                 if (!p.stale.SyncRequired && p.current.SyncRequired)
