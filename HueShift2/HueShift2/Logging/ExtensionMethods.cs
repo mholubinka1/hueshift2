@@ -79,17 +79,21 @@ namespace HueShift2.Logging
         public static void LogRefresh<T>(this ILogger<T> logger, IEnumerable<(CachedControlPair stale, LightControlPair current)> pairs)
         {
             var changed = pairs
-                .Where(p => p.stale.PowerState != p.current.PowerState || p.stale.AppControlState != p.current.AppControlState)
+                .Where(p => p.stale.IsOn != p.current.IsOn() || p.stale.IsTransitioning != p.current.IsTransitioning() || p.stale.IsReachable != p.current.IsReachable() || p.stale.AppControlState != p.current.AppControlState || (!p.stale.SyncRequired && p.current.SyncRequired))
                 .ToList();
             if (!changed.Any()) return;
 
             var groups = changed.GroupBy(p =>
             {
                 var parts = new List<string>();
-                if (p.stale.PowerState != p.current.PowerState)
-                    parts.Add($"Power state changed from {p.stale.PowerState} to {p.current.PowerState}");
+                if (p.stale.IsReachable != p.current.IsReachable())
+                    parts.Add($"Reachability changed from {p.stale.IsReachable} to {p.current.IsReachable()}");
+                if (p.stale.IsOn != p.current.IsOn() || p.stale.IsTransitioning != p.current.IsTransitioning())
+                    parts.Add($"Power state changed: on={p.current.IsOn()} transitioning={p.current.IsTransitioning()}");
                 if (p.stale.AppControlState != p.current.AppControlState)
                     parts.Add($"Control state changed from {p.stale.AppControlState} to {p.current.AppControlState}");
+                if (!p.stale.SyncRequired && p.current.SyncRequired)
+                    parts.Add("Drift detected — sync queued");
                 return string.Join(" | ", parts);
             });
 

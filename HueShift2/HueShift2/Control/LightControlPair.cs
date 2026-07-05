@@ -13,8 +13,12 @@ namespace HueShift2.Control
     public class LightControlPair
     {
         private const int TransitionSettlingPeriodSeconds = 10;
+
+        private bool _isOn;
+        private bool _isReachable;
+        private bool _isTransitioning;
+
         public LightProperties Properties { get; private set; }
-        public LightPowerState PowerState { get; private set; }
         public LightControlState AppControlState { get; private set; }
         public State NetworkLight { get; private set; }
         public AppLightState ExpectedLight { get; private set; }
@@ -22,88 +26,79 @@ namespace HueShift2.Control
         public bool ResetOccurred { get; private set; }
         public bool SyncRequired { get; private set; }
 
+        public bool IsOn() => _isOn;
+        public bool IsReachable() => _isReachable;
+        public bool IsTransitioning() => _isTransitioning;
+        public bool CanReceiveCommand() => AppControlState == LightControlState.HueShiftControlled && _isOn && !_isTransitioning && _isReachable;
+        public double? TransitionSecondsRemaining() => _isTransitioning ? Transition?.SecondsRemaining : null;
+
         public LightControlPair(Light networkLight)
         {
             this.Properties = new LightProperties(networkLight);
-            this.PowerState = networkLight.State.DeterminePowerState();
-            this.AppControlState = LightControlState.HueShift;
+            _isReachable = networkLight.State.IsReachable == true;
+            _isOn = _isReachable && networkLight.State.On;
+            _isTransitioning = false;
+            this.AppControlState = LightControlState.HueShiftControlled;
             this.NetworkLight = networkLight.State;
             this.ExpectedLight = new AppLightState(this.NetworkLight);
             this.ResetOccurred = false;
             this.SyncRequired = false;
         }
 
-        public void RefreshTransition(bool isOn, DateTime currentTime)
-        {
-            if (isOn)
-            {
-                if (this.PowerState == LightPowerState.Transitioning)
-                {
-                    if (this.Transition == null) throw new NullReferenceException();
-                    if (this.Transition.IsExpired(currentTime))
-                    {
-                        this.PowerState = LightPowerState.On;
-                        this.Transition = null;
-                    }
-                }
-                else
-                {
-                    this.PowerState = LightPowerState.On;
-                }
-            }
-            else
-            {
-                this.PowerState = LightPowerState.Off;
-                this.Transition = null;
-                this.SyncRequired = false;
-            }
-        }
-
         public void Refresh(State networkLight, DateTime currentTime, int minCt, int maxCt)
         {
             this.NetworkLight = networkLight;
-            this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
-            var isOn = networkLight.DeterminePowerState() == LightPowerState.On;
-            var wasOff = this.PowerState == LightPowerState.Off;
-            if (isOn)
+
+            var prevIsOn = _isOn;
+            var prevIsReachable = _isReachable;
+
+            _isReachable = networkLight.IsReachable == true;
+            if (_isReachable)
+            {
+                _isOn = networkLight.On;
+                this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
+            }
+
+            if (_isReachable && _isOn && !_isTransitioning)
             {
                 switch (this.AppControlState)
                 {
-                    case LightControlState.HueShift:
-                        if (this.PowerState == LightPowerState.On)
+                    case LightControlState.HueShiftControlled:
+                        if (prevIsOn && prevIsReachable)
                         {
                             if (this.NetworkLight.IsManualOverride(minCt, maxCt))
-                            {
-                                this.AppControlState = LightControlState.Manual;
-                            }
+                                TakeManualOverride();
                             else if (this.NetworkLight.HasDrifted(this.ExpectedLight))
-                            {
                                 this.SyncRequired = true;
-                            }
                         }
                         break;
                     case LightControlState.Manual:
-                        if (this.PowerState == LightPowerState.Off)
-                        {
-                            this.AppControlState = LightControlState.HueShift;
-                        }
+                        if (!prevIsOn && prevIsReachable)
+                            ReturnToControl();
                         break;
                     case LightControlState.Excluded:
                         break;
                 }
             }
-            RefreshTransition(isOn, currentTime);
-            if (isOn && wasOff && this.PowerState == LightPowerState.On && this.AppControlState == LightControlState.HueShift)
+
+            RefreshTransition(currentTime);
+
+            if (_isReachable && _isOn && this.AppControlState == LightControlState.HueShiftControlled)
             {
-                this.SyncRequired = true;
+                var justTurnedOn = !prevIsOn && prevIsReachable;
+                var justReconnected = !prevIsReachable;
+                if (justTurnedOn || justReconnected)
+                    this.SyncRequired = true;
             }
+
+            if (_isReachable && !_isOn)
+                this.SyncRequired = false;
         }
 
         public bool RequiresSync(out LightCommand syncCommand)
         {
             syncCommand = null;
-            if (this.PowerState != LightPowerState.On || this.AppControlState != LightControlState.HueShift)
-                return false;
+            if (!CanReceiveCommand()) return false;
 
             if (this.SyncRequired)
             {
@@ -134,9 +129,10 @@ namespace HueShift2.Control
 
         public void Reset()
         {
+            if (this.AppControlState == LightControlState.Excluded) return;
             if (this.AppControlState == LightControlState.Manual)
             {
-                this.AppControlState = LightControlState.HueShift;
+                ReturnToControl();
                 this.SyncRequired = true;
             }
             this.ResetOccurred = true;
@@ -145,6 +141,72 @@ namespace HueShift2.Control
         internal void MarkForSync()
         {
             this.SyncRequired = true;
+        }
+
+        public void ExecuteCommand(LightCommand command, DateTime currentTime, TransitionType transitionType)
+        {
+            if (this.AppControlState != LightControlState.HueShiftControlled) throw new InvalidOperationException();
+            if (command.TransitionTime != null)
+            {
+                _isTransitioning = true;
+                var internalDuration = (TimeSpan)command.TransitionTime + TimeSpan.FromSeconds(TransitionSettlingPeriodSeconds);
+                this.Transition = new Transition(currentTime, internalDuration, transitionType);
+            }
+            else
+            {
+                _isTransitioning = false;
+            }
+            UpdateExpectedState(command);
+        }
+
+        public void UpdateExpectedState(LightCommand command)
+        {
+            if (command.Brightness != null)
+                this.ExpectedLight.Brightness = (byte)command.Brightness;
+            else
+                this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
+            ChangeColour(command);
+        }
+
+        public override string ToString()
+        {
+            var powerDesc = _isReachable ? (_isOn ? "On" : "Off") : "Unreachable";
+            var @base = $"Control Pair | Id: {this.Properties.Id} Name: {this.Properties.Name} | {powerDesc} - Control: {this.AppControlState}";
+            if (_isTransitioning)
+                @base += $" | Transition Time Remaining: {Transition?.SecondsRemaining}s";
+            var networkLight = $" | Network Light | " + this.NetworkLight.ToLogString();
+            var expectedLight = $" | Expected Light | " + this.ExpectedLight.ToString();
+            return @base + networkLight + expectedLight;
+        }
+
+        private void TakeManualOverride() => this.AppControlState = LightControlState.Manual;
+        private void ReturnToControl() => this.AppControlState = LightControlState.HueShiftControlled;
+
+        private void RefreshTransition(DateTime currentTime)
+        {
+            if (!_isReachable || !_isOn)
+            {
+                if (_isReachable)
+                {
+                    _isTransitioning = false;
+                    this.Transition = null;
+                }
+                else if (_isTransitioning && (this.Transition?.IsExpired(currentTime) ?? false))
+                {
+                    _isTransitioning = false;
+                    this.Transition = null;
+                }
+                return;
+            }
+            if (_isTransitioning)
+            {
+                if (this.Transition == null) throw new NullReferenceException();
+                if (this.Transition.IsExpired(currentTime))
+                {
+                    _isTransitioning = false;
+                    this.Transition = null;
+                }
+            }
         }
 
         private void ClearColourState()
@@ -171,48 +233,6 @@ namespace HueShift2.Control
                 this.ExpectedLight.Colour.ColourTemperature = command.ColorTemperature;
                 return;
             }
-            // HS or unknown: ClearColourState already set Mode = None; nothing further needed
-        }
-
-        public void ExecuteCommand(LightCommand command, DateTime currentTime, TransitionType transitionType)
-        {
-            if (this.AppControlState != LightControlState.HueShift) throw new InvalidOperationException();
-            if (command.TransitionTime != null)
-            {
-                this.PowerState = LightPowerState.Transitioning;
-                var internalDuration = (TimeSpan)command.TransitionTime + TimeSpan.FromSeconds(TransitionSettlingPeriodSeconds);
-                this.Transition = new Transition(currentTime, internalDuration, transitionType);
-            }
-            else
-            {
-                this.PowerState = LightPowerState.On;
-            }
-            ExecuteInstantaneousCommand(command);
-        }
-
-        public void ExecuteInstantaneousCommand(LightCommand command)
-        {
-            if (command.Brightness != null)
-            {
-                this.ExpectedLight.Brightness = (byte)command.Brightness;
-            }
-            else
-            {
-                this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
-            }
-            ChangeColour(command);
-        }
-
-        public override string ToString()
-        {
-            var @base = $"Control Pair | Id: {this.Properties.Id} Name: {this.Properties.Name} | {this.PowerState} - Control: {this.AppControlState}";
-            if (this.PowerState == LightPowerState.Transitioning)
-            {
-                @base += $" | Transition Time Remaining: {this.Transition.SecondsRemaining}s";
-            }
-            var networkLight = $" | Network Light | " + this.NetworkLight.ToLogString();
-            var expectedLight = $" | Expected Light | " + this.ExpectedLight.ToString();
-            return @base + networkLight + expectedLight;
         }
     }
 }

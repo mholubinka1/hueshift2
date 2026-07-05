@@ -48,7 +48,7 @@ namespace HueShift2.Tests.Control
 
             // Then: drift check suppressed — Transition Settling Period still active
             Assert.False(pair.SyncRequired);
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
         }
         [Fact]
         public void DriftCheckFiresAfterSettlingPeriodExpires()
@@ -67,7 +67,7 @@ namespace HueShift2.Tests.Control
 
             // Then: drift check fires — Transition Settling Period has expired
             Assert.True(pair.SyncRequired);
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
         }
         [Fact]
         public void ManualOverrideCheckSuppressedWithinSettlingPeriod()
@@ -85,7 +85,7 @@ namespace HueShift2.Tests.Control
             pair.Refresh(BridgeCt(455), Now.AddSeconds(5), Coolest, Warmest);
 
             // Then: Manual Override not detected — settling period suppresses checks
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
         }
         [Fact]
         public void SettlingPeriodAppliesAfterAdaptiveTransition()
@@ -104,7 +104,7 @@ namespace HueShift2.Tests.Control
 
             // Then: drift check suppressed — Transition Settling Period still active
             Assert.False(pair.SyncRequired);
-            Assert.Equal(LightControlState.HueShift, pair.AppControlState);
+            Assert.Equal(LightControlState.HueShiftControlled, pair.AppControlState);
         }
     }
 }
