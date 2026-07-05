@@ -163,7 +163,7 @@ namespace HueShift2.Control
         {
             if (command.Brightness != null)
                 this.ExpectedLight.Brightness = (byte)command.Brightness;
-            else
+            else if (_isReachable)
                 this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
             ChangeColour(command);
         }
