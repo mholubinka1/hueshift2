@@ -39,6 +39,7 @@ namespace HueShift2.Control
             logger.LogDiscovery(discoveredLights, lights.Values);
 
             var exclusions = new HashSet<string>(appOptionsDelegate.CurrentValue.LightsToExclude ?? Enumerable.Empty<string>());
+            var currentNames = discoveredLights.ToDictionary(l => l.Id, l => l.Name);
 
             var refreshLog = new List<(CachedControlPair stale, LightControlPair current)>();
             foreach (var discoveredLight in discoveredLights)
@@ -74,7 +75,8 @@ namespace HueShift2.Control
                     throw new InvalidOperationException("Lights must be accessible via the Light ID.");
 
                 var light = pair.Value;
-                var isExcluded = exclusions.Contains(light.Properties.Id) || exclusions.Contains(light.Properties.Name);
+                var currentName = currentNames.TryGetValue(light.Properties.Id, out var name) ? name : light.Properties.Name;
+                var isExcluded = exclusions.Contains(light.Properties.Id) || exclusions.Contains(currentName);
 
                 if (isExcluded && light.AppControlState != LightControlState.Excluded)
                     light.Exclude();
@@ -84,7 +86,11 @@ namespace HueShift2.Control
 
             foreach (var entry in exclusions)
             {
-                var matched = lights.Values.Any(l => l.Properties.Id == entry || l.Properties.Name == entry);
+                var matched = lights.Values.Any(l =>
+                {
+                    var currentName = currentNames.TryGetValue(l.Properties.Id, out var name) ? name : l.Properties.Name;
+                    return l.Properties.Id == entry || currentName == entry;
+                });
                 if (!matched && warnedExclusions.Add(entry))
                     logger.LogWarning($"[Exclusion] No light found matching '{entry}' — entry will be ignored.");
             }
