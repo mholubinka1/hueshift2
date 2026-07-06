@@ -43,7 +43,7 @@ namespace HueShift2.Tests.Control
             var optionsMonitor = Substitute.For<IOptionsMonitor<HueShiftOptions>>();
             optionsMonitor.CurrentValue.Returns(DefaultOptions());
 
-            var registry = new LightRegistry(NullLogger<LightRegistry>.Instance, hueClient);
+            var registry = new LightRegistry(NullLogger<LightRegistry>.Instance, hueClient, optionsMonitor);
             var synchroniser = new LightSynchroniser(NullLogger<LightSynchroniser>.Instance, optionsMonitor, hueClient);
             var controller = new LightController(
                 NullLogger<LightController>.Instance,

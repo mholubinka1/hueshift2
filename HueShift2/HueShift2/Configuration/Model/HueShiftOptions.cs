@@ -24,6 +24,8 @@ namespace HueShift2.Configuration.Model
 
         public int NightBrightnessPercentage { get; set; }
 
+        public IList<string> LightsToExclude { get; set; } = new List<string>();
+
         public HueShiftOptions()
         {
 

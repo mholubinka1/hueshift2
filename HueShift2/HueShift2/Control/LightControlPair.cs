@@ -179,6 +179,19 @@ namespace HueShift2.Control
             return @base + networkLight + expectedLight;
         }
 
+        internal void Exclude()
+        {
+            this.AppControlState = LightControlState.Excluded;
+            this.SyncRequired = false;
+            this.ResetOccurred = false;
+        }
+
+        internal void Unexclude()
+        {
+            this.AppControlState = LightControlState.HueShiftControlled;
+            this.SyncRequired = true;
+        }
+
         private void TakeManualOverride() => this.AppControlState = LightControlState.Manual;
         private void ReturnToControl() => this.AppControlState = LightControlState.HueShiftControlled;
 
