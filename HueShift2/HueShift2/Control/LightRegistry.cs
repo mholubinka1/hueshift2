@@ -4,6 +4,7 @@ using HueShift2.Interfaces;
 using HueShift2.Logging;
 using HueShift2.Model;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Q42.HueApi;
 using Q42.HueApi.Interfaces;
 using System;
@@ -18,14 +19,17 @@ namespace HueShift2.Control
     {
         private readonly ILogger<LightRegistry> logger;
         private readonly ILocalHueClient client;
+        private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
 
         private readonly Dictionary<string, LightControlPair> lights = new();
         private readonly ReadOnlyDictionary<string, LightControlPair> readOnlyView;
+        private readonly HashSet<string> warnedExclusions = new();
 
-        public LightRegistry(ILogger<LightRegistry> logger, ILocalHueClient client)
+        public LightRegistry(ILogger<LightRegistry> logger, ILocalHueClient client, IOptionsMonitor<HueShiftOptions> appOptionsDelegate)
         {
             this.logger = logger;
             this.client = client;
+            this.appOptionsDelegate = appOptionsDelegate;
             readOnlyView = new ReadOnlyDictionary<string, LightControlPair>(lights);
         }
 
@@ -34,15 +38,19 @@ namespace HueShift2.Control
             var discoveredLights = (await client.GetLightsAsync()).ToList();
             logger.LogDiscovery(discoveredLights, lights.Values);
 
+            var exclusions = new HashSet<string>(appOptionsDelegate.CurrentValue.LightsToExclude ?? Enumerable.Empty<string>());
+
             var refreshLog = new List<(CachedControlPair stale, LightControlPair current)>();
             foreach (var discoveredLight in discoveredLights)
             {
                 var id = discoveredLight.Id;
+                var isExcluded = exclusions.Contains(id) || exclusions.Contains(discoveredLight.Name);
+
                 if (!lights.ContainsKey(id))
                 {
                     var light = new LightControlPair(discoveredLight);
                     lights.Add(id, light);
-                    if (cachedCommand is not null)
+                    if (!isExcluded && cachedCommand is not null)
                     {
                         light.UpdateExpectedState(cachedCommand);
                         if (light.IsOn())
@@ -64,6 +72,21 @@ namespace HueShift2.Control
             {
                 if (pair.Key != pair.Value.Properties.Id)
                     throw new InvalidOperationException("Lights must be accessible via the Light ID.");
+
+                var light = pair.Value;
+                var isExcluded = exclusions.Contains(light.Properties.Id) || exclusions.Contains(light.Properties.Name);
+
+                if (isExcluded && light.AppControlState != LightControlState.Excluded)
+                    light.Exclude();
+                else if (!isExcluded && light.AppControlState == LightControlState.Excluded)
+                    light.Unexclude();
+            }
+
+            foreach (var entry in exclusions)
+            {
+                var matched = lights.Values.Any(l => l.Properties.Id == entry || l.Properties.Name == entry);
+                if (!matched && warnedExclusions.Add(entry))
+                    logger.LogWarning($"[Exclusion] No light found matching '{entry}' — entry will be ignored.");
             }
         }
 
