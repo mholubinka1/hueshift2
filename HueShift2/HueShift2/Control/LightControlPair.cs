@@ -183,6 +183,7 @@ namespace HueShift2.Control
         {
             this.AppControlState = LightControlState.Excluded;
             this.SyncRequired = false;
+            this.ResetOccurred = false;
         }
 
         internal void Unexclude()

@@ -108,5 +108,20 @@ namespace HueShift2.Tests.Control
             // Then: state stays Excluded
             Assert.Equal(LightControlState.Excluded, pair.AppControlState);
         }
+
+        [Fact]
+        public void Exclude_WithPendingReset_ClearsResetOccurred()
+        {
+            // Given: a light that has a pending Reset (ResetOccurred = true)
+            var pair = HueShiftControlledLight();
+            pair.Reset();
+            Assert.True(pair.ResetOccurred);
+
+            // When: Exclude() is called
+            pair.Exclude();
+
+            // Then: ResetOccurred is cleared — so Unexclude() cannot trigger an unexpected brightness-254 jump
+            Assert.False(pair.ResetOccurred);
+        }
     }
 }
