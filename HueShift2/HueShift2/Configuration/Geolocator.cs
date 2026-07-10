@@ -14,6 +14,7 @@ namespace HueShift2.Configuration
 
         public Geolocator(HttpClient httpClient, IConfigurationSection config)
         {
+            if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
             if (config == null) throw new ArgumentNullException(nameof(config));
             this.httpClient = httpClient;
             this.config = config;
@@ -23,6 +24,7 @@ namespace HueShift2.Configuration
         {
             var baseUri = config["Uri"];
             var fullUri = baseUri + config["Key"];
+            var safeUri = GetSafeUri(baseUri);
 
             string responseBody;
             try
@@ -32,23 +34,38 @@ namespace HueShift2.Configuration
             catch (Exception e)
             {
                 throw new GeolocationUnavailableException(
-                    $"Geolocation request to {baseUri} failed. Check the IpStackApi configuration section.",
+                    $"Geolocation request to {safeUri} failed. Check the IpStackApi configuration section.",
                     e);
             }
 
             try
             {
-                dynamic response = JObject.Parse(responseBody);
-                double latitude = (double)response.latitude;
-                double longitude = (double)response.longitude;
-                return new Geolocation(latitude, longitude);
+                var obj = JObject.Parse(responseBody);
+                var lat = obj["latitude"];
+                var lon = obj["longitude"];
+                if (lat == null || lon == null)
+                    throw new GeolocationUnavailableException(
+                        $"Geolocation response from {safeUri} did not contain latitude and longitude fields. Check the IpStackApi configuration section.");
+                return new Geolocation(lat.Value<double>(), lon.Value<double>());
+            }
+            catch (GeolocationUnavailableException)
+            {
+                throw;
             }
             catch (Exception e)
             {
                 throw new GeolocationUnavailableException(
-                    $"Geolocation response from {baseUri} could not be parsed. Check the IpStackApi configuration section.",
+                    $"Geolocation response from {safeUri} could not be parsed. Check the IpStackApi configuration section.",
                     e);
             }
+        }
+
+        private static string GetSafeUri(string uri)
+        {
+            Uri parsed;
+            if (uri != null && Uri.TryCreate(uri, UriKind.Absolute, out parsed))
+                return parsed.GetLeftPart(UriPartial.Path);
+            return "(check IpStackApi:Uri configuration)";
         }
     }
 }

@@ -42,7 +42,7 @@ namespace HueShift2.Tests.Configuration
                 HttpRequestMessage request, CancellationToken cancellationToken)
             {
                 await Task.Delay(Timeout.Infinite, cancellationToken);
-                return null!;
+                throw new InvalidOperationException("unreachable");
             }
         }
 
@@ -81,8 +81,25 @@ namespace HueShift2.Tests.Configuration
             // Given: response body is not valid JSON
             var geolocator = BuildGeolocator(new FixedResponseHandler("not-json"));
 
-            // When / Then
-            await Assert.ThrowsAsync<GeolocationUnavailableException>(() => geolocator.Get());
+            // When
+            var ex = await Assert.ThrowsAsync<GeolocationUnavailableException>(() => geolocator.Get());
+
+            // Then
+            Assert.Contains("could not be parsed", ex.Message);
+        }
+
+        [Fact]
+        public async Task Get_ThrowsGeolocationUnavailableException_OnMissingLatLon()
+        {
+            // Given: valid JSON but no latitude/longitude (e.g. IpStack auth-failure body)
+            var json = "{\"success\": false, \"error\": {\"type\": \"invalid_access_key\"}}";
+            var geolocator = BuildGeolocator(new FixedResponseHandler(json));
+
+            // When
+            var ex = await Assert.ThrowsAsync<GeolocationUnavailableException>(() => geolocator.Get());
+
+            // Then
+            Assert.Contains("latitude and longitude", ex.Message);
         }
 
         [Fact]
@@ -111,8 +128,9 @@ namespace HueShift2.Tests.Configuration
 
             // Then: the API key is not in the exception message or inner exception messages
             Assert.DoesNotContain(TestKey, ex.Message);
-            if (ex.InnerException != null)
-                Assert.DoesNotContain(TestKey, ex.InnerException.Message);
+            Assert.DoesNotContain(TestKey, ex.InnerException?.Message ?? string.Empty);
+            // and no query string (scheme + host + path only per spec)
+            Assert.DoesNotContain("?", ex.Message);
         }
     }
 }
