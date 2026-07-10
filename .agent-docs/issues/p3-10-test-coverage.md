@@ -1,3 +1,5 @@
+> Work complete — PR ready to merge.
+
 # Issues: p3-10-test-coverage
 
 ## Add `AdaptiveLightColourCalculatorTests` (#385)
@@ -12,11 +14,11 @@ New `AdaptiveLightColourCalculatorTests` in `HueShift2.Tests/Control/`. Construc
 
 ### Acceptance criteria
 
-- [ ] `AdaptiveLightColourCalculatorTests` class exists in `HueShift2.Tests/Control/`
-- [ ] All 7 sun position boundary cases are tested
-- [ ] All 3 CT mapping cases are tested
-- [ ] Tests use fixed `AdaptiveSolarEvents` and fixed `ColourTemperature` config values
-- [ ] All tests pass with no network, filesystem, or Bridge access
+- [x] `AdaptiveLightColourCalculatorTests` class exists in `HueShift2.Tests/Control/`
+- [x] All 7 sun position boundary cases are tested
+- [x] All 3 CT mapping cases are tested
+- [x] Tests use fixed `AdaptiveSolarEvents` and fixed `ColourTemperature` config values
+- [x] All tests pass with no network, filesystem, or Bridge access
 
 ---
 
