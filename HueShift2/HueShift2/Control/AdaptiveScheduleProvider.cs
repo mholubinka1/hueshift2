@@ -107,6 +107,8 @@ namespace HueShift2.Control
 
         public bool IsSleep(DateTime currentTime)
         {
+            if (solarEvents == null)
+                throw new InvalidOperationException("Solar events have not been loaded. Call TransitionRequired before IsSleep.");
             var midnight = solarEvents.Sunrise.Date;
             var sleepDateTime = midnight + appOptionsDelegate.CurrentValue.Sleep;
             if (currentTime >= sleepDateTime) return true;

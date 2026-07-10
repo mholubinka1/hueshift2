@@ -38,25 +38,25 @@ namespace HueShift2.Control
             }
             catch (Exception e)
             {
-                logger.LogError(e, "HueShift2 does not support OSX");
+                logger.LogError(e, "Failed to resolve timezone {TimeZone}", ianaTimeZone);
                 throw;
             }
         }
 
         public AdaptiveSolarEvents GetEventsForDate(DateOnly date)
         {
-            var geolocation = appOptionsDelegate.CurrentValue.Geolocation;
-            var tz = ResolveTimeZone(geolocation.TimeZone);
+            var options = appOptionsDelegate.CurrentValue;
+            var tz = ResolveTimeZone(options.Geolocation.TimeZone);
 
             var target = date.ToDateTime(TimeOnly.MinValue);
-            var solarTimes = new SolarTimes(target, geolocation.Latitude, geolocation.Longitude);
+            var solarTimes = new SolarTimes(target, options.Geolocation.Latitude, options.Geolocation.Longitude);
 
             var sunrise = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise.ToUniversalTime(), tz);
             var solarNoon = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.SolarNoon.ToUniversalTime(), tz);
             var sunset = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset.ToUniversalTime(), tz);
 
             var midnight = sunrise.Date;
-            var limits = appOptionsDelegate.CurrentValue.SolarTransitionTimeLimits;
+            var limits = options.SolarTransitionTimeLimits;
 
             var events = new AdaptiveSolarEvents(
                 sunrise.Clamp(midnight + limits.SunriseLower, midnight + limits.SunriseUpper),

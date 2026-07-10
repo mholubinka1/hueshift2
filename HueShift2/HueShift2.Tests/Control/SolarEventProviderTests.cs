@@ -113,6 +113,24 @@ namespace HueShift2.Tests.Control
         }
 
         [Fact]
+        public void Sunrise_IsNotClamped_WhenWithinBounds()
+        {
+            // Given: London midwinter — astronomical sunrise ≈ 08:04 GMT, within bounds 06:00–09:00
+            var provider = BuildProvider(Limits(
+                sunriseLower: TimeSpan.FromHours(6),
+                sunriseUpper: TimeSpan.FromHours(9),
+                sunsetLower: TimeSpan.FromHours(14),
+                sunsetUpper: TimeSpan.FromHours(20)));
+
+            // When
+            var events = provider.GetEventsForDate(MidWinter);
+
+            // Then: Sunrise is between bounds, not equal to either — clamping was not applied
+            Assert.True(events.Sunrise.TimeOfDay > TimeSpan.FromHours(6));
+            Assert.True(events.Sunrise.TimeOfDay < TimeSpan.FromHours(9));
+        }
+
+        [Fact]
         public void ReturnedEvents_AlwaysSatisfy_SunriseBeforeSolarNoonBeforeSunset()
         {
             // Given: limits that produce clamped sunrise and sunset

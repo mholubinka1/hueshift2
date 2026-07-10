@@ -168,5 +168,54 @@ namespace HueShift2.Tests.Control
             // Then: ISolarEventProvider was called a second time for the new date
             fakeSolar.Received(2).GetEventsForDate(Arg.Any<DateOnly>());
         }
+
+        [Fact]
+        public void IsSleep_ThrowsInvalidOperationException_WhenCalledBeforeInitialisation()
+        {
+            // Given: provider not yet initialised (TransitionRequired not called)
+            var provider = BuildProvider(FakeSolarProvider());
+
+            // When / Then
+            Assert.Throws<InvalidOperationException>(() => provider.IsSleep(Today));
+        }
+
+        [Fact]
+        public void IsSleep_ReturnsTrue_WhenBeforeSunrise()
+        {
+            // Given: fixed sunrise at 07:00, current time 06:59
+            var provider = BuildInitialisedProvider(FakeSolarProvider());
+
+            // When
+            var result = provider.IsSleep(Today.AddHours(6).AddMinutes(59));
+
+            // Then
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void IsSleep_ReturnsFalse_WhenAfterSunriseAndBeforeSleepTime()
+        {
+            // Given: fixed sunrise at 07:00, Sleep config at 23:00, current time 12:00
+            var provider = BuildInitialisedProvider(FakeSolarProvider());
+
+            // When
+            var result = provider.IsSleep(Today.AddHours(12));
+
+            // Then
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void IsSleep_ReturnsTrue_WhenAfterSleepTime()
+        {
+            // Given: Sleep config at 23:00, current time 23:01
+            var provider = BuildInitialisedProvider(FakeSolarProvider());
+
+            // When
+            var result = provider.IsSleep(Today.AddHours(23).AddMinutes(1));
+
+            // Then
+            Assert.True(result);
+        }
     }
 }
