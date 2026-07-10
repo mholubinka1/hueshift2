@@ -43,16 +43,17 @@ namespace HueShift2.Configuration
                 var obj = JObject.Parse(responseBody);
                 var lat = obj["latitude"];
                 var lon = obj["longitude"];
-                if (lat == null || lon == null)
+                if (lat == null || lat.Type == JTokenType.Null ||
+                    lon == null || lon.Type == JTokenType.Null ||
+                    (lat.Type != JTokenType.Float && lat.Type != JTokenType.Integer) ||
+                    (lon.Type != JTokenType.Float && lon.Type != JTokenType.Integer))
+                {
                     throw new GeolocationUnavailableException(
-                        $"Geolocation response from {safeUri} did not contain latitude and longitude fields. Check the IpStackApi configuration section.");
+                        $"Geolocation response from {safeUri} did not contain valid latitude and longitude fields. Check the IpStackApi configuration section.");
+                }
                 return new Geolocation(lat.Value<double>(), lon.Value<double>());
             }
-            catch (GeolocationUnavailableException)
-            {
-                throw;
-            }
-            catch (Exception e)
+            catch (Exception e) when (e is not GeolocationUnavailableException)
             {
                 throw new GeolocationUnavailableException(
                     $"Geolocation response from {safeUri} could not be parsed. Check the IpStackApi configuration section.",

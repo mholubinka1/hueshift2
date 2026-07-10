@@ -20,11 +20,11 @@ namespace HueShift2.Tests.Configuration
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["IpStack:Uri"] = uri,
-                    ["IpStack:Key"] = key,
+                    ["IpStackApi:Uri"] = uri,
+                    ["IpStackApi:Key"] = key,
                 })
                 .Build();
-            return config.GetSection("IpStack");
+            return config.GetSection("IpStackApi");
         }
 
         private static Geolocator BuildGeolocator(HttpMessageHandler handler, TimeSpan? timeout = null)
@@ -99,7 +99,21 @@ namespace HueShift2.Tests.Configuration
             var ex = await Assert.ThrowsAsync<GeolocationUnavailableException>(() => geolocator.Get());
 
             // Then
-            Assert.Contains("latitude and longitude", ex.Message);
+            Assert.Contains("valid latitude and longitude", ex.Message);
+        }
+
+        [Fact]
+        public async Task Get_ThrowsGeolocationUnavailableException_OnNullLatLon()
+        {
+            // Given: latitude present but explicitly null (IpStack can return null for unknown location)
+            var json = "{\"latitude\": null, \"longitude\": -0.1}";
+            var geolocator = BuildGeolocator(new FixedResponseHandler(json));
+
+            // When
+            var ex = await Assert.ThrowsAsync<GeolocationUnavailableException>(() => geolocator.Get());
+
+            // Then
+            Assert.Contains("valid latitude and longitude", ex.Message);
         }
 
         [Fact]
