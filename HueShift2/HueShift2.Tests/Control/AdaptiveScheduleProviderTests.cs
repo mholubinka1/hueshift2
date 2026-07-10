@@ -131,5 +131,41 @@ namespace HueShift2.Tests.Control
             // Then
             Assert.Equal(TransitionType.Null, result);
         }
+
+        [Fact]
+        public void SolarProvider_IsCalledOnce_WhenQueriedMultipleTimesSameDay()
+        {
+            // Given: initialised with a first run, then queried again mid-day
+            var fakeSolar = FakeSolarProvider();
+            var scheduleProvider = BuildProvider(fakeSolar);
+            var firstRunTime = Today.AddHours(8);
+            scheduleProvider.TransitionRequired(firstRunTime, null, null);
+
+            // When: second call same day
+            scheduleProvider.TransitionRequired(
+                Today.AddHours(10),
+                firstRunTime,
+                firstRunTime);
+
+            // Then: ISolarEventProvider was called exactly once (no re-fetch same day)
+            fakeSolar.Received(1).GetEventsForDate(Arg.Any<DateOnly>());
+        }
+
+        [Fact]
+        public void SolarProvider_IsCalledAgain_WhenDateChanges()
+        {
+            // Given: initialised on day 1
+            var fakeSolar = FakeSolarProvider();
+            var scheduleProvider = BuildProvider(fakeSolar);
+            var day1Run = Today.AddHours(8);
+            scheduleProvider.TransitionRequired(day1Run, null, null);
+
+            // When: call on day 2
+            var day2 = Today.AddDays(1).AddHours(8);
+            scheduleProvider.TransitionRequired(day2, day1Run, day1Run);
+
+            // Then: ISolarEventProvider was called a second time for the new date
+            fakeSolar.Received(2).GetEventsForDate(Arg.Any<DateOnly>());
+        }
     }
 }
