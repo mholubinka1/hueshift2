@@ -1,17 +1,12 @@
 ﻿using HueShift2.Configuration;
 using HueShift2.Configuration.Model;
-using HueShift2.Helpers;
 using HueShift2.Interfaces;
 using HueShift2.Model;
-using Innovative.SolarCalculator;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.ComponentModel;
 using System.Globalization;
-using System.Runtime.InteropServices;
-using TimeZoneConverter;
 
 namespace HueShift2.Control
 {
@@ -22,67 +17,23 @@ namespace HueShift2.Control
         private readonly IConfiguration configuration;
         private readonly IOptionsMonitor<HueShiftOptions> appOptionsDelegate;
         private readonly ILightColourCalculator lightColourCalculator;
+        private readonly ISolarEventProvider solarEventProvider;
 
         private AdaptiveSolarEvents solarEvents;
 
-        public AdaptiveScheduleProvider(ILogger<AdaptiveScheduleProvider> logger, IConfiguration configuration, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, ILightColourCalculator lightColourCalculator)
+        public AdaptiveScheduleProvider(ILogger<AdaptiveScheduleProvider> logger, IConfiguration configuration, IOptionsMonitor<HueShiftOptions> appOptionsDelegate, ILightColourCalculator lightColourCalculator, ISolarEventProvider solarEventProvider)
         {
             this.mode = HueShiftMode.Adaptive;
             this.logger = logger;
             this.configuration = configuration;
             this.appOptionsDelegate = appOptionsDelegate;
             this.lightColourCalculator = lightColourCalculator;
+            this.solarEventProvider = solarEventProvider;
         }
 
         public HueShiftMode Mode()
         {
             return mode;
-        }
-
-        private TimeZoneInfo DetermineTimeZoneId(string timeZone)
-        {
-            try
-            {
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                if (isWindows)
-                {
-                    var windowsId = TZConvert.IanaToWindows(timeZone);
-                    return TimeZoneInfo.FindSystemTimeZoneById(windowsId);
-                }
-                var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-                if (isLinux)
-                {
-                    return TimeZoneInfo.FindSystemTimeZoneById(timeZone);
-                }
-                throw new PlatformNotSupportedException();
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"HueShift2 does not support OSX");
-                throw;
-            }
-        }
-
-        private void RefreshSolarEvents(DateTime target)
-        {
-            var geolocation = appOptionsDelegate.CurrentValue.Geolocation;
-            var tz = DetermineTimeZoneId(geolocation.TimeZone);
-
-            var solarTimes = new SolarTimes(target, geolocation.Latitude, geolocation.Longitude);
-
-            var sunrise = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise.ToUniversalTime(), tz);
-            var sunset = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset.ToUniversalTime(), tz);
-            var solar_noon = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.SolarNoon.ToUniversalTime(), tz);
-
-            var midnight = sunrise.Date;
-            var adaptiveTransitionTimeLimits = appOptionsDelegate.CurrentValue.SolarTransitionTimeLimits;
-            this.solarEvents = new AdaptiveSolarEvents(
-                sunrise.Clamp(midnight + adaptiveTransitionTimeLimits.SunriseLower, midnight + adaptiveTransitionTimeLimits.SunriseUpper),
-                solar_noon,
-                sunset.Clamp(midnight + adaptiveTransitionTimeLimits.SunsetLower, midnight + adaptiveTransitionTimeLimits.SunsetUpper)
-            );
-            if (solarEvents.Sunrise.Date != solarEvents.Sunset.Date) throw new InvalidOperationException();
-            logger.LogInformation($"Solar transition times refreshed | Day: {solarEvents.Sunrise.ToString(CultureInfo.InvariantCulture)} | Night: {solarEvents.Sunset.ToString(CultureInfo.InvariantCulture)}");
         }
 
         private bool RefreshRequired(DateTime currentTime, DateTime? lastRunTime)
@@ -100,7 +51,11 @@ namespace HueShift2.Control
 
         public TransitionType TransitionRequired(DateTime currentTime, DateTime? lastRunTime, DateTime? lastTransitionTime)
         {
-            if (RefreshRequired(currentTime, lastRunTime)) RefreshSolarEvents(currentTime);
+            if (RefreshRequired(currentTime, lastRunTime))
+            {
+                solarEvents = solarEventProvider.GetEventsForDate(DateOnly.FromDateTime(currentTime));
+                logger.LogInformation($"Solar transition times refreshed | Day: {solarEvents.Sunrise.ToString(CultureInfo.InvariantCulture)} | Night: {solarEvents.Sunset.ToString(CultureInfo.InvariantCulture)}");
+            }
 
             if (lastRunTime == null)
             {
@@ -152,6 +107,8 @@ namespace HueShift2.Control
 
         public bool IsSleep(DateTime currentTime)
         {
+            if (solarEvents == null)
+                throw new InvalidOperationException("Solar events have not been loaded. Call TransitionRequired before IsSleep.");
             var midnight = solarEvents.Sunrise.Date;
             var sleepDateTime = midnight + appOptionsDelegate.CurrentValue.Sleep;
             if (currentTime >= sleepDateTime) return true;
@@ -161,12 +118,13 @@ namespace HueShift2.Control
 
         public AppLightState TargetLightState(DateTime currentTime)
         {
+            var isSleep = IsSleep(currentTime);
             var colourTemperatures = appOptionsDelegate.CurrentValue.ColourTemperature;
             var parameters = new AdaptiveCalculationParameters(
                 solarEvents,
                 colourTemperatures
             );
-            var targetLightState = lightColourCalculator.SetBrightnessAndColour(parameters, currentTime, IsSleep(currentTime));
+            var targetLightState = lightColourCalculator.SetBrightnessAndColour(parameters, currentTime, isSleep);
             logger.LogDebug($"Transition target lightstate: {targetLightState}");
             return targetLightState;
         }
