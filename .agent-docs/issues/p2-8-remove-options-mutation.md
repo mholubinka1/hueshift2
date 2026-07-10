@@ -1,3 +1,5 @@
+> Work complete — PR ready to merge.
+
 # Issues: p2-8-remove-options-mutation
 
 ## Remove runtime mutation of `HueShiftOptions` in `LocalHueClientManager` (#381)
@@ -12,10 +14,10 @@ Remove the assignment `optionsDelegate.CurrentValue.BridgeProperties.ApiKey = aw
 
 ### Acceptance criteria
 
-- [ ] `optionsDelegate.CurrentValue.BridgeProperties.ApiKey` is not assigned anywhere in `LocalHueClientManager`
-- [ ] `client.Initialize` is called with the key returned by `RegisterApplication()`, not with the options value
-- [ ] `configHelper.AddOrUpdateSetting(...)` call inside `RegisterApplication()` is unchanged
-- [ ] A test verifies `HueShiftOptions` is not mutated during the registration flow
-- [ ] A test verifies `client.Initialize` receives the correct key
+- [x] `optionsDelegate.CurrentValue.BridgeProperties.ApiKey` is not assigned anywhere in `LocalHueClientManager`
+- [x] `client.Initialize` is called with the key returned by `RegisterApplication()`, not with the options value
+- [x] `configHelper.AddOrUpdateSetting(...)` call inside `RegisterApplication()` is unchanged
+- [x] A test verifies `HueShiftOptions` is not mutated during the registration flow
+- [x] A test verifies `client.Initialize` receives the correct key
 
 ---
