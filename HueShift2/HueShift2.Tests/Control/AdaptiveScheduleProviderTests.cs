@@ -36,6 +36,15 @@ namespace HueShift2.Tests.Control
                 solarEventProvider);
         }
 
+        private static AdaptiveScheduleProvider BuildInitialisedProvider(
+            ISolarEventProvider solarEventProvider,
+            HueShiftOptions? options = null)
+        {
+            var provider = BuildProvider(solarEventProvider, options);
+            provider.TransitionRequired(Today.AddHours(8), null, null);
+            return provider;
+        }
+
         private static HueShiftOptions DefaultOptions() => new HueShiftOptions
         {
             TransitionInterval = 60,
@@ -66,8 +75,7 @@ namespace HueShift2.Tests.Control
         public void TransitionRequired_ReturnsSolar_WhenCurrentTimeCrossesSunrise()
         {
             // Given: fixed sunrise at 07:00, lastRunTime just before, currentTime just after
-            var scheduleProvider = BuildProvider(FakeSolarProvider());
-            scheduleProvider.TransitionRequired(Today.AddHours(8), null, null); // initialise
+            var scheduleProvider = BuildInitialisedProvider(FakeSolarProvider());
 
             // When
             var result = scheduleProvider.TransitionRequired(
@@ -83,8 +91,7 @@ namespace HueShift2.Tests.Control
         public void TransitionRequired_ReturnsSolar_WhenCurrentTimeCrossesSunset()
         {
             // Given: fixed sunset at 20:00, lastRunTime just before, currentTime just after
-            var scheduleProvider = BuildProvider(FakeSolarProvider());
-            scheduleProvider.TransitionRequired(Today.AddHours(8), null, null); // initialise
+            var scheduleProvider = BuildInitialisedProvider(FakeSolarProvider());
 
             // When
             var result = scheduleProvider.TransitionRequired(
@@ -100,8 +107,7 @@ namespace HueShift2.Tests.Control
         public void TransitionRequired_ReturnsAdaptive_WhenTransitionIntervalElapsed()
         {
             // Given: transition interval = 60s, last transition 61s ago
-            var scheduleProvider = BuildProvider(FakeSolarProvider());
-            scheduleProvider.TransitionRequired(Today.AddHours(8), null, null); // initialise
+            var scheduleProvider = BuildInitialisedProvider(FakeSolarProvider());
 
             var currentTime = Today.AddHours(10);
             var lastRunTime = currentTime.AddSeconds(-61);
@@ -118,8 +124,7 @@ namespace HueShift2.Tests.Control
         public void TransitionRequired_ReturnsNull_WhenTransitionIntervalNotYetElapsed()
         {
             // Given: transition interval = 60s, last transition only 30s ago
-            var scheduleProvider = BuildProvider(FakeSolarProvider());
-            scheduleProvider.TransitionRequired(Today.AddHours(8), null, null); // initialise
+            var scheduleProvider = BuildInitialisedProvider(FakeSolarProvider());
 
             var currentTime = Today.AddHours(10);
             var lastRunTime = currentTime.AddSeconds(-30);
@@ -135,17 +140,15 @@ namespace HueShift2.Tests.Control
         [Fact]
         public void SolarProvider_IsCalledOnce_WhenQueriedMultipleTimesSameDay()
         {
-            // Given: initialised with a first run, then queried again mid-day
+            // Given: provider initialised (1 solar fetch already made)
             var fakeSolar = FakeSolarProvider();
-            var scheduleProvider = BuildProvider(fakeSolar);
-            var firstRunTime = Today.AddHours(8);
-            scheduleProvider.TransitionRequired(firstRunTime, null, null);
+            var scheduleProvider = BuildInitialisedProvider(fakeSolar);
 
             // When: second call same day
             scheduleProvider.TransitionRequired(
                 Today.AddHours(10),
-                firstRunTime,
-                firstRunTime);
+                Today.AddHours(8),
+                Today.AddHours(8));
 
             // Then: ISolarEventProvider was called exactly once (no re-fetch same day)
             fakeSolar.Received(1).GetEventsForDate(Arg.Any<DateOnly>());
@@ -154,15 +157,13 @@ namespace HueShift2.Tests.Control
         [Fact]
         public void SolarProvider_IsCalledAgain_WhenDateChanges()
         {
-            // Given: initialised on day 1
+            // Given: provider initialised on day 1 (1 solar fetch already made)
             var fakeSolar = FakeSolarProvider();
-            var scheduleProvider = BuildProvider(fakeSolar);
-            var day1Run = Today.AddHours(8);
-            scheduleProvider.TransitionRequired(day1Run, null, null);
+            var scheduleProvider = BuildInitialisedProvider(fakeSolar);
 
             // When: call on day 2
             var day2 = Today.AddDays(1).AddHours(8);
-            scheduleProvider.TransitionRequired(day2, day1Run, day1Run);
+            scheduleProvider.TransitionRequired(day2, Today.AddHours(8), Today.AddHours(8));
 
             // Then: ISolarEventProvider was called a second time for the new date
             fakeSolar.Received(2).GetEventsForDate(Arg.Any<DateOnly>());

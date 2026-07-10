@@ -134,14 +134,17 @@ namespace HueShift2.Tests.Control
         [Fact]
         public void ReturnedEvents_Sunrise_And_Sunset_AreOnSameDate()
         {
+            // Given: standard limits, London midsummer
             var provider = BuildProvider(Limits(
                 sunriseLower: TimeSpan.FromHours(6),
                 sunriseUpper: TimeSpan.FromHours(8),
                 sunsetLower: TimeSpan.FromHours(18),
                 sunsetUpper: TimeSpan.FromHours(20)));
 
+            // When
             var events = provider.GetEventsForDate(MidSummer);
 
+            // Then
             Assert.Equal(events.Sunrise.Date, events.Sunset.Date);
         }
     }

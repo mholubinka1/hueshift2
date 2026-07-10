@@ -52,7 +52,7 @@ namespace HueShift2
                         services.AddSingleton<ILightRegistry, LightRegistry>();
                         services.AddSingleton<ILightSynchroniser, LightSynchroniser>();
                         services.AddSingleton<ILightController, LightController>();
-                        services.AddScoped<ISolarEventProvider, SolarEventProvider>();
+                        services.AddSingleton<ISolarEventProvider, SolarEventProvider>();
                         services.AddScoped<ILightColourCalculator, AdaptiveLightColourCalculator>();
                         services.AddScoped<IScheduleProvider, AdaptiveScheduleProvider>();
                         services.AddSingleton<ILightScheduler, AdaptiveLightScheduler>();
