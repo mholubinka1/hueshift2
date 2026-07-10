@@ -118,12 +118,13 @@ namespace HueShift2.Control
 
         public AppLightState TargetLightState(DateTime currentTime)
         {
+            var isSleep = IsSleep(currentTime);
             var colourTemperatures = appOptionsDelegate.CurrentValue.ColourTemperature;
             var parameters = new AdaptiveCalculationParameters(
                 solarEvents,
                 colourTemperatures
             );
-            var targetLightState = lightColourCalculator.SetBrightnessAndColour(parameters, currentTime, IsSleep(currentTime));
+            var targetLightState = lightColourCalculator.SetBrightnessAndColour(parameters, currentTime, isSleep);
             logger.LogDebug($"Transition target lightstate: {targetLightState}");
             return targetLightState;
         }

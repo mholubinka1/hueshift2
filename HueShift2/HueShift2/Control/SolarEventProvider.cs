@@ -51,9 +51,9 @@ namespace HueShift2.Control
             var target = date.ToDateTime(TimeOnly.MinValue);
             var solarTimes = new SolarTimes(target, options.Geolocation.Latitude, options.Geolocation.Longitude);
 
-            var sunrise = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise.ToUniversalTime(), tz);
-            var solarNoon = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.SolarNoon.ToUniversalTime(), tz);
-            var sunset = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset.ToUniversalTime(), tz);
+            var sunrise = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(solarTimes.Sunrise, DateTimeKind.Utc), tz);
+            var solarNoon = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(solarTimes.SolarNoon, DateTimeKind.Utc), tz);
+            var sunset = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(solarTimes.Sunset, DateTimeKind.Utc), tz);
 
             var midnight = sunrise.Date;
             var limits = options.SolarTransitionTimeLimits;
