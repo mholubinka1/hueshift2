@@ -58,12 +58,27 @@ namespace HueShift2.Tests.Control
             var (manager, hueClient, options) = BuildManager(initialApiKey: "");
             hueClient.CheckConnection().Returns(Task.FromResult(false));
             hueClient.RegisterAsync("hueshift-2", "Bridge0").Returns(Task.FromResult<string?>("test-key"));
+            var before = options.BridgeProperties.ApiKey;
 
             // When
             await manager.AssertConnected();
 
             // Then: the options object was not mutated
-            Assert.Equal("", options.BridgeProperties.ApiKey);
+            Assert.Equal(before, options.BridgeProperties.ApiKey);
+        }
+
+        [Fact]
+        public async Task AssertConnected_DoesNotInitializeClient_WhenAlreadyConnected()
+        {
+            // Given: connection already established
+            var (manager, hueClient, _) = BuildManager(initialApiKey: "existing-key");
+            hueClient.CheckConnection().Returns(Task.FromResult(true));
+
+            // When
+            await manager.AssertConnected();
+
+            // Then: client.Initialize is not called
+            hueClient.DidNotReceive().Initialize(Arg.Any<string>());
         }
     }
 }
