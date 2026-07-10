@@ -12,6 +12,7 @@ namespace HueShift2.Helpers
 {
     public static class ExtensionMethods
     {
+        private const double XYComparisonEpsilon = 1e-8;
         public static DateTime Clamp(this DateTime dt, DateTime min, DateTime max)
         {
             if (dt <= min) return min;
@@ -161,7 +162,7 @@ namespace HueShift2.Helpers
 
         public static bool DoubleEquals(double @this, double other)
         {
-            var precision = 0.00000001d;
+            var precision = XYComparisonEpsilon;
             var equals = (Math.Abs(@this - other) <= precision);
             return equals;
         }
