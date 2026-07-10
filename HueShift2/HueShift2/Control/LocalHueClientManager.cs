@@ -63,8 +63,8 @@ namespace HueShift2.Control
                 if (string.IsNullOrEmpty(apiKey))
                 {
                     using var cts = new CancellationTokenSource();
-                    const int cancelAfter = 120;
-                    const double retryInterval = 10.0;
+                    var cancelAfter = optionsDelegate.CurrentValue.BridgeProperties.RegistrationTimeoutSeconds;
+                    var retryInterval = optionsDelegate.CurrentValue.BridgeProperties.RegistrationRetryIntervalSeconds;
                     try
                     {
                         cts.CancelAfter(cancelAfter * 1000);

@@ -13,11 +13,19 @@ namespace HueShift2.Tests.Control
 {
     public class LocalHueClientManagerTests
     {
-        private static (LocalHueClientManager manager, ILocalHueClient hueClient, HueShiftOptions options) BuildManager(string initialApiKey = "")
+        private static (LocalHueClientManager manager, ILocalHueClient hueClient, HueShiftOptions options) BuildManager(
+            string initialApiKey = "",
+            int registrationTimeoutSeconds = 120,
+            double registrationRetryIntervalSeconds = 10.0)
         {
             var options = new HueShiftOptions
             {
-                BridgeProperties = new BridgeProperties { ApiKey = initialApiKey },
+                BridgeProperties = new BridgeProperties
+                {
+                    ApiKey = initialApiKey,
+                    RegistrationTimeoutSeconds = registrationTimeoutSeconds,
+                    RegistrationRetryIntervalSeconds = registrationRetryIntervalSeconds,
+                },
             };
             var optionsMonitor = Substitute.For<IOptionsMonitor<HueShiftOptions>>();
             optionsMonitor.CurrentValue.Returns(options);
@@ -79,6 +87,23 @@ namespace HueShift2.Tests.Control
 
             // Then: client.Initialize is not called
             hueClient.DidNotReceive().Initialize(Arg.Any<string>());
+        }
+
+        [Fact]
+        public async Task AssertConnected_CancelsRegistration_AfterConfiguredTimeout()
+        {
+            // Given: no connection, no stored key, registration always fails,
+            //        config timeout = 0 (immediate cancel), retry = 0 (no delay)
+            var (manager, hueClient, _) = BuildManager(
+                initialApiKey: "",
+                registrationTimeoutSeconds: 0,
+                registrationRetryIntervalSeconds: 0.0);
+            hueClient.CheckConnection().Returns(Task.FromResult(false));
+            hueClient.RegisterAsync(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(Task.FromException<string?>(new Exception("bridge not ready")));
+
+            // When / Then: OperationCanceledException is thrown, proving timeout is read from config
+            await Assert.ThrowsAsync<OperationCanceledException>(() => manager.AssertConnected());
         }
     }
 }

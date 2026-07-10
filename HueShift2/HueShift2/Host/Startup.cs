@@ -1,6 +1,8 @@
 ﻿using HueShift2.Configuration;
+using HueShift2.Configuration.Model;
 using HueShift2.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -32,7 +34,8 @@ namespace HueShift2
             var fileHelperLogger = new SerilogTypedLogger<ConfigFileHelper>(Log.Logger);
             var configFileHelper = new ConfigFileHelper(fileHelperLogger);
             var fileManagerLogger = new SerilogTypedLogger<LightingConfigFileManager>(Log.Logger);
-            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig);
+            var hueShiftOptions = startupConfig.GetSection("HueShiftOptions").Get<HueShiftOptions>() ?? new HueShiftOptions();
+            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig, Options.Create(hueShiftOptions));
 
 
         }
