@@ -92,8 +92,11 @@ namespace HueShift2.Tests.Control
         [Fact]
         public async Task AssertConnected_CancelsRegistration_AfterConfiguredTimeout()
         {
-            // Given: no connection, no stored key, registration always fails,
-            //        config timeout = 0 (immediate cancel), retry = 0 (no delay)
+            // Given: no connection, no stored key, registration always fails.
+            // RegistrationTimeoutSeconds = 0: CancelAfter(0) calls Cancel() synchronously (per .NET semantics),
+            // so the CancellationToken is already cancelled when RegisterApplication checks it.
+            // If the code ignored config and used the hardcoded default of 120, CancelAfter(120000) would
+            // not fire quickly and the test would hang — proving the config value is read.
             var (manager, hueClient, _) = BuildManager(
                 initialApiKey: "",
                 registrationTimeoutSeconds: 0,
@@ -102,7 +105,7 @@ namespace HueShift2.Tests.Control
             hueClient.RegisterAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(Task.FromException<string?>(new Exception("bridge not ready")));
 
-            // When / Then: OperationCanceledException is thrown, proving timeout is read from config
+            // When / Then
             await Assert.ThrowsAsync<OperationCanceledException>(() => manager.AssertConnected());
         }
     }
