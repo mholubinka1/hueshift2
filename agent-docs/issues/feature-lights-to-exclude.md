@@ -1,3 +1,5 @@
+> Merged and closed.
+
 # Issues: feature-lights-to-exclude
 
 ## Add `Exclude()` and `Unexclude()` to `LightControlPair` (#376)
@@ -17,13 +19,13 @@ Add `LightControlPairExclusionTests` covering: `Exclude()` sets state and clears
 
 ### Acceptance criteria
 
-- [ ] `Exclude()` sets `AppControlState` to `Excluded`
-- [ ] `Exclude()` clears `SyncRequired`
-- [ ] `Unexclude()` sets `AppControlState` to `HueShiftControlled`
-- [ ] `Unexclude()` sets `SyncRequired` to `true`
-- [ ] Calling `Exclude()` on an already-excluded pair is idempotent (state remains `Excluded`, `SyncRequired` remains `false`)
-- [ ] `Reset()` on an excluded pair is a no-op — state stays `Excluded`
-- [ ] All new tests pass
+- [x] `Exclude()` sets `AppControlState` to `Excluded`
+- [x] `Exclude()` clears `SyncRequired`
+- [x] `Unexclude()` sets `AppControlState` to `HueShiftControlled`
+- [x] `Unexclude()` sets `SyncRequired` to `true`
+- [x] Calling `Exclude()` on an already-excluded pair is idempotent (state remains `Excluded`, `SyncRequired` remains `false`)
+- [x] `Reset()` on an excluded pair is a no-op — state stays `Excluded`
+- [x] All new tests pass
 
 ---
 
@@ -49,13 +51,13 @@ Add `LightRegistryDiscoverTests` covering exclusion by ID, exclusion by Name, li
 
 ### Acceptance criteria
 
-- [ ] `HueShiftOptions` has `LightsToExclude` property (default empty list)
-- [ ] A light whose ID appears in `LightsToExclude` is in `Excluded` state after `Discover()`
-- [ ] A light whose Name appears in `LightsToExclude` is in `Excluded` state after `Discover()`
-- [ ] An excluded light does not receive `UpdateExpectedState` or `MarkForSync` on first discovery
-- [ ] Adding a light to `LightsToExclude` causes it to be `Excluded` on the next `Discover()` call
-- [ ] Removing a light from `LightsToExclude` causes it to return to `HueShiftControlled` with `SyncRequired = true` on the next `Discover()` call
-- [ ] An unmatched entry in `LightsToExclude` produces exactly one log warning per session
-- [ ] All new tests pass
+- [x] `HueShiftOptions` has `LightsToExclude` property (default empty list)
+- [x] A light whose ID appears in `LightsToExclude` is in `Excluded` state after `Discover()`
+- [x] A light whose Name appears in `LightsToExclude` is in `Excluded` state after `Discover()`
+- [x] An excluded light does not receive `UpdateExpectedState` or `MarkForSync` on first discovery
+- [x] Adding a light to `LightsToExclude` causes it to be `Excluded` on the next `Discover()` call
+- [x] Removing a light from `LightsToExclude` causes it to return to `HueShiftControlled` with `SyncRequired = true` on the next `Discover()` call
+- [x] An unmatched entry in `LightsToExclude` produces exactly one log warning per session
+- [x] All new tests pass
 
 ---
