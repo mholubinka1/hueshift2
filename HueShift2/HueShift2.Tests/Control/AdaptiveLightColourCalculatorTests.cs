@@ -30,6 +30,7 @@ namespace HueShift2.Tests.Control
 
         private static AppLightState Calculate(AdaptiveLightColourCalculator calculator, DateTime currentTime)
         {
+            // CT is resolved from IOptionsMonitor inside the calculator; the ColourTemperature argument to AdaptiveCalculationParameters is unused.
             var parameters = new AdaptiveCalculationParameters(StandardDay, new ColourTemperature());
             return calculator.SetBrightnessAndColour(parameters, currentTime, isSleep: false);
         }
