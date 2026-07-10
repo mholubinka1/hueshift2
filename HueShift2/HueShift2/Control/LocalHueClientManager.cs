@@ -59,15 +59,16 @@ namespace HueShift2.Control
         {
             if (!await client.CheckConnection())
             {
-                if (string.IsNullOrEmpty(optionsDelegate.CurrentValue.BridgeProperties.ApiKey))
+                var apiKey = optionsDelegate.CurrentValue.BridgeProperties.ApiKey;
+                if (string.IsNullOrEmpty(apiKey))
                 {
-                    var cts = new CancellationTokenSource();
+                    using var cts = new CancellationTokenSource();
                     const int cancelAfter = 120;
                     const double retryInterval = 10.0;
                     try
                     {
                         cts.CancelAfter(cancelAfter * 1000);
-                        optionsDelegate.CurrentValue.BridgeProperties.ApiKey = await RegisterApplication(retryInterval, cts.Token);
+                        apiKey = await RegisterApplication(retryInterval, cts.Token);
                     }
                     catch (Exception e)
                     {
@@ -77,7 +78,7 @@ namespace HueShift2.Control
                 }
                 try
                 {
-                    client.Initialize(optionsDelegate.CurrentValue.BridgeProperties.ApiKey);
+                    client.Initialize(apiKey);
                     logger.LogInformation("Hue client initialised.");
                 }
                 catch (Exception e)

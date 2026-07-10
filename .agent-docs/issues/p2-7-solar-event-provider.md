@@ -1,3 +1,5 @@
+> Merged and closed.
+
 # Issues: p2-7-solar-event-provider
 
 ## Add `ISolarEventProvider` interface and `SolarEventProvider` implementation (#380)
@@ -12,13 +14,13 @@ New interface `ISolarEventProvider { AdaptiveSolarEvents GetEventsForDate(DateOn
 
 ### Acceptance criteria
 
-- [ ] `ISolarEventProvider` interface exists with `GetEventsForDate(DateOnly date)` method
-- [ ] `SolarEventProvider` implements `ISolarEventProvider`
-- [ ] `SolarEventProvider` owns all timezone resolution and solar calculation logic
-- [ ] Sunrise and sunset are clamped to `SolarTransitionTimeLimits` from config
-- [ ] Sunrise.Date == Sunset.Date invariant check is preserved
-- [ ] `SolarEventProvider` is registered in DI
-- [ ] `AdaptiveScheduleProvider` still compiles
+- [x] `ISolarEventProvider` interface exists with `GetEventsForDate(DateOnly date)` method
+- [x] `SolarEventProvider` implements `ISolarEventProvider`
+- [x] `SolarEventProvider` owns all timezone resolution and solar calculation logic
+- [x] Sunrise and sunset are clamped to `SolarTransitionTimeLimits` from config
+- [x] Sunrise.Date == Sunset.Date invariant check is preserved
+- [x] `SolarEventProvider` is registered in DI
+- [x] `AdaptiveScheduleProvider` still compiles
 
 ---
 
@@ -34,11 +36,11 @@ Inject `ISolarEventProvider` into `AdaptiveScheduleProvider` and remove `Determi
 
 ### Acceptance criteria
 
-- [ ] `AdaptiveScheduleProvider` constructor takes `ISolarEventProvider`
-- [ ] `DetermineTimeZoneId()` and `RefreshSolarEvents()` removed from `AdaptiveScheduleProvider`
-- [ ] `TransitionRequired()` calls `ISolarEventProvider.GetEventsForDate()` when refresh is required
-- [ ] `RefreshRequired()` logic unchanged
-- [ ] All existing tests pass
-- [ ] `AdaptiveScheduleProvider` has no direct dependency on `SolarTimes`, `TZConvert`, or `RuntimeInformation`
+- [x] `AdaptiveScheduleProvider` constructor takes `ISolarEventProvider`
+- [x] `DetermineTimeZoneId()` and `RefreshSolarEvents()` removed from `AdaptiveScheduleProvider`
+- [x] `TransitionRequired()` calls `ISolarEventProvider.GetEventsForDate()` when refresh is required
+- [x] `RefreshRequired()` logic unchanged
+- [x] All existing tests pass
+- [x] `AdaptiveScheduleProvider` has no direct dependency on `SolarTimes`, `TZConvert`, or `RuntimeInformation`
 
 ---
