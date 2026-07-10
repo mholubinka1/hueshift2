@@ -1,5 +1,7 @@
 # Issues: p3-9-geolocator-timeout
 
+> Work complete — PR ready to merge.
+
 ## Add `GeolocationUnavailableException` and Geolocator timeout handling (#382)
 
 **Blocked by**: None
@@ -12,12 +14,12 @@ New `GeolocationUnavailableException` in `HueShift2.Configuration`. Refactor `Ge
 
 ### Acceptance criteria
 
-- [ ] `GeolocationUnavailableException` class exists in `HueShift2.Configuration`
-- [ ] `Geolocator` uses an injected `HttpClient` (not `new HttpClient()`)
-- [ ] Injected `HttpClient` has a 10-second timeout
-- [ ] Any HTTP or network failure throws `GeolocationUnavailableException`
-- [ ] Any JSON parse failure throws `GeolocationUnavailableException`
-- [ ] No exception message or log output contains the API key string
-- [ ] `GeolocatorTests` covers: timeout, malformed response, success, key exclusion
+- [x] `GeolocationUnavailableException` class exists in `HueShift2.Configuration`
+- [x] `Geolocator` uses an injected `HttpClient` (not `new HttpClient()`)
+- [x] Injected `HttpClient` has a 10-second timeout
+- [x] Any HTTP or network failure throws `GeolocationUnavailableException`
+- [x] Any JSON parse failure throws `GeolocationUnavailableException`
+- [x] No exception message or log output contains the API key string
+- [x] `GeolocatorTests` covers: timeout, malformed response, success, key exclusion
 
 ---
