@@ -28,11 +28,9 @@ namespace HueShift2.Tests.Control
             return new AdaptiveLightColourCalculator(NullLogger<AdaptiveLightColourCalculator>.Instance, optionsMonitor);
         }
 
-        private static AppLightState Calculate(AdaptiveLightColourCalculator calculator, DateTime currentTime, AdaptiveSolarEvents? solarEvents = null)
+        private static AppLightState Calculate(AdaptiveLightColourCalculator calculator, DateTime currentTime)
         {
-            var parameters = new AdaptiveCalculationParameters(
-                solarEvents ?? StandardDay,
-                new ColourTemperature { Coolest = Coolest, Warmest = Warmest });
+            var parameters = new AdaptiveCalculationParameters(StandardDay, new ColourTemperature());
             return calculator.SetBrightnessAndColour(parameters, currentTime, isSleep: false);
         }
 
