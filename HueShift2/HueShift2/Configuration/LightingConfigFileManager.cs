@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,9 @@ namespace HueShift2.Configuration
             this.logger = logger;
             this.configFileHelper = configFileHelper;
             bridgeLocator = new HttpBridgeLocator();
-            geolocator = new Geolocator(configuration.GetSection("IpStackApi"));
+            geolocator = new Geolocator(
+                new HttpClient { Timeout = TimeSpan.FromSeconds(10) },
+                configuration.GetSection("IpStackApi"));
         }
 
         private async Task<BridgeProperties> DiscoverBridgesOnNetwork()

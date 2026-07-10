@@ -1,4 +1,4 @@
-﻿using HueShift2.Configuration.Model;
+using HueShift2.Configuration.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,27 +9,64 @@ namespace HueShift2.Configuration
 {
     public class Geolocator : IGeoLocator
     {
+        private readonly HttpClient httpClient;
         private readonly IConfigurationSection config;
 
-        public Geolocator(IConfigurationSection config)
+        public Geolocator(HttpClient httpClient, IConfigurationSection config)
         {
-            if (config == null) throw new ArgumentNullException();
+            if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            this.httpClient = httpClient;
             this.config = config;
         }
 
         public async Task<Geolocation> Get()
         {
-            //confirm config is present
-            var geolocationUri = new Uri(config["Uri"] + config["Key"]);
-            string geolocationResponse;
-            using (var client = new HttpClient())
+            var baseUri = config["Uri"];
+            var fullUri = baseUri + config["Key"];
+            var safeUri = GetSafeUri(baseUri);
+
+            string responseBody;
+            try
             {
-                geolocationResponse = await client.GetStringAsync(geolocationUri);
+                responseBody = await httpClient.GetStringAsync(fullUri);
             }
-            dynamic response = JObject.Parse(geolocationResponse);
-            return new Geolocation(
-                (double)response.latitude,
-                (double)response.longitude);
+            catch (Exception e)
+            {
+                throw new GeolocationUnavailableException(
+                    $"Geolocation request to {safeUri} failed. Check the IpStackApi configuration section.",
+                    e);
+            }
+
+            try
+            {
+                var obj = JObject.Parse(responseBody);
+                var lat = obj["latitude"];
+                var lon = obj["longitude"];
+                if (lat == null || lat.Type == JTokenType.Null ||
+                    lon == null || lon.Type == JTokenType.Null ||
+                    (lat.Type != JTokenType.Float && lat.Type != JTokenType.Integer) ||
+                    (lon.Type != JTokenType.Float && lon.Type != JTokenType.Integer))
+                {
+                    throw new GeolocationUnavailableException(
+                        $"Geolocation response from {safeUri} did not contain valid latitude and longitude fields. Check the IpStackApi configuration section.");
+                }
+                return new Geolocation(lat.Value<double>(), lon.Value<double>());
+            }
+            catch (Exception e) when (e is not GeolocationUnavailableException)
+            {
+                throw new GeolocationUnavailableException(
+                    $"Geolocation response from {safeUri} could not be parsed. Check the IpStackApi configuration section.",
+                    e);
+            }
+        }
+
+        private static string GetSafeUri(string uri)
+        {
+            Uri parsed;
+            if (uri != null && Uri.TryCreate(uri, UriKind.Absolute, out parsed))
+                return parsed.GetLeftPart(UriPartial.Path);
+            return "(check IpStackApi:Uri configuration)";
         }
     }
 }
