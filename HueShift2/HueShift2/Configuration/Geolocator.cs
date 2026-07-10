@@ -1,4 +1,4 @@
-﻿using HueShift2.Configuration.Model;
+using HueShift2.Configuration.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,27 +9,46 @@ namespace HueShift2.Configuration
 {
     public class Geolocator : IGeoLocator
     {
+        private readonly HttpClient httpClient;
         private readonly IConfigurationSection config;
 
-        public Geolocator(IConfigurationSection config)
+        public Geolocator(HttpClient httpClient, IConfigurationSection config)
         {
-            if (config == null) throw new ArgumentNullException();
+            if (config == null) throw new ArgumentNullException(nameof(config));
+            this.httpClient = httpClient;
             this.config = config;
         }
 
         public async Task<Geolocation> Get()
         {
-            //confirm config is present
-            var geolocationUri = new Uri(config["Uri"] + config["Key"]);
-            string geolocationResponse;
-            using (var client = new HttpClient())
+            var baseUri = config["Uri"];
+            var fullUri = baseUri + config["Key"];
+
+            string responseBody;
+            try
             {
-                geolocationResponse = await client.GetStringAsync(geolocationUri);
+                responseBody = await httpClient.GetStringAsync(fullUri);
             }
-            dynamic response = JObject.Parse(geolocationResponse);
-            return new Geolocation(
-                (double)response.latitude,
-                (double)response.longitude);
+            catch (Exception e)
+            {
+                throw new GeolocationUnavailableException(
+                    $"Geolocation request to {baseUri} failed. Check the IpStackApi configuration section.",
+                    e);
+            }
+
+            try
+            {
+                dynamic response = JObject.Parse(responseBody);
+                double latitude = (double)response.latitude;
+                double longitude = (double)response.longitude;
+                return new Geolocation(latitude, longitude);
+            }
+            catch (Exception e)
+            {
+                throw new GeolocationUnavailableException(
+                    $"Geolocation response from {baseUri} could not be parsed. Check the IpStackApi configuration section.",
+                    e);
+            }
         }
     }
 }
