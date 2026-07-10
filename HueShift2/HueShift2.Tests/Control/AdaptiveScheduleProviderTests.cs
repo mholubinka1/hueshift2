@@ -150,8 +150,8 @@ namespace HueShift2.Tests.Control
                 Today.AddHours(8),
                 Today.AddHours(8));
 
-            // Then: ISolarEventProvider was called exactly once (no re-fetch same day)
-            fakeSolar.Received(1).GetEventsForDate(Arg.Any<DateOnly>());
+            // Then: ISolarEventProvider was called exactly once for today's date (no re-fetch same day)
+            fakeSolar.Received(1).GetEventsForDate(DateOnly.FromDateTime(Today));
         }
 
         [Fact]
@@ -165,8 +165,9 @@ namespace HueShift2.Tests.Control
             var day2 = Today.AddDays(1).AddHours(8);
             scheduleProvider.TransitionRequired(day2, Today.AddHours(8), Today.AddHours(8));
 
-            // Then: ISolarEventProvider was called a second time for the new date
-            fakeSolar.Received(2).GetEventsForDate(Arg.Any<DateOnly>());
+            // Then: ISolarEventProvider was called once for day 1 and once for day 2
+            fakeSolar.Received(1).GetEventsForDate(DateOnly.FromDateTime(Today));
+            fakeSolar.Received(1).GetEventsForDate(DateOnly.FromDateTime(Today.AddDays(1)));
         }
 
         [Fact]
