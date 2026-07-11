@@ -41,8 +41,6 @@ namespace HueShift2
                 hueShiftOptions = new HueShiftOptions();
             }
             lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig, Options.Create(hueShiftOptions));
-
-
         }
 
         private async Task GenerateStartupConfigurationFile(IConfiguration config)
