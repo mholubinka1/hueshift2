@@ -42,7 +42,8 @@ namespace HueShift2.Configuration
         {
             logger.LogInformation($"Searching for Hue bridges on network...");
             //FIXME: what if no bridges are found?
-            var locatedBridges = (await bridgeLocator.LocateBridgesAsync(TimeSpan.FromSeconds(appOptions.Value.BridgeProperties.DiscoveryTimeoutSeconds))).ToList();
+            var discoveryTimeout = appOptions.Value.BridgeProperties.DiscoveryTimeoutSeconds;
+            var locatedBridges = (await bridgeLocator.LocateBridgesAsync(TimeSpan.FromSeconds(discoveryTimeout))).ToList();
             var locatedBridge = locatedBridges[0];
             if (locatedBridges.Count() > 1)
             {

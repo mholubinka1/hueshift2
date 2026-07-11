@@ -37,7 +37,7 @@ Pass these as parameters (or read inline) in `AssertConnected()` and `RegisterAp
 ### `LightingConfigFileManager`
 
 Replace:
-- `TimeSpan.FromSeconds(30)` in `DiscoverBridgesOnNetwork()` → `TimeSpan.FromSeconds(options.BridgeProperties.DiscoveryTimeoutSeconds)` where `options` is read from `IOptionsMonitor<HueShiftOptions>`. `LightingConfigFileManager` currently receives `IConfiguration` but not `IOptionsMonitor`; inject it.
+- `TimeSpan.FromSeconds(30)` in `DiscoverBridgesOnNetwork()` → `TimeSpan.FromSeconds(options.BridgeProperties.DiscoveryTimeoutSeconds)` where `options` is read from injected options. Inject `IOptions<HueShiftOptions>` (not `IOptionsMonitor`) — `LightingConfigFileManager` runs before the DI container is built in `Startup.cs`, so `IOptions` (snapshot) is appropriate; change-tracking adds no value for a startup-only class. Caller constructs options with `Options.Create(config.GetSection("HueShiftOptions").Get<HueShiftOptions>())`.
 
 ### `LightControlPair`
 
