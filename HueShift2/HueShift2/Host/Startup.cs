@@ -3,7 +3,9 @@ using HueShift2.Configuration.Model;
 using HueShift2.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Q42.HueApi;
 using Serilog;
+using System.Net.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,7 +41,12 @@ namespace HueShift2
                 Log.Warning("HueShiftOptions section missing from config; using default timeout values.");
             var hueShiftOptions = hueShiftSection.Get<HueShiftOptions>() ?? new HueShiftOptions();
             hueShiftOptions.BridgeProperties ??= new BridgeProperties();
-            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig, Options.Create(hueShiftOptions));
+            var healthCheckClient = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+            var bridgeLocator = new HttpBridgeLocator();
+            var geolocator = new Geolocator(
+                new HttpClient { Timeout = TimeSpan.FromSeconds(10) },
+                startupConfig.GetSection("IpStackApi"));
+            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, Options.Create(hueShiftOptions), healthCheckClient, bridgeLocator, geolocator);
         }
 
         private async Task GenerateStartupConfigurationFile(IConfiguration config)

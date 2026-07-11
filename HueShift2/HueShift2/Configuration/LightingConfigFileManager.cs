@@ -1,5 +1,4 @@
 ﻿using HueShift2.Configuration.Model;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -23,19 +22,37 @@ namespace HueShift2.Configuration
         private readonly IOptions<HueShiftOptions> appOptions;
 
         private readonly IConfigFileHelper configFileHelper;
+        private readonly HttpClient healthCheckClient;
 
         private readonly IBridgeLocator bridgeLocator;
         private readonly IGeoLocator geolocator;
 
-        public LightingConfigFileManager(ILogger<LightingConfigFileManager> logger, IConfigFileHelper configFileHelper, IConfiguration configuration, IOptions<HueShiftOptions> appOptions)
+        public LightingConfigFileManager(ILogger<LightingConfigFileManager> logger, IConfigFileHelper configFileHelper, IOptions<HueShiftOptions> appOptions, HttpClient healthCheckClient, IBridgeLocator bridgeLocator, IGeoLocator geolocator)
         {
             this.logger = logger;
             this.configFileHelper = configFileHelper;
             this.appOptions = appOptions;
-            bridgeLocator = new HttpBridgeLocator();
-            geolocator = new Geolocator(
-                new HttpClient { Timeout = TimeSpan.FromSeconds(10) },
-                configuration.GetSection("IpStackApi"));
+            this.healthCheckClient = healthCheckClient;
+            this.bridgeLocator = bridgeLocator;
+            this.geolocator = geolocator;
+        }
+
+        private async Task<bool> IsBridgeReachable(string ip)
+        {
+            if (string.IsNullOrWhiteSpace(ip))
+                return false;
+            var url = $"http://{ip.Trim()}/api";
+            if (!Uri.TryCreate(url, UriKind.Absolute, out _))
+                return false;
+            try
+            {
+                using var _ = await healthCheckClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                return true;
+            }
+            catch (Exception e) when (e is HttpRequestException or OperationCanceledException)
+            {
+                return false;
+            }
         }
 
         private async Task<BridgeProperties> DiscoverBridgesOnNetwork()
@@ -74,6 +91,11 @@ namespace HueShift2.Configuration
         public async Task Assert(string configFilePath, string bridgeIp)
         {
             logger.LogInformation($"Asserting {configFilePath} Hue bridge settings...");
+            if (await IsBridgeReachable(bridgeIp))
+            {
+                logger.LogInformation($"Bridge reachable at {bridgeIp} — skipping discovery.");
+                return;
+            }
             var discoveredBridge = await DiscoverBridgesOnNetwork();
             var discoveredBridgeIp = discoveredBridge.IpAddress;
             if (discoveredBridgeIp != bridgeIp)

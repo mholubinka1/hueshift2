@@ -1,3 +1,5 @@
+> Work complete — PR ready to merge.
+
 # Issues: p4-13-skip-bridge-discovery
 
 ## Skip Bridge discovery when stored IP is reachable (#388)
@@ -12,11 +14,11 @@ Add a private `IsBridgeReachable(string ip)` method to `LightingConfigFileManage
 
 ### Acceptance criteria
 
-- [ ] `Assert()` performs a health check before running discovery
-- [ ] If health check succeeds, discovery is skipped and method returns
-- [ ] If health check fails, discovery runs and config is updated if a new IP is found
-- [ ] `Generate()` behaviour is unchanged
-- [ ] `LightingConfigFileManagerTests` covers: reachable (skip), unreachable (discover), first run (once)
-- [ ] All existing tests pass
+- [x] `Assert()` performs a health check before running discovery
+- [x] If health check succeeds, discovery is skipped and method returns
+- [x] If health check fails, discovery runs and config is updated if a new IP is found
+- [x] `Generate()` behaviour is unchanged
+- [x] `LightingConfigFileManagerTests` covers: reachable (skip), unreachable (discover), first run (once)
+- [x] All existing tests pass
 
 ---
