@@ -48,7 +48,7 @@ namespace HueShift2.Control
                 {
                     logger.LogWarning("Failed to authorise application. Ensure the button on the top of the bridge has been pressed.");
                     logger.LogInformation($"Retrying in {retryInterval}s.");
-                    await Task.Delay(TimeSpan.FromSeconds(retryInterval));
+                    await Task.Delay(TimeSpan.FromSeconds(retryInterval), token);
                     logger.LogInformation("Retrying...");
                 }
             }
@@ -63,11 +63,12 @@ namespace HueShift2.Control
                 if (string.IsNullOrEmpty(apiKey))
                 {
                     using var cts = new CancellationTokenSource();
-                    const int cancelAfter = 120;
-                    const double retryInterval = 10.0;
+                    var bridge = optionsDelegate.CurrentValue.BridgeProperties;
+                    var cancelAfter = bridge.RegistrationTimeoutSeconds;
+                    var retryInterval = bridge.RegistrationRetryIntervalSeconds;
                     try
                     {
-                        cts.CancelAfter(cancelAfter * 1000);
+                        cts.CancelAfter(TimeSpan.FromSeconds(cancelAfter));
                         apiKey = await RegisterApplication(retryInterval, cts.Token);
                     }
                     catch (Exception e)

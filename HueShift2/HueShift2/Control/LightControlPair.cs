@@ -13,6 +13,7 @@ namespace HueShift2.Control
     public class LightControlPair
     {
         private const int TransitionSettlingPeriodSeconds = 10;
+        private const byte MaxBrightness = 254;
 
         private bool _isOn;
         private bool _isReachable;
@@ -107,14 +108,14 @@ namespace HueShift2.Control
                 if (this.ResetOccurred)
                 {
                     this.ResetOccurred = false;
-                    syncCommand.Brightness = 254;
+                    syncCommand.Brightness = MaxBrightness;
                 }
                 return true;
             }
 
             if (this.ResetOccurred)
             {
-                var brightness = (byte)254;
+                var brightness = MaxBrightness;
                 this.ResetOccurred = false;
                 if (this.NetworkLight.Brightness != brightness)
                 {

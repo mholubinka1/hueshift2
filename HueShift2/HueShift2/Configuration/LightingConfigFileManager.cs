@@ -1,6 +1,7 @@
 ﻿using HueShift2.Configuration.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Q42.HueApi;
@@ -19,16 +20,18 @@ namespace HueShift2.Configuration
     public class LightingConfigFileManager
     {
         private readonly ILogger logger;
+        private readonly IOptions<HueShiftOptions> appOptions;
 
         private readonly IConfigFileHelper configFileHelper;
 
         private readonly IBridgeLocator bridgeLocator;
         private readonly IGeoLocator geolocator;
 
-        public LightingConfigFileManager(ILogger<LightingConfigFileManager> logger, IConfigFileHelper configFileHelper, IConfiguration configuration)
+        public LightingConfigFileManager(ILogger<LightingConfigFileManager> logger, IConfigFileHelper configFileHelper, IConfiguration configuration, IOptions<HueShiftOptions> appOptions)
         {
             this.logger = logger;
             this.configFileHelper = configFileHelper;
+            this.appOptions = appOptions;
             bridgeLocator = new HttpBridgeLocator();
             geolocator = new Geolocator(
                 new HttpClient { Timeout = TimeSpan.FromSeconds(10) },
@@ -39,7 +42,8 @@ namespace HueShift2.Configuration
         {
             logger.LogInformation($"Searching for Hue bridges on network...");
             //FIXME: what if no bridges are found?
-            var locatedBridges = (await bridgeLocator.LocateBridgesAsync(TimeSpan.FromSeconds(30))).ToList();
+            var discoveryTimeout = (appOptions.Value.BridgeProperties ?? new BridgeProperties()).DiscoveryTimeoutSeconds;
+            var locatedBridges = (await bridgeLocator.LocateBridgesAsync(TimeSpan.FromSeconds(discoveryTimeout))).ToList();
             var locatedBridge = locatedBridges[0];
             if (locatedBridges.Count() > 1)
             {

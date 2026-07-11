@@ -1,6 +1,8 @@
 ﻿using HueShift2.Configuration;
+using HueShift2.Configuration.Model;
 using HueShift2.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -32,9 +34,12 @@ namespace HueShift2
             var fileHelperLogger = new SerilogTypedLogger<ConfigFileHelper>(Log.Logger);
             var configFileHelper = new ConfigFileHelper(fileHelperLogger);
             var fileManagerLogger = new SerilogTypedLogger<LightingConfigFileManager>(Log.Logger);
-            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig);
-
-
+            var hueShiftSection = startupConfig.GetSection("HueShiftOptions");
+            if (!hueShiftSection.Exists())
+                Log.Warning("HueShiftOptions section missing from config; using default timeout values.");
+            var hueShiftOptions = hueShiftSection.Get<HueShiftOptions>() ?? new HueShiftOptions();
+            hueShiftOptions.BridgeProperties ??= new BridgeProperties();
+            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig, Options.Create(hueShiftOptions));
         }
 
         private async Task GenerateStartupConfigurationFile(IConfiguration config)

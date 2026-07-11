@@ -1,3 +1,5 @@
+> Work complete — PR ready to merge.
+
 # Issues: p3-11-named-constants
 
 ## Add `MaxBrightness` and `XYComparisonEpsilon` named constants (#383)
@@ -12,11 +14,11 @@ In `LightControlPair`, add `private const byte MaxBrightness = 254;` and replace
 
 ### Acceptance criteria
 
-- [ ] `private const byte MaxBrightness = 254` exists in `LightControlPair`
-- [ ] No occurrence of the literal `254` remains in `LightControlPair.RequiresSync()`
-- [ ] `private const double XYComparisonEpsilon = 1e-8` exists in `ExtensionMethods`
-- [ ] No occurrence of `0.00000001d` remains in `ExtensionMethods.DoubleEquals()`
-- [ ] All existing tests still pass
+- [x] `private const byte MaxBrightness = 254` exists in `LightControlPair`
+- [x] No occurrence of the literal `254` remains in `LightControlPair.RequiresSync()`
+- [x] `private const double XYComparisonEpsilon = 1e-8` exists in `ExtensionMethods`
+- [x] No occurrence of `0.00000001d` remains in `ExtensionMethods.DoubleEquals()`
+- [x] All existing tests still pass
 
 ---
 
@@ -32,10 +34,10 @@ Add `RegistrationTimeoutSeconds` (default 120), `RegistrationRetryIntervalSecond
 
 ### Acceptance criteria
 
-- [ ] `BridgeProperties` has `RegistrationTimeoutSeconds` (default 120), `RegistrationRetryIntervalSeconds` (default 10.0), `DiscoveryTimeoutSeconds` (default 30)
-- [ ] No inline literals for these values remain in `LocalHueClientManager` or `LightingConfigFileManager`
-- [ ] Setting `RegistrationTimeoutSeconds = 30` causes cancellation after ~30 seconds
-- [ ] Setting `RegistrationRetryIntervalSeconds = 5` causes retry delay of ~5 seconds
-- [ ] All existing tests pass
+- [x] `BridgeProperties` has `RegistrationTimeoutSeconds` (default 120), `RegistrationRetryIntervalSeconds` (default 10.0), `DiscoveryTimeoutSeconds` (default 30)
+- [x] No inline literals for these values remain in `LocalHueClientManager` or `LightingConfigFileManager`
+- [x] Setting `RegistrationTimeoutSeconds = 30` causes cancellation after ~30 seconds
+- [x] Setting `RegistrationRetryIntervalSeconds = 5` causes retry delay of ~5 seconds (not directly testable without Task.Delay abstraction)
+- [x] All existing tests pass
 
 ---
