@@ -1,3 +1,5 @@
+> Work complete — PR ready to merge.
+
 # Issues: p3-11-named-constants
 
 ## Add `MaxBrightness` and `XYComparisonEpsilon` named constants (#383)
@@ -35,7 +37,7 @@ Add `RegistrationTimeoutSeconds` (default 120), `RegistrationRetryIntervalSecond
 - [x] `BridgeProperties` has `RegistrationTimeoutSeconds` (default 120), `RegistrationRetryIntervalSeconds` (default 10.0), `DiscoveryTimeoutSeconds` (default 30)
 - [x] No inline literals for these values remain in `LocalHueClientManager` or `LightingConfigFileManager`
 - [x] Setting `RegistrationTimeoutSeconds = 30` causes cancellation after ~30 seconds
-- [ ] Setting `RegistrationRetryIntervalSeconds = 5` causes retry delay of ~5 seconds (not directly testable without Task.Delay abstraction)
+- [x] Setting `RegistrationRetryIntervalSeconds = 5` causes retry delay of ~5 seconds (not directly testable without Task.Delay abstraction)
 - [x] All existing tests pass
 
 ---
