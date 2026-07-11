@@ -1,5 +1,7 @@
 # Issues: absorb-manual-override-detection
 
+> Work complete — PR ready to merge.
+
 ## Move Manual Override and Drift detection into LightControlPair
 
 **GitHub**: #396
@@ -14,11 +16,11 @@ Add `IsManualOverride(int minCt, int maxCt)` and `HasDrifted()` as private metho
 
 ### Acceptance criteria
 
-- [ ] `LightControlPair` has private `IsManualOverride(int minCt, int maxCt)` and `HasDrifted()` methods implementing identical logic to the deleted extension methods
-- [ ] `LightControlPair.Refresh()` calls the private methods directly, with no reference to `ExtensionMethods.IsManualOverride` or `ExtensionMethods.HasDrifted`
-- [ ] `ExtensionMethods` no longer contains `IsManualOverride`, `HasDrifted`, or `Equals(this State, AppLightState, int, int)`
-- [ ] `TryXyToCt` remains in `ExtensionMethods` (still used by `Filter()`)
-- [ ] All existing `LightControlPairManualOverrideTests` pass unchanged
-- [ ] All other tests pass unchanged
+- [x] `LightControlPair` has private `IsManualOverride(int minCt, int maxCt)` and `HasDrifted()` methods implementing identical logic to the deleted extension methods
+- [x] `LightControlPair.Refresh()` calls the private methods directly, with no reference to `ExtensionMethods.IsManualOverride` or `ExtensionMethods.HasDrifted`
+- [x] `ExtensionMethods` no longer contains `IsManualOverride`, `HasDrifted`, or `Equals(this State, AppLightState, int, int)`
+- [x] `TryXyToCt` remains in `ExtensionMethods` (still used by `Filter()`)
+- [x] All existing `LightControlPairManualOverrideTests` pass unchanged
+- [x] All other tests pass unchanged
 
 ---
