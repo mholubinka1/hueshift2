@@ -41,9 +41,12 @@ namespace HueShift2.Configuration
         {
             if (string.IsNullOrWhiteSpace(ip))
                 return false;
+            var url = $"http://{ip.Trim()}/api";
+            if (!Uri.TryCreate(url, UriKind.Absolute, out _))
+                return false;
             try
             {
-                using var _ = await healthCheckClient.GetAsync($"http://{ip}/api");
+                using var _ = await healthCheckClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                 return true;
             }
             catch (Exception e) when (e is HttpRequestException or OperationCanceledException)
