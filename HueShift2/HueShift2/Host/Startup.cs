@@ -34,12 +34,11 @@ namespace HueShift2
             var fileHelperLogger = new SerilogTypedLogger<ConfigFileHelper>(Log.Logger);
             var configFileHelper = new ConfigFileHelper(fileHelperLogger);
             var fileManagerLogger = new SerilogTypedLogger<LightingConfigFileManager>(Log.Logger);
-            var hueShiftOptions = startupConfig.GetSection("HueShiftOptions").Get<HueShiftOptions>();
-            if (hueShiftOptions is null)
-            {
+            var hueShiftSection = startupConfig.GetSection("HueShiftOptions");
+            if (!hueShiftSection.Exists())
                 Log.Warning("HueShiftOptions section missing from config; using default timeout values.");
-                hueShiftOptions = new HueShiftOptions();
-            }
+            var hueShiftOptions = hueShiftSection.Get<HueShiftOptions>() ?? new HueShiftOptions();
+            hueShiftOptions.BridgeProperties ??= new BridgeProperties();
             lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig, Options.Create(hueShiftOptions));
         }
 
