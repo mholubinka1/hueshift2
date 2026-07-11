@@ -46,7 +46,7 @@ namespace HueShift2
             var geolocator = new Geolocator(
                 new HttpClient { Timeout = TimeSpan.FromSeconds(10) },
                 startupConfig.GetSection("IpStackApi"));
-            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, startupConfig, Options.Create(hueShiftOptions), healthCheckClient, bridgeLocator, geolocator);
+            lightingConfigFileManager = new LightingConfigFileManager(fileManagerLogger, configFileHelper, Options.Create(hueShiftOptions), healthCheckClient, bridgeLocator, geolocator);
         }
 
         private async Task GenerateStartupConfigurationFile(IConfiguration config)

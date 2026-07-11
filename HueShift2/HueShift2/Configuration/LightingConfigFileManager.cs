@@ -1,5 +1,4 @@
 ﻿using HueShift2.Configuration.Model;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -28,7 +27,7 @@ namespace HueShift2.Configuration
         private readonly IBridgeLocator bridgeLocator;
         private readonly IGeoLocator geolocator;
 
-        public LightingConfigFileManager(ILogger<LightingConfigFileManager> logger, IConfigFileHelper configFileHelper, IConfiguration configuration, IOptions<HueShiftOptions> appOptions, HttpClient healthCheckClient, IBridgeLocator bridgeLocator, IGeoLocator geolocator)
+        public LightingConfigFileManager(ILogger<LightingConfigFileManager> logger, IConfigFileHelper configFileHelper, IOptions<HueShiftOptions> appOptions, HttpClient healthCheckClient, IBridgeLocator bridgeLocator, IGeoLocator geolocator)
         {
             this.logger = logger;
             this.configFileHelper = configFileHelper;
@@ -40,6 +39,8 @@ namespace HueShift2.Configuration
 
         private async Task<bool> IsBridgeReachable(string ip)
         {
+            if (string.IsNullOrWhiteSpace(ip))
+                return false;
             try
             {
                 using var _ = await healthCheckClient.GetAsync($"http://{ip}/api");

@@ -1,6 +1,5 @@
 using HueShift2.Configuration;
 using HueShift2.Configuration.Model;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -54,7 +53,6 @@ namespace HueShift2.Tests.Configuration
             return new LightingConfigFileManager(
                 NullLogger<LightingConfigFileManager>.Instance,
                 configFileHelper ?? Substitute.For<IConfigFileHelper>(),
-                new ConfigurationBuilder().Build(),
                 options,
                 healthCheckClient,
                 bridgeLocator ?? Substitute.For<IBridgeLocator>(),
