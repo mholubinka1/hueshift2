@@ -42,7 +42,7 @@ namespace HueShift2.Configuration
         {
             try
             {
-                await healthCheckClient.GetAsync($"http://{ip}/api");
+                using var _ = await healthCheckClient.GetAsync($"http://{ip}/api");
                 return true;
             }
             catch (Exception e) when (e is HttpRequestException or OperationCanceledException)
