@@ -83,36 +83,6 @@ namespace HueShift2.Helpers
             };
         }
 
-        #region Manual Override and Drift Detection
-
-        public static bool IsManualOverride(this State @this, int minCt, int maxCt)
-        {
-            var low = Math.Min(minCt, maxCt);
-            var high = Math.Max(minCt, maxCt);
-            return @this.ColorMode.ToColourMode() switch
-            {
-                ColourMode.CT => @this.ColorTemperature == null || @this.ColorTemperature.Value < low || @this.ColorTemperature.Value > high,
-                ColourMode.XY => @this.ColorCoordinates == null || !TryXyToCt(@this.ColorCoordinates, out var convertedCt) || convertedCt < low || convertedCt > high,
-                _ => true,
-            };
-        }
-
-        public static bool HasDrifted(this State @this, AppLightState expectedLight)
-        {
-            if (expectedLight.Colour.ColourTemperature == null) return false;
-            var expectedCt = expectedLight.Colour.ColourTemperature.Value;
-            return @this.ColorMode.ToColourMode() switch
-            {
-                ColourMode.CT => @this.ColorTemperature != null && Math.Abs(@this.ColorTemperature.Value - expectedCt) > 10,
-                ColourMode.XY => @this.ColorCoordinates != null && TryXyToCt(@this.ColorCoordinates, out var convertedCt) && Math.Abs(convertedCt - expectedCt) > 10,
-                _ => false,
-            };
-        }
-
-        #endregion
-
-        #region Light Equality
-
         public static bool TryXyToCt(double[] xy, out int ct)
         {
             ct = 0;
@@ -124,28 +94,6 @@ namespace HueShift2.Helpers
             if (kelvin <= 0 || double.IsNaN(kelvin) || double.IsInfinity(kelvin)) return false;
             ct = (int)(1_000_000 / kelvin);
             return true;
-        }
-
-        public static bool Equals(this State @this, AppLightState expectedLight, int minCt, int maxCt)
-        {
-            if (expectedLight.Colour.ColourTemperature != null)
-            {
-                var expectedCt = expectedLight.Colour.ColourTemperature.Value;
-                if (@this.ColorTemperature != null)
-                    return Math.Abs(@this.ColorTemperature.Value - expectedCt) <= 50;
-                if (@this.ColorCoordinates != null)
-                {
-                    if (!TryXyToCt(@this.ColorCoordinates, out var convertedCt)) return false;
-                    var low = Math.Min(minCt, maxCt);
-                    var high = Math.Max(minCt, maxCt);
-                    if (convertedCt < low - 50 || convertedCt > high + 50) return false;
-                    return Math.Abs(convertedCt - expectedCt) <= 50;
-                }
-                return false;
-            }
-            if (expectedLight.Colour.ColourCoordinates != null && @this.ColorCoordinates != null)
-                return ArrayEquals(expectedLight.Colour.ColourCoordinates, @this.ColorCoordinates);
-            return false;
         }
 
         public static bool ArrayEquals(double[] @this, double[] other)
@@ -166,8 +114,6 @@ namespace HueShift2.Helpers
             var equals = (Math.Abs(@this - other) <= precision);
             return equals;
         }
-
-        #endregion
 
         #region Cloning
 

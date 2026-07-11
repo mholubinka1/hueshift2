@@ -67,9 +67,9 @@ namespace HueShift2.Control
                     case LightControlState.HueShiftControlled:
                         if (prevIsOn && prevIsReachable)
                         {
-                            if (this.NetworkLight.IsManualOverride(minCt, maxCt))
+                            if (IsManualOverride(minCt, maxCt))
                                 TakeManualOverride();
-                            else if (this.NetworkLight.HasDrifted(this.ExpectedLight))
+                            else if (HasDrifted())
                                 this.SyncRequired = true;
                         }
                         break;
@@ -195,6 +195,30 @@ namespace HueShift2.Control
 
         private void TakeManualOverride() => this.AppControlState = LightControlState.Manual;
         private void ReturnToControl() => this.AppControlState = LightControlState.HueShiftControlled;
+
+        private bool IsManualOverride(int minCt, int maxCt)
+        {
+            var low = Math.Min(minCt, maxCt);
+            var high = Math.Max(minCt, maxCt);
+            return this.NetworkLight.ColorMode.ToColourMode() switch
+            {
+                ColourMode.CT => this.NetworkLight.ColorTemperature == null || this.NetworkLight.ColorTemperature.Value < low || this.NetworkLight.ColorTemperature.Value > high,
+                ColourMode.XY => this.NetworkLight.ColorCoordinates == null || !Helpers.ExtensionMethods.TryXyToCt(this.NetworkLight.ColorCoordinates, out var convertedCt) || convertedCt < low || convertedCt > high,
+                _ => true,
+            };
+        }
+
+        private bool HasDrifted()
+        {
+            if (this.ExpectedLight.Colour.ColourTemperature == null) return false;
+            var expectedCt = this.ExpectedLight.Colour.ColourTemperature.Value;
+            return this.NetworkLight.ColorMode.ToColourMode() switch
+            {
+                ColourMode.CT => this.NetworkLight.ColorTemperature != null && Math.Abs(this.NetworkLight.ColorTemperature.Value - expectedCt) > 10,
+                ColourMode.XY => this.NetworkLight.ColorCoordinates != null && Helpers.ExtensionMethods.TryXyToCt(this.NetworkLight.ColorCoordinates, out var convertedCt) && Math.Abs(convertedCt - expectedCt) > 10,
+                _ => false,
+            };
+        }
 
         private void RefreshTransition(DateTime currentTime)
         {
