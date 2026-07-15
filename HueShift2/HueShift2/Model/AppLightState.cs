@@ -1,4 +1,3 @@
-﻿using HueShift2.Interfaces;
 using HueShift2.Model;
 using Q42.HueApi;
 using System;
@@ -7,14 +6,13 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class AppLightState : IDeepCloneable<AppLightState>, IEquatable<AppLightState>
+    public class AppLightState : IEquatable<AppLightState>
     {
-        public byte? Brightness { get; set; }
-        public Colour Colour { get; set; }
+        public byte? Brightness { get; init; }
+        public Colour Colour { get; init; }
 
         public AppLightState()
         {
-
         }
 
         public AppLightState(State state)
@@ -25,7 +23,7 @@ namespace HueShift2.Model
 
         public AppLightState(Colour colour)
         {
-            this.Colour = colour.DeepClone();
+            this.Colour = colour;
         }
 
         public AppLightState(byte? brightness, int colourTemperature)
@@ -34,18 +32,15 @@ namespace HueShift2.Model
             this.Colour = new Colour(colourTemperature);
         }
 
-        public AppLightState DeepClone()
-        {
-            return new AppLightState
-            {
-                Brightness = this.Brightness,
-                Colour = this.Colour.DeepClone()
-            };
-        }
+        internal AppLightState WithBrightness(byte? brightness) => new AppLightState { Brightness = brightness, Colour = this.Colour };
+        internal AppLightState WithColour(Colour colour) => new AppLightState { Brightness = this.Brightness, Colour = colour };
 
         public bool Equals(AppLightState other)
         {
+            if (other == null) return false;
             var brightness = other.Brightness == null || other.Brightness == this.Brightness;
+            if (this.Colour == null) return brightness && other.Colour == null;
+            if (other.Colour == null) return false;
             return brightness && this.Colour.Equals(other.Colour);
         }
 

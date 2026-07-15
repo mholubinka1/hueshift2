@@ -57,7 +57,7 @@ namespace HueShift2.Control
             if (_isReachable)
             {
                 _isOn = networkLight.On;
-                this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
+                this.ExpectedLight = this.ExpectedLight.WithBrightness(this.NetworkLight.Brightness);
             }
 
             if (_isReachable && _isOn && !_isTransitioning)
@@ -162,10 +162,14 @@ namespace HueShift2.Control
 
         public void UpdateExpectedState(LightCommand command)
         {
+            byte? brightness;
             if (command.Brightness != null)
-                this.ExpectedLight.Brightness = (byte)command.Brightness;
+                brightness = (byte)command.Brightness;
             else if (_isReachable)
-                this.ExpectedLight.Brightness = this.NetworkLight.Brightness;
+                brightness = this.NetworkLight.Brightness;
+            else
+                brightness = this.ExpectedLight.Brightness;
+            this.ExpectedLight = this.ExpectedLight.WithBrightness(brightness);
             ChangeColour(command);
         }
 
@@ -247,30 +251,19 @@ namespace HueShift2.Control
             }
         }
 
-        private void ClearColourState()
-        {
-            this.ExpectedLight.Colour.Mode = ColourMode.None;
-            this.ExpectedLight.Colour.ColourCoordinates = null;
-            this.ExpectedLight.Colour.ColourTemperature = null;
-            this.ExpectedLight.Colour.Hue = null;
-            this.ExpectedLight.Colour.Saturation = null;
-        }
-
         private void ChangeColour(LightCommand command)
         {
-            ClearColourState();
             if (command.ColorCoordinates != null)
             {
-                this.ExpectedLight.Colour.Mode = ColourMode.XY;
-                this.ExpectedLight.Colour.ColourCoordinates = command.ColorCoordinates;
+                this.ExpectedLight = this.ExpectedLight.WithColour(new Colour(command.ColorCoordinates));
                 return;
             }
             if (command.ColorTemperature != null)
             {
-                this.ExpectedLight.Colour.Mode = ColourMode.CT;
-                this.ExpectedLight.Colour.ColourTemperature = command.ColorTemperature;
+                this.ExpectedLight = this.ExpectedLight.WithColour(new Colour(command.ColorTemperature));
                 return;
             }
+            this.ExpectedLight = this.ExpectedLight.WithColour(new Colour());
         }
     }
 }
