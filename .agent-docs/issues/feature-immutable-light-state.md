@@ -1,3 +1,5 @@
+> Work complete — PR ready to merge.
+
 # Issues: feature-immutable-light-state
 
 ## Convert Colour to a record and fix equality
@@ -10,16 +12,16 @@
 
 ### What to build
 
-Convert `Colour` from a mutable class to a C# `record class` with `init`-only properties. Override `Equals(Colour other)` to use `ExtensionMethods.ArrayEquals` for `ColourCoordinates` value comparison. Fix `Equals(object obj)` to cast to `Colour` instead of `AppLightState`. Fix all `NotImplementedException` branches in `Equals(Colour)`. Override `GetHashCode()` consistently. Add `ColourEqualityTests` covering: identical XY coordinates compare equal, different XY unequal, CT-only equality by value, `Equals(object)` with a boxed Colour, null coordinate handling.
+Convert `Colour` from a mutable class to an init-only class with `init`-only properties. Override `Equals(Colour other)` to use `ExtensionMethods.ArrayEquals` for `ColourCoordinates` value comparison. Fix `Equals(object obj)` to cast to `Colour` instead of `AppLightState`. Fix all `NotImplementedException` branches in `Equals(Colour)`. Override `GetHashCode()` consistently with mode-gating. Add `ColourEqualityTests` covering: identical XY coordinates compare equal, different XY unequal, CT-only equality by value, `Equals(object)` with a boxed Colour, null coordinate handling.
 
 ### Acceptance criteria
 
-- [ ] `Colour` is a `record class` with all five properties (`Mode`, `ColourCoordinates`, `ColourTemperature`, `Hue`, `Saturation`) `init`-only
-- [ ] `Colour.Equals(Colour other)` uses `ExtensionMethods.ArrayEquals` for `ColourCoordinates` and has no `NotImplementedException` branches
-- [ ] `Colour.Equals(object obj)` casts to `Colour`, not `AppLightState`
-- [ ] `Colour.GetHashCode()` is consistent with `Equals`
-- [ ] New `ColourEqualityTests` pass covering XY value equality, CT equality, object overload, and null coordinates
-- [ ] All existing tests pass unchanged
+- [x] `Colour` has all five properties (`Mode`, `ColourCoordinates`, `ColourTemperature`, `Hue`, `Saturation`) `init`-only
+- [x] `Colour.Equals(Colour other)` uses `ExtensionMethods.ArrayEquals` for `ColourCoordinates` and has no `NotImplementedException` branches
+- [x] `Colour.Equals(object obj)` casts to `Colour`, not `AppLightState`
+- [x] `Colour.GetHashCode()` is consistent with `Equals` (mode-gated switch)
+- [x] New `ColourEqualityTests` pass covering XY value equality, CT equality, object overload, and null coordinates
+- [x] All existing tests pass unchanged
 
 ---
 
@@ -33,16 +35,16 @@ Convert `Colour` from a mutable class to a C# `record class` with `init`-only pr
 
 ### What to build
 
-Convert `AppLightState` from a mutable class to a C# `record class` with `init`-only properties (`Brightness`, `Colour`). Remove `IDeepCloneable<AppLightState>` from `AppLightState` and delete its `DeepClone()` method. Remove `IDeepCloneable<Colour>` from `Colour` and delete its `DeepClone()` method. Update `CachedControlPair` to replace `light.ExpectedLight.DeepClone()` with a direct assignment `light.ExpectedLight`. The `IDeepCloneable<T>` interface is retained — `LightProperties` and `Transition` still implement it.
+Convert `AppLightState` from a mutable class to an init-only class with `init`-only properties (`Brightness`, `Colour`). Add `WithBrightness`/`WithColour` factory methods. Remove `IDeepCloneable<T>` from `AppLightState`, `Colour`, `LightProperties`, and `Transition`; delete `IDeepCloneable.cs`. Update `CachedControlPair` to replace `DeepClone()` calls with direct assignment.
 
 ### Acceptance criteria
 
-- [ ] `AppLightState` is a `record class` with `Brightness` and `Colour` `init`-only
-- [ ] `AppLightState` does not implement `IDeepCloneable<AppLightState>` and has no `DeepClone()` method
-- [ ] `Colour` does not implement `IDeepCloneable<Colour>` and has no `DeepClone()` method
-- [ ] `IDeepCloneable<T>` interface file is unchanged (still implemented by `LightProperties` and `Transition`)
-- [ ] `CachedControlPair` assigns `ExpectedLight` directly without calling `DeepClone()`
-- [ ] All existing tests pass unchanged
+- [x] `AppLightState` has `Brightness` and `Colour` `init`-only with `WithBrightness`/`WithColour` factory methods
+- [x] `AppLightState` does not implement `IDeepCloneable<AppLightState>` and has no `DeepClone()` method
+- [x] `Colour` does not implement `IDeepCloneable<Colour>` and has no `DeepClone()` method
+- [x] `LightProperties` and `Transition` no longer implement `IDeepCloneable<T>`; `IDeepCloneable.cs` is deleted
+- [x] `CachedControlPair` assigns `ExpectedLight` and `Properties` directly without calling `DeepClone()`
+- [x] All existing tests pass unchanged
 
 ---
 
@@ -56,15 +58,15 @@ Convert `AppLightState` from a mutable class to a C# `record class` with `init`-
 
 ### What to build
 
-Replace all in-place mutations of `ExpectedLight` and its `Colour` in `LightControlPair` with `with`-expressions that produce new instances atomically. Specifically: the `Refresh()` Brightness update, both `UpdateExpectedState()` Brightness assignments, and `ChangeColour()` which constructs a fresh `Colour` per colour mode in a single expression. Delete `ClearColourState()` — it exists solely to zero Colour fields before `ChangeColour()` sets new ones, a step that is unnecessary once `ChangeColour()` constructs a complete `Colour` in one operation.
+Replace all in-place mutations of `ExpectedLight` and its `Colour` in `LightControlPair` with factory method calls (`WithBrightness`/`WithColour`) that produce new instances atomically. Delete `ClearColourState()` — it exists solely to zero Colour fields before `ChangeColour()` sets new ones, a step that is unnecessary once `ChangeColour()` constructs a complete `Colour` in one operation.
 
 ### Acceptance criteria
 
-- [ ] `LightControlPair.Refresh()` updates Expected Light Brightness via a `with`-expression on `this.ExpectedLight`
-- [ ] `LightControlPair.UpdateExpectedState()` updates Expected Light Brightness via `with`-expressions
-- [ ] `LightControlPair.ChangeColour()` constructs a new `Colour` in a single expression per colour mode (XY, CT, or default) and assigns it via a `with`-expression on `this.ExpectedLight`
-- [ ] `ClearColourState()` is deleted
-- [ ] No remaining direct property assignments on `this.ExpectedLight` or `this.ExpectedLight.Colour`
-- [ ] All existing tests pass unchanged
+- [x] `LightControlPair.Refresh()` updates Expected Light Brightness via `WithBrightness` on `this.ExpectedLight`
+- [x] `LightControlPair.UpdateExpectedState()` updates Expected Light Brightness via `WithBrightness`
+- [x] `LightControlPair.ChangeColour()` constructs a new `Colour` in a single expression per colour mode (XY, CT, or default) and assigns it via `WithColour` on `this.ExpectedLight`
+- [x] `ClearColourState()` is deleted
+- [x] No remaining direct property assignments on `this.ExpectedLight` or `this.ExpectedLight.Colour`
+- [x] All existing tests pass unchanged
 
 ---
