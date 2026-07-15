@@ -22,13 +22,13 @@ namespace HueShift2.Model
 
         public CachedControlPair(LightControlPair light)
         {
-            this.Properties = light.Properties.DeepClone();
+            this.Properties = light.Properties;
             this.IsOn = light.IsOn();
             this.IsTransitioning = light.IsTransitioning();
             this.IsReachable = light.IsReachable();
             this.AppControlState = light.AppControlState;
             this.NetworkLight = new AppLightState(light.NetworkLight);
-            this.ExpectedLight = light.ExpectedLight.DeepClone();
+            this.ExpectedLight = light.ExpectedLight;
             this.TransitionSecondsRemaining = light.TransitionSecondsRemaining();
             this.ResetOccurred = light.ResetOccurred;
             this.SyncRequired = light.SyncRequired;

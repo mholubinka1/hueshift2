@@ -1,5 +1,4 @@
-﻿using HueShift2.Interfaces;
-using Q42.HueApi;
+﻿using Q42.HueApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HueShift2.Model
 {
-    public class LightProperties : IDeepCloneable<LightProperties>
+    public class LightProperties
     {
         public string Id { get; private set; }
         public string Name { get; private set; }
@@ -18,7 +17,6 @@ namespace HueShift2.Model
 
         public LightProperties()
         {
-
         }
 
         public LightProperties(Light networkLight)
@@ -29,15 +27,5 @@ namespace HueShift2.Model
             this.ProductId = networkLight.ProductId;
         }
 
-        public LightProperties DeepClone()
-        {
-            return new LightProperties
-            {
-                Id = this.Id,
-                Name = this.Name,
-                ModelId = this.ModelId,
-                ProductId = this.ProductId,
-            };
-        }
     }
 }

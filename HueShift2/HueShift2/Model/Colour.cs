@@ -1,5 +1,4 @@
-﻿using HueShift2.Helpers;
-using HueShift2.Interfaces;
+using HueShift2.Helpers;
 using Q42.HueApi;
 using System;
 using System.Collections.Generic;
@@ -7,23 +6,22 @@ using System.Text;
 
 namespace HueShift2.Model
 {
-    public class Colour : IDeepCloneable<Colour>, IEquatable<Colour>
+    public class Colour : IEquatable<Colour>
     {
-        public ColourMode Mode { get; set; }
-        public double[] ColourCoordinates { get; set; }
-        public int? ColourTemperature { get; set; }
-        public int? Hue { get; set; }
-        public int? Saturation { get; set; }
+        public ColourMode Mode { get; init; }
+        public double[] ColourCoordinates { get; init; }
+        public int? ColourTemperature { get; init; }
+        public int? Hue { get; init; }
+        public int? Saturation { get; init; }
 
         public Colour()
         {
-
         }
 
         public Colour(double[] colourCoordinates)
         {
             this.Mode = ColourMode.XY;
-            this.ColourCoordinates = colourCoordinates;
+            this.ColourCoordinates = colourCoordinates.DeepClone();
         }
 
         public Colour(int? colourTemperature)
@@ -48,61 +46,43 @@ namespace HueShift2.Model
             this.Saturation = state.Saturation;
         }
 
-        public Colour(Colour other)
-        {
-            this.Mode = other.Mode;
-            this.ColourCoordinates = other.ColourCoordinates.DeepClone();
-            this.ColourTemperature = other.ColourTemperature;
-            this.Hue = other.Hue;
-            this.Saturation = other.Saturation;
-        }
-
-        public Colour DeepClone()
-        {
-            return new Colour
-            {
-                Mode = this.Mode,
-                ColourCoordinates = this.ColourCoordinates.DeepClone(),
-                ColourTemperature = this.ColourTemperature,
-                Hue = this.Hue,
-                Saturation = this.Saturation,
-            };
-        }
-
         public bool Equals(Colour other)
         {
             if (other == null) return false;
-            if (this.Mode == other.Mode)
+            if (this.Mode != other.Mode) return false;
+            return this.Mode switch
             {
-                switch (this.Mode)
-                {
-                    case ColourMode.XY:
-                        return ExtensionMethods.ArrayEquals(this.ColourCoordinates, other.ColourCoordinates);
-                    case ColourMode.CT:
-                        return this.ColourTemperature == other.ColourTemperature;
-                    default:
-                        //return this.Hue == lightState.Hue && this.Saturation == lightState.Saturation;
-                        throw new NotImplementedException();
-                }
-            }
-            else
-            {
-                if (ExtensionMethods.ArrayEquals(this.ColourCoordinates, other.ColourCoordinates))
-                {
-                    return true;
-                }
-                throw new NotImplementedException();
-            }
+                ColourMode.XY => ExtensionMethods.ArrayEquals(this.ColourCoordinates, other.ColourCoordinates),
+                ColourMode.CT => this.ColourTemperature == other.ColourTemperature,
+                _ => this.Hue == other.Hue && this.Saturation == other.Saturation,
+            };
         }
 
         public override bool Equals(object obj)
         {
-            return this.Equals(obj as AppLightState);
+            return this.Equals(obj as Colour);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Mode, ColourCoordinates, ColourTemperature, Hue, Saturation);
+            var hc = new HashCode();
+            hc.Add(Mode);
+            switch (Mode)
+            {
+                case ColourMode.XY:
+                    if (ColourCoordinates != null)
+                        foreach (var v in ColourCoordinates)
+                            hc.Add(Math.Round(v, 7));
+                    break;
+                case ColourMode.CT:
+                    hc.Add(ColourTemperature);
+                    break;
+                default:
+                    hc.Add(Hue);
+                    hc.Add(Saturation);
+                    break;
+            }
+            return hc.ToHashCode();
         }
 
         public override string ToString()
