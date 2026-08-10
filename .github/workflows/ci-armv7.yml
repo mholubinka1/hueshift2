@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - '**'
+  pull_request:
+    branches:
+      - 'master'
 
 jobs:
   ARMv7_Image_Build_and_Push:
