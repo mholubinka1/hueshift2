@@ -1,5 +1,7 @@
 # Issues: hotfix-harden-ci-arm64-fork-pr-exposure
 
+> Work complete — PR ready to merge.
+
 ## Close ARM64 runner fork-PR exposure (push-only CI trigger)
 
 **GitHub issue**: #409
@@ -18,11 +20,11 @@ during design — confirm it's committed alongside this change).
 
 ### Acceptance criteria
 
-- [ ] `ci-armv7.yml` no longer has a `pull_request:` trigger block
-- [ ] `ci-armv7.yml` still has its `push:` trigger, unchanged (`branches: ['**']`)
-- [ ] No other job content in `ci-armv7.yml` changes
-- [ ] ADR-0003 is present at `.agent-docs/adr/0003-ci-arm64-push-only-trigger.md`
-- [ ] A push on this branch triggers the workflow (verified by this PR's own CI run)
+- [x] `ci-armv7.yml` no longer has a `pull_request:` trigger block
+- [x] `ci-armv7.yml` still has its `push:` trigger, unchanged (`branches: ['**']`)
+- [x] No other job content in `ci-armv7.yml` changes
+- [x] ADR-0003 is present at `.agent-docs/adr/0003-ci-arm64-push-only-trigger.md`
+- [x] A push on this branch triggers the workflow (verified by this PR's own CI run)
 
 ---
 
@@ -44,11 +46,11 @@ Created via `gh api` so it's reproducible, not via the web UI.
 
 ### Acceptance criteria
 
-- [ ] `CODEOWNERS` exists at repo root with `* @mholubinka1`
-- [ ] A new ruleset targeting `master` exists via `gh api repos/mholubinka1/hueshift2/rulesets`
-- [ ] The ruleset's `pull_request` rule has `required_approving_review_count: 1` and `require_code_owner_review: true`
-- [ ] The ruleset includes `non_fast_forward` and `deletion` rules
-- [ ] The ruleset enforcement is `active`
-- [ ] The ruleset has a bypass actor for the repository admin role set to `always`
+- [x] `CODEOWNERS` exists at repo root with `* @mholubinka1`
+- [x] A new ruleset targeting `master` exists via `gh api repos/mholubinka1/hueshift2/rulesets`
+- [x] The ruleset's `pull_request` rule has `required_approving_review_count: 1` and `require_code_owner_review: true`
+- [x] The ruleset includes `non_fast_forward` and `deletion` rules
+- [x] The ruleset enforcement is `active`
+- [x] The ruleset has a bypass actor for the repository admin role set to `always`
 
 ---
