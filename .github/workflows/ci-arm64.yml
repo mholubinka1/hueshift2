@@ -55,5 +55,6 @@ jobs:
           timeout_minutes: 5
           command: |
             set -euo pipefail
+            trap 'docker logout "$DOCKER_REGISTRY" || true' EXIT
             echo "$DOCKERHUB_TOKEN" | docker login "$DOCKER_REGISTRY" --username "$DOCKERHUB_USERNAME" --password-stdin
             docker buildx build --push --tag "$TAG" .
