@@ -53,4 +53,4 @@ jobs:
           command: |
             set -euo pipefail
             echo "$DOCKERHUB_TOKEN" | docker login "$DOCKER_REGISTRY" --username "$DOCKERHUB_USERNAME" --password-stdin
-            docker buildx build --no-cache --pull --push --tag "$TAG" .
+            docker buildx build --push --tag "$TAG" .
