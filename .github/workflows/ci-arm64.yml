@@ -1,0 +1,60 @@
+name: Docker Build/Publish Image - ARM64
+
+on:
+  push:
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+
+jobs:
+  ARM64_Image_Build_and_Push:
+    runs-on: [ ARM64 ]
+    env:
+      DOCKER_REGISTRY: docker.io
+      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/hueshift2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare
+        if: success()
+        id: prepare
+        run: |
+          echo "docker_image=${DOCKER_REGISTRY}/${DOCKER_IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Docker info
+        run: |
+          docker version
+          docker info
+          docker ps
+
+      - name: Get Docker Image Tag
+        if: success()
+        id: tag
+        shell: bash
+        run: |
+          branchName=${{ github.ref_name }}
+          if [ "$branchName" != 'master' ]; then image_tag='dev'; else image_tag='latest'; fi
+          echo "tag=$image_tag" >> "$GITHUB_OUTPUT"
+
+      # Builds from the local checkout rather than a remote git#{sha} fetch (the old
+      # docker/build-push-action default) — the remote-fetch path was a confirmed source
+      # of transient CI failures in this pattern's originating repo. Keep it this way.
+      - name: Docker Login, Build and Push
+        if: success()
+        uses: nick-fields/retry@v4
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          TAG: ${{ steps.prepare.outputs.docker_image }}:${{ steps.tag.outputs.tag }}
+        with:
+          max_attempts: 3
+          retry_wait_seconds: 15
+          timeout_minutes: 5
+          command: |
+            set -euo pipefail
+            trap 'docker logout "$DOCKER_REGISTRY" || true' EXIT
+            echo "$DOCKERHUB_TOKEN" | docker login "$DOCKER_REGISTRY" --username "$DOCKERHUB_USERNAME" --password-stdin
+            docker buildx build --push --tag "$TAG" .
