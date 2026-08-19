@@ -20,7 +20,6 @@ jobs:
         id: prepare
         run: |
           echo "docker_image=${DOCKER_REGISTRY}/${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
-          echo "version=${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
 
       - name: Docker info
         run: |
@@ -54,4 +53,4 @@ jobs:
           command: |
             set -euo pipefail
             echo "$DOCKERHUB_TOKEN" | docker login "$DOCKER_REGISTRY" --username "$DOCKERHUB_USERNAME" --password-stdin
-            docker buildx build --rm --no-cache --pull --push --tag "$TAG" .
+            docker buildx build --no-cache --pull --push --tag "$TAG" .
