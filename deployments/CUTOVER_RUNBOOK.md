@@ -1,0 +1,140 @@
+# Pi cutover runbook: hueshift2 → `pi-media/containers/hueshift2/`
+
+This runbook moves the live hueshift2 container's config and logs off the SD card and into the per-container layout on the media drive ([ADR-0004](../.agent-docs/adr/0004-pi-media-per-container-bind-mounts.md)):
+
+| | From | To |
+|---|---|---|
+| `/config` | `/home/pi/.config/hueshift2` | `/mnt/media/pi-media/containers/hueshift2/config` |
+| `/log` | `/home/pi/.log/hueshift2` | `/mnt/media/pi-media/containers/hueshift2/log` |
+
+Run it in one supervised session on the Pi. hueshift2 is down for under a minute, so lights hold their current state and are not adjusted during that time. Nothing changes inside the container, so there is no image change or app config edit.
+
+Names used below, on the Pi (`pi-desktop`):
+
+```bash
+COMPOSE=/home/pi/git/pi-desktop/docker/docker-compose.yml
+OLD_CONFIG=/home/pi/.config/hueshift2
+OLD_LOG=/home/pi/.log/hueshift2
+NEW=/mnt/media/pi-media/containers/hueshift2
+```
+
+The live compose file is in the separate `pi-desktop` repo and may hold uncommitted edits. Every edit below is a minimal, anchored change made after a backup. Never replace the file wholesale.
+
+The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` print "Operation not permitted" warnings, but the copy or edit still happens, so check the result. Use plain `cp`. The drive is mounted world-writable, so the container can write `log/` without a `chown`.
+
+## Pre-checks
+
+1. Confirm the media drive is mounted. If it isn't, the container would write into an empty directory on the SD card under `/mnt/media`:
+
+   ```bash
+   mountpoint /mnt/media/pi-media || mountpoint /mnt/media
+   ```
+
+   One of them must print `is a mountpoint`.
+
+2. Confirm the current mounts and that the config file exists:
+
+   ```bash
+   docker inspect hueshift2 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
+   ls -la "$OLD_CONFIG" "$OLD_LOG"
+   ```
+
+   Expected: `$OLD_CONFIG -> /config` and `$OLD_LOG -> /log`, and `hueshift2-config.json` in `$OLD_CONFIG`.
+
+3. Confirm the destination doesn't exist yet. A rerun must not overwrite a config that is already in place:
+
+   ```bash
+   [ ! -e "$NEW" ] && echo "preconditions OK" || echo "STOP: $NEW already exists; inspect it before going on"
+   ```
+
+## Procedure
+
+1. Stop the container, so nothing writes while the files are copied:
+
+   ```bash
+   docker compose -f "$COMPOSE" stop hueshift2
+   ```
+
+2. Create the directories and copy the config and logs. The old directories stay in place as the rollback:
+
+   ```bash
+   mkdir -p "$NEW/config" "$NEW/log"
+   cp -r "$OLD_CONFIG/." "$NEW/config/"
+   cp -r "$OLD_LOG/." "$NEW/log/"
+   cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config copied intact"
+   ls -la "$NEW/config" "$NEW/log"
+   ```
+
+   Stop if `config copied intact` does not print.
+
+3. Edit the live compose file. Back it up, swap the two hueshift2 volume lines, then review the diff and validate:
+
+   ```bash
+   BAK="$COMPOSE.bak-$(date +%Y%m%d%H%M%S)"
+   cp "$COMPOSE" "$BAK"
+   sed -i \
+     -e 's#- /home/pi/.config/hueshift2:/config:rw#- /mnt/media/pi-media/containers/hueshift2/config:/config#' \
+     -e 's#- /home/pi/.log/hueshift2:/log:rw#- /mnt/media/pi-media/containers/hueshift2/log:/log#' \
+     "$COMPOSE"
+   diff "$BAK" "$COMPOSE"
+   docker compose -f "$COMPOSE" config --format json | python3 -c "import json,sys; print([(v['source'], v['target']) for v in json.load(sys.stdin)['services']['hueshift2']['volumes']])"
+   ```
+
+   The diff must show only the two hueshift2 volume lines. The last command must print the two new mounts.
+
+4. Recreate the container on the new mounts:
+
+   ```bash
+   docker compose -f "$COMPOSE" up -d hueshift2
+   ```
+
+## Verify
+
+1. The container is running with the new mounts:
+
+   ```bash
+   docker ps --filter name=hueshift2 --format '{{.Names}}\t{{.Status}}'
+   docker inspect hueshift2 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
+   ```
+
+2. The existing config was loaded and not regenerated. At startup the app logs `Asserting ... Hue bridge settings` for an existing file and `Generating ...` for a missing one:
+
+   ```bash
+   docker logs --since 5m hueshift2 2>&1 | grep -E 'Asserting|Generating|Bridge reachable|IP mismatch'
+   cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config unchanged"
+   ```
+
+   Expected: `Asserting /config/hueshift2-config.json ...` and `Bridge reachable at ...`, with no `Generating`, then `config unchanged`. If the bridge IP changed since the last start, the app logs `IP mismatch` and rewrites only the IP. That is normal, and the `cmp` will then differ.
+
+3. New log lines are appearing on the media drive. Wait a minute after step 4, then:
+
+   ```bash
+   ls -lt "$NEW/log" | head -3
+   tail -5 "$(ls -t "$NEW"/log/hueshift2-*.log | grep -v debug | head -1)"
+   docker logs --since 5m hueshift2 2>&1 | tail -10
+   ```
+
+   The newest log file has entries timestamped after step 4, and they show no config or bridge errors.
+
+4. Commit the compose change in the `pi-desktop` repo. Commit the hueshift2 hunk only, if the file has other uncommitted edits.
+
+## Clean up
+
+Do this only after Verify passes, ideally after a day of normal running:
+
+```bash
+rm -r "$OLD_CONFIG" "$OLD_LOG"
+rm "$BAK"
+```
+
+## Rollback
+
+Use this if any Verify step fails before Clean up:
+
+```bash
+docker compose -f "$COMPOSE" stop hueshift2
+cp "$BAK" "$COMPOSE"
+docker compose -f "$COMPOSE" up -d hueshift2
+```
+
+The old directories were never changed, so hueshift2 comes back exactly as it was. Leave `$NEW` in place to investigate, or remove it before a retry so pre-check 3 passes.
