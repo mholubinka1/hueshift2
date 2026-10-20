@@ -56,6 +56,15 @@ volumes:
     - <LOCAL-LOG-LOCATION>:/log
 ```
 
+The sample `docker-compose.yml` follows the per-container layout used on the deployment host. The compose service name, the `container_name` and the host directory are all `hueshift2`:
+
+```
+/mnt/media/pi-media/containers/hueshift2/config   ->  /config   (hueshift2-config.json)
+/mnt/media/pi-media/containers/hueshift2/log      ->  /log      (hueshift2-<date>.log, hueshift2-debug-<date>.log)
+```
+
+These host paths are host-specific placeholders, so change them to suit your machine. See [ADR-0004](.agent-docs/adr/0004-pi-media-per-container-bind-mounts.md).
+
 ## Docker
 
 The latest image can be found on [DockerHub](https://hub.docker.com/repository/docker/mholubinka1/hueshift2/general) and a sample `docker-compose.yml` is included for deployment.
