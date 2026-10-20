@@ -91,5 +91,5 @@ across.
   (project name `docker`). Current hueshift2 mounts there are
   `/home/pi/.config/hueshift2:/config:rw` and `/home/pi/.log/hueshift2:/log:rw`.
 - The existing config file holds the bridge API key, and it must be copied, not
-  regenerated. If `/config/hueshift2-config.json` is missing at startup, the app writes a
-  default template with placeholder bridge credentials.
+  regenerated. If `/config/hueshift2-config.json` is missing at startup, the app generates
+  a fresh config with no API key, and the bridge has to be paired again.

@@ -5,7 +5,8 @@ hueshift2's config and logs used to live in the Pi user's home directory on the 
 reference `docker-compose.yml` had a different log path again (`/home/pi/hueshift2`).
 Every other single-container stack on the host (`bin-reminder`,
 `hypervolt-agile-scheduler`, `octopus-app`, `hive-app`, `home-monitoring-db`) keeps its
-state under one per-container root on the media drive. home-monitoring ADR-0015 and its
+state under one per-container root on the media drive. home-monitoring
+[ADR-0015](https://github.com/mholubinka1/home-monitoring/blob/main/.agent-docs/adr/0015-pi-media-per-container-bind-mounts.md) and its
 2026-10-02 amendment state the rule: **a container's compose service name, its
 `container_name` and its directory under `/mnt/media/pi-media/containers/` are the same
 string.**
@@ -38,5 +39,5 @@ the sibling stacks.
   repo's reference until it is updated. The cutover is in
   `deployments/CUTOVER_RUNBOOK.md`.
 - The config file holds the bridge API key, so the cutover must copy it. If the app
-  starts without `/config/hueshift2-config.json`, it writes a default template with
-  placeholder bridge credentials.
+  starts without `/config/hueshift2-config.json`, it generates a fresh config with no
+  API key, and the bridge has to be paired again.

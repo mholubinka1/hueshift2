@@ -24,13 +24,13 @@ The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` pr
 
 ## Pre-checks
 
-1. Confirm the media drive is mounted. If it isn't, the container would write into an empty directory on the SD card under `/mnt/media`:
+1. Confirm the media drive is mounted. fstab mounts it at `/mnt/media/pi-media`. If it isn't mounted, the container would write into an empty directory on the SD card:
 
    ```bash
-   mountpoint /mnt/media/pi-media || mountpoint /mnt/media
+   mountpoint /mnt/media/pi-media
    ```
 
-   One of them must print `is a mountpoint`.
+   It must print `/mnt/media/pi-media is a mountpoint`.
 
 2. Confirm the current mounts and that the config file exists:
 
@@ -80,7 +80,7 @@ The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` pr
    docker compose -f "$COMPOSE" config --format json | python3 -c "import json,sys; print([(v['source'], v['target']) for v in json.load(sys.stdin)['services']['hueshift2']['volumes']])"
    ```
 
-   The diff must show only the two hueshift2 volume lines. The last command must print the two new mounts.
+   The diff must show only the two hueshift2 volume lines. If it is empty, `sed` matched nothing: STOP and compare the live hueshift2 volume lines with the patterns above. The last command must print the two new mounts.
 
 4. Recreate the container on the new mounts:
 
@@ -100,11 +100,11 @@ The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` pr
 2. The existing config was loaded and not regenerated. At startup the app logs `Asserting ... Hue bridge settings` for an existing file and `Generating ...` for a missing one:
 
    ```bash
-   docker logs --since 5m hueshift2 2>&1 | grep -E 'Asserting|Generating|Bridge reachable|IP mismatch'
+   docker logs hueshift2 2>&1 | grep -E 'Asserting|Generating|does not exist|Bridge reachable|IP mismatch'
    cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config unchanged"
    ```
 
-   Expected: `Asserting /config/hueshift2-config.json ...` and `Bridge reachable at ...`, with no `Generating`, then `config unchanged`. If the bridge IP changed since the last start, the app logs `IP mismatch` and rewrites only the IP. That is normal, and the `cmp` will then differ.
+   Expected: `Asserting /config/hueshift2-config.json ...` and `Bridge reachable at ...`, with no `Generating` or `does not exist`, then `config unchanged`. (`docker logs` covers only the recreated container, so these are this start's lines.) If the bridge IP changed since the last start, the app logs `IP mismatch` and rewrites only the IP. That is normal, and the `cmp` will then differ.
 
 3. New log lines are appearing on the media drive. Wait a minute after step 4, then:
 
@@ -120,21 +120,31 @@ The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` pr
 
 ## Clean up
 
-Do this only after Verify passes, ideally after a day of normal running:
+Do this only after Verify passes, ideally after a day of normal running. This is probably a new shell, so declare the names again (see the top of this runbook) and check which backup will be removed:
+
+```bash
+COMPOSE=/home/pi/git/pi-desktop/docker/docker-compose.yml
+OLD_CONFIG=/home/pi/.config/hueshift2
+OLD_LOG=/home/pi/.log/hueshift2
+ls "$COMPOSE".bak-*
+```
+
+Then remove the old directories and the compose backup from this cutover:
 
 ```bash
 rm -r "$OLD_CONFIG" "$OLD_LOG"
-rm "$BAK"
+rm "$COMPOSE".bak-<timestamp>
 ```
 
 ## Rollback
 
-Use this if any Verify step fails before Clean up:
+Use this if any Verify step fails before Clean up. In a new shell, declare the names from the top of this runbook first. `BAK` is the backup taken in Procedure step 3, which `ls "$COMPOSE".bak-*` lists:
 
 ```bash
+BAK="$COMPOSE".bak-<timestamp>
 docker compose -f "$COMPOSE" stop hueshift2
 cp "$BAK" "$COMPOSE"
 docker compose -f "$COMPOSE" up -d hueshift2
 ```
 
-The old directories were never changed, so hueshift2 comes back exactly as it was. Leave `$NEW` in place to investigate, or remove it before a retry so pre-check 3 passes.
+The old directories were never changed, so hueshift2 comes back with its pre-cutover config and logs. Anything written after the cutover stays only in `$NEW`: log lines, and any bridge-IP rewrite in the config. Copy it back if you need it. Leave `$NEW` in place to investigate, or remove it before a retry so pre-check 3 passes.

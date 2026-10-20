@@ -46,7 +46,7 @@ A `deployments/CUTOVER_RUNBOOK.md` that moves the running hueshift2 container on
 ### Acceptance criteria
 
 - [ ] The runbook checks that `/mnt/media` is mounted before creating anything under it
-- [ ] The runbook copies the config and logs, keeping ownership and permissions, and keeps the old directories until verification passes
+- [ ] The runbook copies the config and logs with plain `cp`, because the media drive does not keep ownership or permissions, and keeps the old directories until verification passes
 - [ ] The runbook includes rollback steps
 - [ ] Given the live hueshift2 on `/home/pi` paths, when the runbook is followed, then `docker inspect hueshift2` shows the new mounts
 - [ ] The app loads the existing config after cutover: the bridge key is intact and no fresh default is written
