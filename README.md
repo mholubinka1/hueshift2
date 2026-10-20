@@ -63,7 +63,7 @@ The sample `docker-compose.yml` follows the per-container layout used on the dep
 /mnt/media/pi-media/containers/hueshift2/log      ->  /log      (hueshift2-<date>.log, hueshift2-debug-<date>.log)
 ```
 
-These host paths are host-specific placeholders, so change them to suit your machine. See [ADR-0004](.agent-docs/adr/0004-pi-media-per-container-bind-mounts.md).
+These host paths are host-specific placeholders, so change them to suit your machine. Create both directories before the first `docker compose up`. Otherwise Docker creates them owned by root. See [ADR-0004](.agent-docs/adr/0004-pi-media-per-container-bind-mounts.md).
 
 ## Docker
 

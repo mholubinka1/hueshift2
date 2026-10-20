@@ -42,3 +42,8 @@ the sibling stacks.
 - The config file holds the bridge API key, so the cutover must copy it. If the app
   starts without `/config/hueshift2-config.json`, it generates a fresh config with no
   API key, and the bridge has to be paired again.
+- The bridge API key moves from the SD card, where the file had its own owner and mode,
+  onto the NTFS media drive. That drive's fstab mask sets a single mode for every file,
+  and Samba exports it. Anyone who can read the `pi-media` share can therefore read the
+  key, unless the fstab `fmask` or the share ACL rules that out. Confirm both are
+  acceptable when cutting over.
