@@ -57,6 +57,8 @@ The media drive (NTFS) does not keep timestamps or permissions, so use plain `cp
    docker compose -f "$COMPOSE" stop hueshift2
    ```
 
+   From here on, any STOP in steps 2–4 leaves hueshift2 down. To bring it back on the old paths, run [Rollback](#rollback). It is safe even if the compose file was never edited. Then run `rm -r "$NEW"` so that pre-check 3 passes on a retry.
+
 2. Create the directories and copy the config and logs. The old directories stay in place as the rollback:
 
    ```bash
@@ -141,7 +143,7 @@ rm "$BAK"
 
 ## Rollback
 
-Use this if any Verify step fails before Clean up. In a new shell, declare the names from the top of this runbook first. Rollback reverses only the two hueshift2 volume lines, so any other edits made to the live compose since the backup are kept:
+Use this if a Procedure step stops or any Verify step fails before Clean up. In a new shell, declare the names from the top of this runbook first. Rollback reverses only the two hueshift2 volume lines, so any other edits made to the live compose since the backup are kept:
 
 ```bash
 docker compose -f "$COMPOSE" stop hueshift2

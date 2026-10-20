@@ -3,9 +3,10 @@
 hueshift2's config and logs used to live in the Pi user's home directory on the SD card:
 `/home/pi/.config/hueshift2` and `/home/pi/.log/hueshift2` in the deployed compose. The
 reference `docker-compose.yml` had a different log path again (`/home/pi/hueshift2`).
-Every other single-container stack on the host (`bin-reminder`,
-`hypervolt-agile-scheduler`, `octopus-app`, `hive-app`, `home-monitoring-db`) keeps its
-state under one per-container root on the media drive. home-monitoring
+The other single-container stacks on the host (`bin-reminder`,
+`hypervolt-agile-scheduler`, `octopus-app`, `hive-app`, `home-monitoring-db`) keep their
+state under one per-container root on the media drive, named after the
+`container_name`. bin-reminder's compose service is still `bromley-bin-reminder`. home-monitoring
 [ADR-0015](https://github.com/mholubinka1/home-monitoring/blob/main/.agent-docs/adr/0015-pi-media-per-container-bind-mounts.md) and its
 2026-10-02 amendment state the rule: **a container's compose service name, its
 `container_name` and its directory under `/mnt/media/pi-media/containers/` are the same
