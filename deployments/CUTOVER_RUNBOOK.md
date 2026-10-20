@@ -133,7 +133,14 @@ Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, p
 4. Commit the compose change in the `pi-desktop` repo, staging only the hueshift2 hunk (`add -p`), and record the commit for Rollback:
 
    ```bash
+   git -C /home/pi/git/pi-desktop diff --cached --quiet && echo "staging area empty" || echo "STOP: pi-desktop already has staged changes; commit or unstage them first"
    git -C /home/pi/git/pi-desktop add -p docker/docker-compose.yml
+   git -C /home/pi/git/pi-desktop diff --cached
+   ```
+
+   Commit only if `staging area empty` printed and the staged diff is exactly the two hueshift2 volume lines:
+
+   ```bash
    git -C /home/pi/git/pi-desktop commit -m "hueshift2: mount config and logs under pi-media/containers/hueshift2"
    SHA=$(git -C /home/pi/git/pi-desktop rev-parse HEAD); git -C /home/pi/git/pi-desktop show --stat "$SHA"
    ```
