@@ -74,8 +74,8 @@ Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, p
    mkdir -p "$NEW/config" "$NEW/log"
    sudo cp -r "$OLD_CONFIG/." "$NEW/config/"   # the container runs as root, so files it wrote may be root-only
    sudo cp -r "$OLD_LOG/." "$NEW/log/"
-   cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config copied intact"
-   diff -rq "$OLD_LOG" "$NEW/log" && echo "logs copied intact"
+   sudo cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config copied intact"
+   sudo diff -rq "$OLD_LOG" "$NEW/log" && echo "logs copied intact"
    ls -la "$NEW/config" "$NEW/log"
    ```
 
@@ -115,7 +115,7 @@ Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, p
 
    ```bash
    docker logs hueshift2 2>&1 | grep -E 'Asserting|Generating|does not exist|Bridge reachable|IP mismatch'
-   cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config unchanged"
+   sudo cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config unchanged"
    ```
 
    Pass: `Asserting /config/hueshift2-config.json ...` with no `Generating` or `does not exist`, then `config unchanged`. You will usually also see `Bridge reachable at ...`, but if the bridge didn't answer at that moment the app runs discovery instead, and that is not a failure. (`docker logs` covers only the recreated container, so these are this start's lines.) A `cmp` difference is expected only if the logs also show `IP mismatch` (the app rewrote the bridge IP) or a fresh bridge pairing. In any other case, treat it as a failure and go to Rollback.
@@ -175,6 +175,8 @@ Use this if a Procedure step stops or any Verify step fails before Clean up. In 
      ```bash
      git -C /home/pi/git/pi-desktop revert "$SHA"   # the value printed in Verify step 4
      ```
+
+     If the revert refuses because of other local changes in the compose file, use the `sed` option below instead, and then commit that reversal in `pi-desktop`.
 
    - Otherwise, reverse the two lines in place:
 
