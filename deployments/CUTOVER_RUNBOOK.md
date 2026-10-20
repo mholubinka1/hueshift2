@@ -51,7 +51,7 @@ The media drive (NTFS) does not keep timestamps or permissions, so use plain `cp
 
    ```bash
    grep pi-media /etc/fstab
-   testparm -s 2>/dev/null | sed -n '/^\[/h; /path = \/mnt\/media\/pi-media/{x;p;x;p}'
+   testparm -s 2>/dev/null | grep -B3 -A12 'path = /mnt/media/pi-media'
    ```
 
    Look at the `fmask`/`umask` in the fstab line and the users the share allows. Decide that it is acceptable for them to read the key before continuing.
@@ -152,18 +152,36 @@ rm "$BAK"
 
 ## Rollback
 
-Use this if a Procedure step stops or any Verify step fails before Clean up. In a new shell, declare the names from the top of this runbook first. Rollback reverses only the two hueshift2 volume lines, so any other edits made to the live compose since the backup are kept:
+Use this if a Procedure step stops or any Verify step fails before Clean up. In a new shell, declare the names from the top of this runbook first. Rollback reverses only the two hueshift2 volume lines, so any other edits made to the live compose since the backup are kept.
 
-```bash
-docker compose -f "$COMPOSE" stop hueshift2
-sed -i \
-  -e 's#- /mnt/media/pi-media/containers/hueshift2/config:/config#- /home/pi/.config/hueshift2:/config:rw#' \
-  -e 's#- /mnt/media/pi-media/containers/hueshift2/log:/log#- /home/pi/.log/hueshift2:/log:rw#' \
-  "$COMPOSE"
-docker compose -f "$COMPOSE" up -d hueshift2
-docker inspect hueshift2 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
-```
+1. Stop the container:
 
-If Verify step 4 already committed the compose change in `pi-desktop`, revert that commit as well (`git -C /home/pi/git/pi-desktop revert <sha>`). Otherwise the next pull or checkout brings the new mounts back.
+   ```bash
+   docker compose -f "$COMPOSE" stop hueshift2
+   ```
+
+2. Put the old volume lines back. Use **one** of these:
+
+   - If Verify step 4 already committed the compose change in `pi-desktop`, revert that commit. Then the repo and the live file agree, and a later pull won't bring the new mounts back:
+
+     ```bash
+     git -C /home/pi/git/pi-desktop revert <sha>
+     ```
+
+   - Otherwise, reverse the two lines in place:
+
+     ```bash
+     sed -i \
+       -e 's#- /mnt/media/pi-media/containers/hueshift2/config:/config#- /home/pi/.config/hueshift2:/config:rw#' \
+       -e 's#- /mnt/media/pi-media/containers/hueshift2/log:/log#- /home/pi/.log/hueshift2:/log:rw#' \
+       "$COMPOSE"
+     ```
+
+3. Recreate the container and confirm it is back on the old mounts:
+
+   ```bash
+   docker compose -f "$COMPOSE" up -d hueshift2
+   docker inspect hueshift2 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
+   ```
 
 The old directories were never changed, so hueshift2 comes back with its pre-cutover config and logs. Anything written after the cutover stays only in `$NEW`: log lines, and any bridge-IP rewrite in the config. Copy it back if you need it. Leave `$NEW` in place to investigate, or remove it before a retry so pre-check 3 passes.
