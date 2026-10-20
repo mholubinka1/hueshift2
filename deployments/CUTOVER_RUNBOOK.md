@@ -20,7 +20,7 @@ NEW=/mnt/media/pi-media/containers/hueshift2
 
 The live compose file is in the separate `pi-desktop` repo and may hold uncommitted edits. Every edit below is a minimal, anchored change made after a backup. Never replace the file wholesale.
 
-The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` print "Operation not permitted" warnings, but the copy or edit still happens, so check the result. Use plain `cp`. The drive is mounted world-writable, so the container can write `log/` without a `chown`.
+The media drive (NTFS) does not keep timestamps or permissions, so use plain `cp` when copying onto it. If you use `cp -p`, it prints "Operation not permitted" warnings there, but the copy still happens. The compose file is on the SD card, so editing it raises no such warnings. The image sets no `USER`, so the container runs as root and can write `log/` without a `chown`.
 
 ## Pre-checks
 
@@ -47,6 +47,8 @@ The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` pr
    [ ! -e "$NEW" ] && echo "preconditions OK" || echo "STOP: $NEW already exists; inspect it before going on"
    ```
 
+   Do not continue to the Procedure unless this printed `preconditions OK`.
+
 ## Procedure
 
 1. Stop the container, so nothing writes while the files are copied:
@@ -62,10 +64,11 @@ The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` pr
    cp -r "$OLD_CONFIG/." "$NEW/config/"
    cp -r "$OLD_LOG/." "$NEW/log/"
    cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config copied intact"
+   diff -rq "$OLD_LOG" "$NEW/log" && echo "logs copied intact"
    ls -la "$NEW/config" "$NEW/log"
    ```
 
-   Stop if `config copied intact` does not print.
+   Stop if `config copied intact` or `logs copied intact` does not print.
 
 3. Edit the live compose file. Back it up, swap the two hueshift2 volume lines, then review the diff and validate:
 
@@ -104,9 +107,9 @@ The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` pr
    cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config unchanged"
    ```
 
-   Expected: `Asserting /config/hueshift2-config.json ...` and `Bridge reachable at ...`, with no `Generating` or `does not exist`, then `config unchanged`. (`docker logs` covers only the recreated container, so these are this start's lines.) If the bridge IP changed since the last start, the app logs `IP mismatch` and rewrites only the IP. That is normal, and the `cmp` will then differ.
+   Pass: `Asserting /config/hueshift2-config.json ...` with no `Generating` or `does not exist`, then `config unchanged`. You will usually also see `Bridge reachable at ...`, but if the bridge didn't answer at that moment the app runs discovery instead, and that is not a failure. (`docker logs` covers only the recreated container, so these are this start's lines.) If the bridge IP changed since the last start, the app logs `IP mismatch` and rewrites only the IP. That is normal, and the `cmp` will then differ.
 
-3. New log lines are appearing on the media drive. Wait a minute after step 4, then:
+3. New log lines are appearing on the media drive. Wait a minute after Procedure step 4, then:
 
    ```bash
    ls -lt "$NEW/log" | head -3
@@ -114,7 +117,7 @@ The media drive does not keep timestamps or permissions. `cp -p` and `sed -i` pr
    docker logs --since 5m hueshift2 2>&1 | tail -10
    ```
 
-   The newest log file has entries timestamped after step 4, and they show no config or bridge errors.
+   The newest log file has entries timestamped after Procedure step 4, and they show no config or bridge errors.
 
 4. Commit the compose change in the `pi-desktop` repo. Commit the hueshift2 hunk only, if the file has other uncommitted edits.
 
@@ -126,25 +129,30 @@ Do this only after Verify passes, ideally after a day of normal running. This is
 COMPOSE=/home/pi/git/pi-desktop/docker/docker-compose.yml
 OLD_CONFIG=/home/pi/.config/hueshift2
 OLD_LOG=/home/pi/.log/hueshift2
-ls "$COMPOSE".bak-*
+BAK=$(ls "$COMPOSE".bak-* | tail -1); echo "$BAK"
 ```
 
-Then remove the old directories and the compose backup from this cutover:
+Check that `$BAK` is the backup from this cutover (the newest one), then remove the old directories and that backup:
 
 ```bash
 rm -r "$OLD_CONFIG" "$OLD_LOG"
-rm "$COMPOSE".bak-<timestamp>
+rm "$BAK"
 ```
 
 ## Rollback
 
-Use this if any Verify step fails before Clean up. In a new shell, declare the names from the top of this runbook first. `BAK` is the backup taken in Procedure step 3, which `ls "$COMPOSE".bak-*` lists:
+Use this if any Verify step fails before Clean up. In a new shell, declare the names from the top of this runbook first. Rollback reverses only the two hueshift2 volume lines, so any other edits made to the live compose since the backup are kept:
 
 ```bash
-BAK="$COMPOSE".bak-<timestamp>
 docker compose -f "$COMPOSE" stop hueshift2
-cp "$BAK" "$COMPOSE"
+sed -i \
+  -e 's#- /mnt/media/pi-media/containers/hueshift2/config:/config#- /home/pi/.config/hueshift2:/config:rw#' \
+  -e 's#- /mnt/media/pi-media/containers/hueshift2/log:/log#- /home/pi/.log/hueshift2:/log:rw#' \
+  "$COMPOSE"
 docker compose -f "$COMPOSE" up -d hueshift2
+docker inspect hueshift2 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
 ```
+
+If Verify step 4 already committed the compose change in `pi-desktop`, revert that commit as well (`git -C /home/pi/git/pi-desktop revert <sha>`). Otherwise the next pull or checkout brings the new mounts back.
 
 The old directories were never changed, so hueshift2 comes back with its pre-cutover config and logs. Anything written after the cutover stays only in `$NEW`: log lines, and any bridge-IP rewrite in the config. Copy it back if you need it. Leave `$NEW` in place to investigate, or remove it before a retry so pre-check 3 passes.
