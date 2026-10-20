@@ -72,8 +72,8 @@ Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, p
 
    ```bash
    mkdir -p "$NEW/config" "$NEW/log"
-   cp -r "$OLD_CONFIG/." "$NEW/config/"
-   cp -r "$OLD_LOG/." "$NEW/log/"
+   sudo cp -r "$OLD_CONFIG/." "$NEW/config/"   # the container runs as root, so files it wrote may be root-only
+   sudo cp -r "$OLD_LOG/." "$NEW/log/"
    cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config copied intact"
    diff -rq "$OLD_LOG" "$NEW/log" && echo "logs copied intact"
    ls -la "$NEW/config" "$NEW/log"
@@ -84,7 +84,7 @@ Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, p
 3. Edit the live compose file. Back it up, swap the two hueshift2 volume lines, then review the diff and validate:
 
    ```bash
-   BAK="$COMPOSE.bak-$(date +%Y%m%d%H%M%S)"
+   BAK=~/hueshift2-compose.bak-$(date +%Y%m%d%H%M%S)   # outside the pi-desktop repo, so it can't be committed
    cp "$COMPOSE" "$BAK"
    sed -i \
      -e 's#- /home/pi/.config/hueshift2:/config:rw#- /mnt/media/pi-media/containers/hueshift2/config:/config#' \
@@ -130,11 +130,15 @@ Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, p
 
    The newest log file has entries timestamped after Procedure step 4, and they show no config or bridge errors.
 
-4. Commit the compose change in the `pi-desktop` repo. If the file has other uncommitted edits, commit only the hueshift2 hunk. Then record the commit for Rollback:
+4. Commit the compose change in the `pi-desktop` repo, staging only the hueshift2 hunk (`add -p`), and record the commit for Rollback:
 
    ```bash
-   SHA=$(git -C /home/pi/git/pi-desktop rev-parse HEAD); echo "$SHA"
+   git -C /home/pi/git/pi-desktop add -p docker/docker-compose.yml
+   git -C /home/pi/git/pi-desktop commit -m "hueshift2: mount config and logs under pi-media/containers/hueshift2"
+   SHA=$(git -C /home/pi/git/pi-desktop rev-parse HEAD); git -C /home/pi/git/pi-desktop show --stat "$SHA"
    ```
+
+   The `show --stat` must list only `docker/docker-compose.yml`.
 
 ## Clean up
 
@@ -144,13 +148,13 @@ Do this only after Verify passes, ideally after a day of normal running. This is
 COMPOSE=/home/pi/git/pi-desktop/docker/docker-compose.yml
 OLD_CONFIG=/home/pi/.config/hueshift2
 OLD_LOG=/home/pi/.log/hueshift2
-BAK=$(ls "$COMPOSE".bak-* | tail -1); echo "$BAK"
+BAK=$(ls ~/hueshift2-compose.bak-* | tail -1); echo "$BAK"
 ```
 
 Check that `$BAK` is the backup from this cutover (the newest one), then remove the old directories and that backup:
 
 ```bash
-rm -r "$OLD_CONFIG" "$OLD_LOG"
+sudo rm -r "$OLD_CONFIG" "$OLD_LOG"
 rm "$BAK"
 ```
 
