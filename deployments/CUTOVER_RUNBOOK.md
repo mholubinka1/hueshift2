@@ -51,10 +51,10 @@ The media drive (NTFS) does not keep timestamps or permissions, so use plain `cp
 
    ```bash
    grep pi-media /etc/fstab
-   testparm -s 2>/dev/null | grep -B3 -A12 'path = /mnt/media/pi-media'
+   testparm -s | grep -B3 -A12 'path *= */mnt/media'
    ```
 
-   Look at the `fmask`/`umask` in the fstab line and the users the share allows. Decide that it is acceptable for them to read the key before continuing.
+   Look at the `fmask`/`umask` in the fstab line and the users the share allows. If the `testparm` line prints nothing, empty output is not a pass: read the full `testparm -s` output for any share that covers `/mnt/media/pi-media`. Decide that it is acceptable for them to read the key before continuing.
 
 Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, pre-check 3 printed `preconditions OK`, and pre-check 4 is accepted.
 
@@ -130,7 +130,11 @@ Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, p
 
    The newest log file has entries timestamped after Procedure step 4, and they show no config or bridge errors.
 
-4. Commit the compose change in the `pi-desktop` repo. Commit the hueshift2 hunk only, if the file has other uncommitted edits.
+4. Commit the compose change in the `pi-desktop` repo. If the file has other uncommitted edits, commit only the hueshift2 hunk. Then record the commit for Rollback:
+
+   ```bash
+   SHA=$(git -C /home/pi/git/pi-desktop rev-parse HEAD); echo "$SHA"
+   ```
 
 ## Clean up
 
@@ -165,7 +169,7 @@ Use this if a Procedure step stops or any Verify step fails before Clean up. In 
    - If Verify step 4 already committed the compose change in `pi-desktop`, revert that commit. Then the repo and the live file agree, and a later pull won't bring the new mounts back:
 
      ```bash
-     git -C /home/pi/git/pi-desktop revert <sha>
+     git -C /home/pi/git/pi-desktop revert "$SHA"   # the value printed in Verify step 4
      ```
 
    - Otherwise, reverse the two lines in place:
