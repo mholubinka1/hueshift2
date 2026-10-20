@@ -1,6 +1,6 @@
 # Issues: chore-move-hueshift2-config-logs-pi-media-layout
 
-> Repo work complete — PR ready to merge. #435's live-Pi criteria are checked off when the runbook is executed after merge.
+> Work complete. PR #436 merged; cutover executed on the Pi 2026-10-20 (pi-desktop 9fe9a61).
 
 ## Reference compose, README and ADR use the pi-media per-container layout
 
@@ -50,9 +50,9 @@ A `deployments/CUTOVER_RUNBOOK.md` that moves the running hueshift2 container on
 - [x] The runbook checks that `/mnt/media` is mounted before creating anything under it
 - [x] The runbook copies the config and logs with plain `cp`, because the media drive does not keep ownership or permissions, and keeps the old directories until verification passes
 - [x] The runbook includes rollback steps
-- [ ] Given the live hueshift2 on `/home/pi` paths, when the runbook is followed, then `docker inspect hueshift2` shows the new mounts
-- [ ] The app loads the existing config after cutover: the bridge key is intact and no fresh default is written
-- [ ] New log lines appear under `/mnt/media/pi-media/containers/hueshift2/log/`
-- [ ] The `pi-desktop` `docker/docker-compose.yml` hueshift2 volumes match the reference compose
+- [x] Given the live hueshift2 on `/home/pi` paths, when the runbook is followed, then `docker inspect hueshift2` shows the new mounts
+- [x] The app loads the existing config after cutover: the bridge key is intact and no fresh default is written
+- [x] New log lines appear under `/mnt/media/pi-media/containers/hueshift2/log/`
+- [x] The `pi-desktop` `docker/docker-compose.yml` hueshift2 volumes match the reference compose
 
 ---
