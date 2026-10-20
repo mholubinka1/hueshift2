@@ -24,6 +24,6 @@ services:
     environment:
       TZ: 'Europe/London'
     volumes:
-      - /home/pi/.config/hueshift2:/config
-      - /home/pi/hueshift2:/log
+      - /mnt/media/pi-media/containers/hueshift2/config:/config
+      - /mnt/media/pi-media/containers/hueshift2/log:/log
     restart: unless-stopped
