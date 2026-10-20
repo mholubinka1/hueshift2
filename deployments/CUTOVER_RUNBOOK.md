@@ -47,7 +47,16 @@ The media drive (NTFS) does not keep timestamps or permissions, so use plain `cp
    [ ! -e "$NEW" ] && echo "preconditions OK" || echo "STOP: $NEW already exists; inspect it before going on"
    ```
 
-   Do not continue to the Procedure unless this printed `preconditions OK`.
+4. Check who will be able to read the bridge API key. The config moves onto the NTFS drive, where the fstab mask sets a single mode for every file, and Samba exports the drive ([ADR-0004](../.agent-docs/adr/0004-pi-media-per-container-bind-mounts.md)):
+
+   ```bash
+   grep pi-media /etc/fstab
+   testparm -s 2>/dev/null | sed -n '/^\[/h; /path = \/mnt\/media\/pi-media/{x;p;x;p}'
+   ```
+
+   Look at the `fmask`/`umask` in the fstab line and the users the share allows. Decide that it is acceptable for them to read the key before continuing.
+
+Do not continue to the Procedure unless pre-check 1 printed `is a mountpoint`, pre-check 3 printed `preconditions OK`, and pre-check 4 is accepted.
 
 ## Procedure
 
@@ -109,7 +118,7 @@ The media drive (NTFS) does not keep timestamps or permissions, so use plain `cp
    cmp "$OLD_CONFIG/hueshift2-config.json" "$NEW/config/hueshift2-config.json" && echo "config unchanged"
    ```
 
-   Pass: `Asserting /config/hueshift2-config.json ...` with no `Generating` or `does not exist`, then `config unchanged`. You will usually also see `Bridge reachable at ...`, but if the bridge didn't answer at that moment the app runs discovery instead, and that is not a failure. (`docker logs` covers only the recreated container, so these are this start's lines.) If the bridge IP changed since the last start, the app logs `IP mismatch` and rewrites only the IP. That is normal, and the `cmp` will then differ.
+   Pass: `Asserting /config/hueshift2-config.json ...` with no `Generating` or `does not exist`, then `config unchanged`. You will usually also see `Bridge reachable at ...`, but if the bridge didn't answer at that moment the app runs discovery instead, and that is not a failure. (`docker logs` covers only the recreated container, so these are this start's lines.) A `cmp` difference is expected only if the logs also show `IP mismatch` (the app rewrote the bridge IP) or a fresh bridge pairing. In any other case, treat it as a failure and go to Rollback.
 
 3. New log lines are appearing on the media drive. Wait a minute after Procedure step 4, then:
 
